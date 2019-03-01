@@ -38,3 +38,4 @@ def printDictTree(dicts, level = 0):
 
 h1 = {1:"one", 2:"two", 3:"three", 4:{"a":"b", 5:{"qw":"er", "as":"zx"}}}
 printDictTree(h1)
+print(len(h1))
