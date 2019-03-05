@@ -28,6 +28,19 @@ def countWordsCount():
 	for i in range(len(a)):
 		print(a[i])
 
+def dictSortExample():
+	rmp = {}
+	rmp["10.5"] = 30
+	rmp["10.7"] = 40
+	rmp["10.1"] = 90
+	rmp["10.3"] = 20
+	print(rmp)
+	lst = rmp.items()
+	print(lst)
+	#sortKey = lambda key, value : key
+	#lst.sort(key = lambda key, val: key)
+	print(type(lst))
+
 def printDictTree(dicts, level = 0):
 	for item in dicts.items():
 		if type(item[1]) is not dict:
@@ -36,6 +49,13 @@ def printDictTree(dicts, level = 0):
 			print("  "*level, item[0], ":")
 			printDictTree(item[1], level + 1)
 
-h1 = {1:"one", 2:"two", 3:"three", 4:{"a":"b", 5:{"qw":"er", "as":"zx"}}}
-printDictTree(h1)
-print(len(h1))
+# h1 = {1:"one", 2:"two", 3:"three", 4:{"a":"b", 5:{"qw":"er", "as":"zx"}}}
+# printDictTree(h1)
+# print(len(h1))
+
+# a = 2
+# b = 3
+# f = lambda a, b : int(math.pow(a, b))
+# print(a, b, f(a, b))
+
+dictSortExample()
