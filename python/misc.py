@@ -44,6 +44,11 @@ def printDict():
 	dic = {'John':1200, 'Paul':1000, 'Jones':1850, 'Dorothy': 950}
 	print("\n".join(["%s = %d" % (name, salary) for name, salary in dic.items()]))
 
+def printDict2(tName, **args):
+	print(tName, ":")
+	for key, val in args.items():
+		print("%s = %s" % (key, val))
+
 def printDictTree(dicts, level = 0):
 	for item in dicts.items():
 		if type(item[1]) is not dict:
@@ -51,6 +56,12 @@ def printDictTree(dicts, level = 0):
 		else:
 			print("  "*level, item[0], ":")
 			printDictTree(item[1], level + 1)
+
+def sumUnlim(n, *args):
+	res = n
+	for arg in args:
+		res += arg
+	return res
 
 # h1 = {1:"one", 2:"two", 3:"three", 4:{"a":"b", 5:{"qw":"er", "as":"zx"}}}
 # printDictTree(h1)
@@ -61,4 +72,5 @@ def printDictTree(dicts, level = 0):
 # f = lambda a, b : int(math.pow(a, b))
 # print(a, b, f(a, b))
 
-printDict()
+dict1 = {"key1": 3, "key2": 4, "key5": "test"}
+printDict2("Dict", **dict1)
