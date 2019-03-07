@@ -1,5 +1,6 @@
 import math
 import json
+import testClass
 
 def inputInt(valueName):
 	while True:
@@ -72,5 +73,8 @@ def sumUnlim(n, *args):
 # f = lambda a, b : int(math.pow(a, b))
 # print(a, b, f(a, b))
 
-dict1 = {"key1": 3, "key2": 4, "key5": "test"}
-printDict2("Dict", **dict1)
+# dict1 = {"key1": 3, "key2": 4, "key5": "test"}
+# printDict2("Dict", **dict1)
+
+tc = testClass.testClass()
+tc.printStartMoment()
