@@ -35,11 +35,14 @@ def dictSortExample():
 	rmp["10.1"] = 90
 	rmp["10.3"] = 20
 	print(rmp)
+	print(sorted(rmp, key = rmp.__getitem__))
 	lst = rmp.items()
 	print(lst)
-	#sortKey = lambda key, value : key
-	#lst.sort(key = lambda key, val: key)
-	print(type(lst))
+	print(sorted(lst, key = lambda keySort: keySort[1]))
+
+def printDict():
+	dic = {'John':1200, 'Paul':1000, 'Jones':1850, 'Dorothy': 950}
+	print("\n".join(["%s = %d" % (name, salary) for name, salary in dic.items()]))
 
 def printDictTree(dicts, level = 0):
 	for item in dicts.items():
@@ -58,4 +61,4 @@ def printDictTree(dicts, level = 0):
 # f = lambda a, b : int(math.pow(a, b))
 # print(a, b, f(a, b))
 
-dictSortExample()
+printDict()
