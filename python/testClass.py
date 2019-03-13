@@ -1,7 +1,10 @@
 import datetime
 
 class testClass:
-    dateCreated = datetime.datetime.now()
+    dateCreated = None
+
+    def __init__(self):
+        self.dateCreated = datetime.datetime.now()
 
     def printStartMoment(self):
         print(self.dateCreated)

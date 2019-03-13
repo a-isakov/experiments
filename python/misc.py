@@ -1,6 +1,7 @@
 import math
 import json
 import testClass
+import time
 
 def inputInt(valueName):
 	while True:
@@ -78,3 +79,6 @@ def sumUnlim(n, *args):
 
 tc = testClass.testClass()
 tc.printStartMoment()
+#time.sleep(1)
+tc2 = testClass.testClass()
+tc2.printStartMoment()
