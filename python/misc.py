@@ -82,3 +82,6 @@ tc.printStartMoment()
 #time.sleep(1)
 tc2 = testClass.testClass()
 tc2.printStartMoment()
+
+for i in range(256):
+	print(i, chr(i))
