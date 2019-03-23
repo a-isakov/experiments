@@ -4,8 +4,10 @@
 #include "pch.h"
 #include <iostream>
 #include <unordered_map>
+#include <map>
 #include <string>
 #include <vector>
+#include "CLine.h"
 
 int main()
 {
@@ -28,6 +30,9 @@ int main()
 	{
 		vArray[i] = std::rand();
 	}
+
+	std::map<std::wstring, int> anotherMap;
+	//anotherMap = testMap;
 
 	int q = 1;
 }
