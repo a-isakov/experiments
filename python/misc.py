@@ -85,11 +85,11 @@ def printbc(text, r, g, b):
 # dict1 = {"key1": 3, "key2": 4, "key5": "test"}
 # printDict2("Dict", **dict1)
 
-# tc = testClass.testClass()
-# tc.printStartMoment()
-# #time.sleep(1)
-# tc2 = testClass.testClass()
-# tc2.printStartMoment()
-for blue in range(256):
-	print(blue)
-	printfc("Green", blue, blue, blue)
+tc = testClass.testClass()
+tc.printStartMoment()
+#time.sleep(1)
+tc2 = testClass.testClass()
+tc2.printStartMoment()
+
+for i in range(256):
+	print(i, chr(i))
