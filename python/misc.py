@@ -65,6 +65,14 @@ def sumUnlim(n, *args):
 		res += arg
 	return res
 
+# Set foreground color in RGB
+def printfc(text, r, g, b):
+	print('\x1b[38;2;%d;%d;%dm%s\x1b[0m' % (r, g, b, text))
+
+# Set background color in RGB
+def printbc(text, r, g, b):
+	print('\x1b[48;2;%d;%d;%dm%s\x1b[0m' % (r, g, b, text))
+
 # h1 = {1:"one", 2:"two", 3:"three", 4:{"a":"b", 5:{"qw":"er", "as":"zx"}}}
 # printDictTree(h1)
 # print(len(h1))
@@ -77,8 +85,11 @@ def sumUnlim(n, *args):
 # dict1 = {"key1": 3, "key2": 4, "key5": "test"}
 # printDict2("Dict", **dict1)
 
-tc = testClass.testClass()
-tc.printStartMoment()
-#time.sleep(1)
-tc2 = testClass.testClass()
-tc2.printStartMoment()
+# tc = testClass.testClass()
+# tc.printStartMoment()
+# #time.sleep(1)
+# tc2 = testClass.testClass()
+# tc2.printStartMoment()
+for blue in range(256):
+	print(blue)
+	printfc("Green", blue, blue, blue)
