@@ -31,5 +31,10 @@ public class Main {
             if (fscan.allFriends())
                 System.out.print(logEntry.timeStamp);
         }
+
+        SuccessorWithDelete d = new SuccessorWithDelete(membersCount);
+        int s = d.getSuccessor(3);
+        d.remove(3);
+        s = d.getSuccessor(3);
     }
 }
