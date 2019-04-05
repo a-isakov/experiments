@@ -5,11 +5,15 @@ public class Percolation {
     private boolean[][] grid;
     private int gridSize;
     private int topVNodeIndex;
+    private int bottomVNodeIndex;
     private int openSites = 0;
     private WeightedQuickUnionUF uf;
 
     // create n-by-n grid, with all sites blocked
     public Percolation(int n) {
+        if (n <= 0)
+            throw new IllegalArgumentException("size should be positive");
+
         gridSize = n;
         grid = new boolean[gridSize][gridSize];
         for (int col = 0; col < gridSize; col++) {
@@ -19,8 +23,9 @@ public class Percolation {
         }
 
         // Add two virtual nodes
-        uf = new WeightedQuickUnionUF(gridSize*gridSize + 1);
+        uf = new WeightedQuickUnionUF(gridSize*gridSize + 2);
         topVNodeIndex = gridSize*gridSize;
+        bottomVNodeIndex = gridSize*gridSize + 1;
     }
 
     // open site (row, col) if it is not open already
@@ -34,6 +39,9 @@ public class Percolation {
         int index = calcIndex(row, col);
         if (row == 1) {
             uf.union(index, topVNodeIndex);
+        }
+        if (row == gridSize) {
+            uf.union(index, bottomVNodeIndex);
         }
 
         if (row > 1 && grid[row - 2][col - 1])
@@ -66,12 +74,13 @@ public class Percolation {
 
     // does the system percolate?
     public boolean percolates() {
-        for (int col = 1; col <= gridSize; col++) {
-            if (uf.connected(topVNodeIndex, calcIndex(gridSize, col)))
-                return true;
-        }
+        // for (int col = 1; col <= gridSize; col++) {
+        //     if (uf.connected(topVNodeIndex, calcIndex(gridSize, col)))
+        //         return true;
+        // }
+        // return false;
 
-        return false;
+        return uf.connected(topVNodeIndex, bottomVNodeIndex);
     }
 
     // public static void main(String[] args) {
