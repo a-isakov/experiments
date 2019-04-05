@@ -15,10 +15,6 @@ public class Percolation {
         if (n <= 0)
             throw new IllegalArgumentException("size should be positive");
 
-        long freeMemory = Runtime.getRuntime().freeMemory();
-        if (11*n*n + 128*n + 1024 >= freeMemory)
-            throw new IllegalArgumentException("too big n");
-
         gridSize = n;
         grid = new boolean[gridSize][gridSize];
         for (int col = 0; col < gridSize; col++) {
