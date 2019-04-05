@@ -37,21 +37,27 @@ public class Percolation {
         }
 
         int index = calcIndex(row, col);
+        if (row > 1 && grid[row - 2][col - 1]) {
+            uf.union(index, calcIndex(row - 1, col));
+        }
+        if (row < gridSize && grid[row][col - 1]) {
+            uf.union(index, calcIndex(row + 1, col));
+        }
+        if (col > 1 && grid[row - 1][col - 2]) {
+            uf.union(index, calcIndex(row, col - 1));
+        }
+        if (col < gridSize && grid[row - 1][col]) {
+            uf.union(index, calcIndex(row, col + 1));
+        }
+
         if (row == 1) {
             uf.union(index, topVNodeIndex);
         }
         if (row == gridSize) {
-            uf.union(index, bottomVNodeIndex);
+//            if (isFull(row, col)) {
+                uf.union(index, bottomVNodeIndex);
+//            }
         }
-
-        if (row > 1 && grid[row - 2][col - 1])
-            uf.union(index, calcIndex(row - 1, col));
-        if (row < gridSize && grid[row][col - 1])
-            uf.union(index, calcIndex(row + 1, col));
-        if (col > 1 && grid[row - 1][col - 2])
-            uf.union(index, calcIndex(row, col - 1));
-        if (col < gridSize && grid[row - 1][col])
-            uf.union(index, calcIndex(row, col + 1));
     }
 
     // is site (row, col) open?
