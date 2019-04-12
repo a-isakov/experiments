@@ -1,15 +1,37 @@
+import edu.princeton.cs.algs4.StdRandom;
 import java.util.Iterator;
 
 public class RandomizedQueue<Item> implements Iterable<Item> {
     private int size = 0;
-    private int head = 0;
-    private int tail = 0;
     private Item[] a;
 
-    // construct an empty randomized queue
-    public RandomizedQueue() {
+    private class RandomizedQueueIterator implements Iterator<Item> {
+        private int index = -1;
+        private int[] indexes;
 
+        public RandomizedQueueIterator() {
+            indexes = new int[size];
+            for (int i = 1; i < indexes.length; i++) {
+                indexes[i] = i;
+            }
+            StdRandom.shuffle(indexes);
+            index = 0;
+        }
+
+        public boolean hasNext() {
+            return index < indexes.length;
+        }
+
+        public Item next() {
+            if (index == -1)
+                throw new java.util.NoSuchElementException("Empty storage");
+
+            return a[indexes[index++]];
+        }
     }
+
+    // construct an empty randomized queue
+    public RandomizedQueue() { }
 
     // is the randomized queue empty?
     public boolean isEmpty() {
@@ -21,81 +43,73 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         return size;
     }
 
-    private void doubleSize() {
-        // TODO: double size and shift array
-        Item[] newArray = (Item[]) new Object[a.length*2];
-        int ind = tail + newArray.length/4 + 1;
-        if (ind > newArray.length)
-            ind--;
-        for (int i = tail; i > head; i--) {
-            newArray[ind] = a[i - 1];
-            ind--;
-        }
-        head = ind;
-        tail = ind + newArray.length - 1;
-        a = newArray;
-    }
-
     // add the item
     public void enqueue(final Item item) {
+        // Always add to tail
         if (isEmpty()) {
             a = (Item[]) new Object[1];
             a[0] = item;
-            head = 0;
-            tail = 0;
         }
         else {
-            if (head > 0) {
-                a[head--] = item;
-                // TODO: check how it works
-            }
-            else {
-                if (size > a.length/2) {
-                    // TODO: resize
-                    doubleSize();
-                    a[head--] = item;
+            if (size == a.length) {
+                // TODO: double size
+                Item[] newArray = (Item[]) new Object[a.length*2];
+                for (int i = 0; i < a.length; i++) {
+                    newArray[i] = a[i];
                 }
-                else
-                {
-                    // TODO: shift array
-                    int ind = tail + a.length/4 + 1;
-                    if (ind > a.length)
-                        ind--;
-                    for (int i = tail; i > head; i--) {
-                        a[ind] = a[i - 1];
-                        ind--;
-                    }
-                    head = ind;
-                    tail = ind + a.length - 1;
-                }
-                a[head--] = item;
+                a = newArray;
             }
+            a[size] = item;
         }
         size++;
     }
 
     // remove and return a random item
     public Item dequeue() {
-        return null;
+        if (size == 0)
+            throw new java.util.NoSuchElementException("Empty storage");
+
+        Item ret = null;
+        int randomIndex = size == 1 ? 0 : StdRandom.uniform(size);
+        if (randomIndex == size - 1) {
+            ret = a[randomIndex];
+            a[randomIndex] = null;
+        }
+        else {
+            // shift array left
+            ret = a[randomIndex];
+            for (int i = randomIndex; i < size - 1; i++) {
+                a[i] = a[i + 1];
+                a[i + 1] = null;
+            }
+        }
+        size--;
+        return ret;
     }
 
     // return a random item (but do not remove it)
     public Item sample() {
-        return null;
+        if (size == 0)
+            throw new java.util.NoSuchElementException("Empty storage");
+
+        return a[StdRandom.uniform(size)];
     }
 
     // return an independent iterator over items in random order
     public Iterator<Item> iterator() {
-        return null;
+        return new RandomizedQueueIterator();
     }
 
     // unit testing (optional)
-    public static void main(String[] args) {
-        RandomizedQueue<String> rq = new RandomizedQueue<String>();
-        rq.enqueue("1");
-        rq.enqueue("2");
-        rq.enqueue("3");
-        rq.enqueue("4");
-        rq.enqueue("5");
-    }
+    // public static void main(String[] args) {
+    //     RandomizedQueue<String> rq = new RandomizedQueue<String>();
+    //     rq.enqueue("1");
+    //     rq.enqueue("2");
+    //     rq.enqueue("3");
+    //     rq.enqueue("4");
+    //     rq.enqueue("5");
+    //     for (String s: rq) {
+    //         s = s.concat("-");
+    //     }
+    // }
 }
