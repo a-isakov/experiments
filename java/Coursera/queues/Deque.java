@@ -47,6 +47,9 @@ public class Deque<Item> implements Iterable<Item> {
 
     // add the item to the front
     public void addFirst(final Item item) {
+        if (item == null)
+            throw new IllegalArgumentException("Null argument");
+
         Node newFirst = new Node(item);
         if (isEmpty()) {
             first = newFirst;
@@ -62,6 +65,9 @@ public class Deque<Item> implements Iterable<Item> {
 
     // add the item to the end
     public void addLast(final Item item) {
+        if (item == null)
+            throw new IllegalArgumentException("Null argument");
+
         Node newLast = new Node(item);
         if (isEmpty()) {
             first = newLast;
@@ -115,22 +121,22 @@ public class Deque<Item> implements Iterable<Item> {
 
     // return an iterator over items in order from front to end
     public Iterator<Item> iterator() {
-        if (isEmpty())
-            throw new java.util.NoSuchElementException("Empty storage");
+        // if (isEmpty())
+        //     throw new java.util.NoSuchElementException("Empty storage");
 
         return new DequeIterator();
     }
 
-    // unit testing (optional)
+    // // unit testing (optional)
     // public static void main(String[] args) {
-    //     Deque<String> deque = new Deque<String>();
-    //     deque.addFirst("first");
-    //     deque.addFirst("new first");
-    //     deque.addFirst("second first");
-    //     String value = deque.removeFirst();
-    //     value = deque.removeFirst();
-    //     value = deque.removeFirst();
-    //     value = deque.removeFirst();
-    //     value = "";
+    //     Deque<Integer> deque = new Deque<Integer>();
+    //     deque.addLast(1);
+    //     // deque.addFirst("new first");
+    //     // deque.addFirst("second first");
+    //     Integer value = deque.removeFirst();
+    //     // value = deque.removeFirst();
+    //     // value = deque.removeFirst();
+    //     // value = deque.removeFirst();
+    //     // value = "";
     // }
 }

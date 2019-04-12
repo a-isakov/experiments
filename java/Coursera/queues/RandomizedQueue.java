@@ -10,15 +10,20 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         private int[] indexes;
 
         public RandomizedQueueIterator() {
-            indexes = new int[size];
-            for (int i = 1; i < indexes.length; i++) {
-                indexes[i] = i;
+            if (size != 0) {
+                indexes = new int[size];
+                for (int i = 1; i < indexes.length; i++) {
+                    indexes[i] = i;
+                }
+                StdRandom.shuffle(indexes);
+                index = 0;
             }
-            StdRandom.shuffle(indexes);
-            index = 0;
         }
 
         public boolean hasNext() {
+            if (index == -1)
+                return false;
+
             return index < indexes.length;
         }
 
@@ -32,9 +37,6 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
 
     // construct an empty randomized queue
     public RandomizedQueue() { }
-    public RandomizedQueue(final int capacity) {
-        a = (Item[]) new Object[capacity];
-    }
 
     // is the randomized queue empty?
     public boolean isEmpty() {
@@ -48,6 +50,9 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
 
     // add the item
     public void enqueue(final Item item) {
+        if (item == null)
+            throw new IllegalArgumentException("Null argument");
+
         // Always add to tail
         if (isEmpty()) {
             a = (Item[]) new Object[1];
@@ -55,7 +60,7 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         }
         else {
             if (size == a.length) {
-                // TODO: double size
+                // Double size
                 Item[] newArray = (Item[]) new Object[a.length*2];
                 for (int i = 0; i < a.length; i++) {
                     newArray[i] = a[i];
