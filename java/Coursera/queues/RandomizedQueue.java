@@ -28,10 +28,15 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         }
 
         public Item next() {
-            if (index == -1)
-                throw new java.util.NoSuchElementException("Empty storage");
+            if (index == -1 || index >= indexes.length)
+                throw new java.util.NoSuchElementException("Wrong index");
 
-            return a[indexes[index++]];
+            int i = indexes[index];
+            if (i >= a.length)
+                throw new java.util.NoSuchElementException("Wrong index");
+            Item ret = a[i];
+            index++;
+            return ret;
         }
     }
 
@@ -92,6 +97,14 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
             }
         }
         size--;
+        if (size == a.length/4) {
+            // Resize down
+            Item[] newArray = (Item[]) new Object[a.length/2];
+            for (int i = 0; i < size; i++) {
+                newArray[i] = a[i];
+            }
+            a = newArray;
+        }
         return ret;
     }
 
