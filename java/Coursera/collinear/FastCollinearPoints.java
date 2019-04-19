@@ -18,30 +18,37 @@ public class FastCollinearPoints {
                 throw new IllegalArgumentException("Point cannot be null");
         }
 
-        Point[] pointsCopy = new Point[points.length];
-        for (int i = 0; i < points.length; i++) {
-            pointsCopy[i] = points[i];
-        }
+        Point[] pointsCopy = points.clone();
         Arrays.sort(pointsCopy);
         for (int i = 0; i < pointsCopy.length - 1; i++) {
             if (pointsCopy[i].compareTo(pointsCopy[i + 1]) == 0)
                 throw new IllegalArgumentException("Duplicate point");
         }
-        for (int i0 = 0; i0 < pointsCopy.length - 3; i0++) {
-            for (int i1 = i0 + 1; i1 < pointsCopy.length - 2; i1++) {
-                for (int i2 = i1 + 1; i2 < pointsCopy.length - 1; i2++) {
-                    for (int i3 = i2 + 1; i3 < pointsCopy.length; i3++) {
-                        double slope01 = pointsCopy[i0].slopeTo(pointsCopy[i1]);
-                        double slope02 = pointsCopy[i0].slopeTo(pointsCopy[i2]);
-                        double slope03 = pointsCopy[i0].slopeTo(pointsCopy[i3]);
+        for (int i = 0; i < pointsCopy.length; i++) {
+            Point[] pointsBySlope = pointsCopy.clone();
+            Arrays.sort(pointsBySlope, pointsCopy[i].slopeOrder());
+            // for (int j = 0; j < pointsBySlope.length - 2; j++) {
+            //     double slope = pointsCopy[i].slopeTo(pointsBySlope[j]);
+            //     if (Double.compare(slope, pointsCopy[i].slopeTo(pointsBySlope[j + 1])) == 0
+            //         && Double.compare(slope, pointsCopy[i].slopeTo(pointsBySlope[j + 2])) == 0) {
+            //
+            //     }
+            // }
 
-                        boolean collinear = (Double.compare(slope01, slope02) == 0 && Double.compare(slope02, slope03) == 0);
-                        if (collinear) {
-                            addSegment(pointsCopy[i0], pointsCopy[i3]);
-                        }
-                    }
-                }
-            }
+        //     for (int i1 = i0 + 1; i1 < pointsCopy.length - 2; i1++) {
+        //         for (int i2 = i1 + 1; i2 < pointsCopy.length - 1; i2++) {
+        //             for (int i3 = i2 + 1; i3 < pointsCopy.length; i3++) {
+        //                 double slope01 = pointsCopy[i0].slopeTo(pointsCopy[i1]);
+        //                 double slope02 = pointsCopy[i0].slopeTo(pointsCopy[i2]);
+        //                 double slope03 = pointsCopy[i0].slopeTo(pointsCopy[i3]);
+        //
+        //                 boolean collinear = (Double.compare(slope01, slope02) == 0 && Double.compare(slope02, slope03) == 0);
+        //                 if (collinear) {
+        //                     addSegment(pointsCopy[i0], pointsCopy[i3]);
+        //                 }
+        //             }
+        //         }
+        //     }
         }
     }
 

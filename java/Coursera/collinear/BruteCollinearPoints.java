@@ -23,10 +23,7 @@ public class BruteCollinearPoints {
                 throw new IllegalArgumentException("Point cannot be null");
         }
 
-        Point[] pointsCopy = new Point[points.length];
-        for (int i = 0; i < points.length; i++) {
-            pointsCopy[i] = points[i];
-        }
+        Point[] pointsCopy = points.clone();
         Arrays.sort(pointsCopy);
         for (int i = 0; i < pointsCopy.length - 1; i++) {
             if (pointsCopy[i].compareTo(pointsCopy[i + 1]) == 0)
