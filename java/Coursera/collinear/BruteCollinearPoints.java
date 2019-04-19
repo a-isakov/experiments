@@ -58,18 +58,24 @@ public class BruteCollinearPoints {
 
     // the number of line segments
     public int numberOfSegments() {
-        return segments == null ? 0 : 3;
+        return segments == null ? 0 : segments.length;
     }
 
     // the line segments
     public LineSegment[] segments() {
-        return segments;
+        if (segments == null)
+            return new LineSegment[0];
+
+        LineSegment[] copy = new LineSegment[segments.length];
+        for (int i = 0; i < segments.length; i++)
+            copy[i] = segments[i];
+        return copy;
     }
 
     public static void main(String[] args) {
         // read the n points from a file
-        //In in = new In(args[0]);
-        In in = new In("input8.txt");
+        In in = new In(args[0]);
+        // In in = new In("input8.txt");
         int n = in.readInt();
         Point[] points = new Point[n];
         for (int i = 0; i < n; i++) {
