@@ -4,6 +4,9 @@
  *  Description:
  **************************************************************************** */
 
+import edu.princeton.cs.algs4.In;
+import edu.princeton.cs.algs4.StdOut;
+
 import java.util.Arrays;
 
 public class FastCollinearPoints {
@@ -27,28 +30,23 @@ public class FastCollinearPoints {
         for (int i = 0; i < pointsCopy.length; i++) {
             Point[] pointsBySlope = pointsCopy.clone();
             Arrays.sort(pointsBySlope, pointsCopy[i].slopeOrder());
-            // for (int j = 0; j < pointsBySlope.length - 2; j++) {
-            //     double slope = pointsCopy[i].slopeTo(pointsBySlope[j]);
-            //     if (Double.compare(slope, pointsCopy[i].slopeTo(pointsBySlope[j + 1])) == 0
-            //         && Double.compare(slope, pointsCopy[i].slopeTo(pointsBySlope[j + 2])) == 0) {
-            //
-            //     }
-            // }
 
-        //     for (int i1 = i0 + 1; i1 < pointsCopy.length - 2; i1++) {
-        //         for (int i2 = i1 + 1; i2 < pointsCopy.length - 1; i2++) {
-        //             for (int i3 = i2 + 1; i3 < pointsCopy.length; i3++) {
-        //                 double slope01 = pointsCopy[i0].slopeTo(pointsCopy[i1]);
-        //                 double slope02 = pointsCopy[i0].slopeTo(pointsCopy[i2]);
-        //                 double slope03 = pointsCopy[i0].slopeTo(pointsCopy[i3]);
-        //
-        //                 boolean collinear = (Double.compare(slope01, slope02) == 0 && Double.compare(slope02, slope03) == 0);
-        //                 if (collinear) {
-        //                     addSegment(pointsCopy[i0], pointsCopy[i3]);
-        //                 }
-        //             }
-        //         }
-        //     }
+            for (int i1 = 0, i2 = 1; i2 < pointsBySlope.length;) {
+                double slope1 = pointsCopy[i].slopeTo(pointsBySlope[i1]);
+                double slope2 = pointsCopy[i].slopeTo(pointsBySlope[i2]);
+                if (Double.compare(slope1, slope2) == 0) {
+                    i2++;
+                    if (i2 == pointsBySlope.length && i2 - i1 >= 4)
+                        addSegment(pointsBySlope[i1], pointsBySlope[i2 - 1]);
+                }
+                else {
+                    if (i2 - i1 >= 3)
+                        addSegment(pointsBySlope[i1], pointsBySlope[i2]);
+                    i1 = i2;
+                    i2++;
+                }
+            }
+            // Last i2 to check
         }
     }
 
@@ -81,5 +79,25 @@ public class FastCollinearPoints {
         for (int i = 0; i < segments.length; i++)
             copy[i] = segments[i];
         return copy;
+    }
+
+    public static void main(String[] args) {
+        // read the n points from a file
+        // In in = new In(args[0]);
+        In in = new In("input9.txt");
+        int n = in.readInt();
+        Point[] points = new Point[n];
+        for (int i = 0; i < n; i++) {
+            int x = in.readInt();
+            int y = in.readInt();
+            points[i] = new Point(x, y);
+        }
+
+        // print and draw the line segments
+        FastCollinearPoints collinear = new FastCollinearPoints(points);
+        for (LineSegment segment : collinear.segments()) {
+            StdOut.println(segment);
+        }
+        StdOut.println("End");
     }
 }
