@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class FastCollinearPoints {
-    private ArrayList<LineSegment> segments = new ArrayList<>();
+    private final ArrayList<LineSegment> segments = new ArrayList<>();
 
     // finds all line segments containing 4 or more points
     public FastCollinearPoints(Point[] points) {
@@ -35,7 +35,7 @@ public class FastCollinearPoints {
                 throw new IllegalArgumentException("Duplicate point");
             int maxIndex = minIndex;
             while (minIndex < aux.length) {
-                while (maxIndex < aux.length && p.slopeTo(aux[maxIndex]) == p.slopeTo(aux[minIndex]))
+                while (maxIndex < aux.length && Double.compare(p.slopeTo(aux[maxIndex]), p.slopeTo(aux[minIndex])) == 0)
                     maxIndex++;
                 if (maxIndex - minIndex >= 3) {
                     Point pMin = aux[minIndex].compareTo(p) < 0 ? aux[minIndex] : p;
