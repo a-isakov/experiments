@@ -7,10 +7,11 @@
 import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.StdOut;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class FastCollinearPoints {
-    private LineSegment[] segments;
+    private ArrayList<LineSegment> segments = new ArrayList<>();
 
     // finds all line segments containing 4 or more points
     public FastCollinearPoints(Point[] points) {
@@ -21,70 +22,47 @@ public class FastCollinearPoints {
                 throw new IllegalArgumentException("Point cannot be null");
         }
 
-        Point[] pointsCopy = points.clone();
-        Arrays.sort(pointsCopy);
-        for (int i = 0; i < pointsCopy.length - 1; i++) {
-            if (pointsCopy[i].compareTo(pointsCopy[i + 1]) == 0)
+        Point[] aux = Arrays.copyOf(points, points.length);
+        for (int i = 0; i < points.length; i++) {
+            Point p = points[i];
+            Arrays.sort(aux);
+            Arrays.sort(aux, p.slopeOrder());
+
+            int minIndex = 0;
+            while (minIndex < aux.length && p.slopeTo(aux[minIndex]) == Double.NEGATIVE_INFINITY)
+                minIndex++;
+            if (minIndex != 1)
                 throw new IllegalArgumentException("Duplicate point");
-        }
-        for (int i = 0; i < pointsCopy.length; i++) {
-            Point[] pointsBySlope = pointsCopy.clone();
-            Arrays.sort(pointsBySlope, pointsCopy[i].slopeOrder());
-
-            for (int i1 = 0, i2 = 1; i2 < pointsBySlope.length;) {
-                double slope1 = pointsCopy[i].slopeTo(pointsBySlope[i1]);
-                double slope2 = pointsCopy[i].slopeTo(pointsBySlope[i2]);
-                if (Double.compare(slope1, slope2) == 0) {
-                    i2++;
-                    if (i2 == pointsBySlope.length && i2 - i1 >= 4)
-                        addSegment(pointsBySlope[i1], pointsBySlope[i2 - 1]);
+            int maxIndex = minIndex;
+            while (minIndex < aux.length) {
+                while (maxIndex < aux.length && p.slopeTo(aux[maxIndex]) == p.slopeTo(aux[minIndex]))
+                    maxIndex++;
+                if (maxIndex - minIndex >= 3) {
+                    Point pMin = aux[minIndex].compareTo(p) < 0 ? aux[minIndex] : p;
+                    Point pMax = aux[maxIndex - 1].compareTo(p) > 0 ? aux[maxIndex - 1] : p;
+                    if (p.equals(pMin))
+                        segments.add(new LineSegment(pMin, pMax));
                 }
-                else {
-                    if (i2 - i1 >= 3)
-                        addSegment(pointsBySlope[i1], pointsBySlope[i2]);
-                    i1 = i2;
-                    i2++;
-                }
+                minIndex = maxIndex;
             }
-            // Last i2 to check
         }
-    }
-
-    private void addSegment(final Point point1, final Point point2) {
-        if (segments == null) {
-            segments = new LineSegment[1];
-        }
-        else {
-            LineSegment[] newArray = new LineSegment[segments.length + 1];
-            for (int i = 0; i < segments.length; i++) {
-                newArray[i] = segments[i];
-            }
-            segments = newArray;
-        }
-
-        segments[segments.length - 1] = new LineSegment(point1, point2);
     }
 
     // the number of line segments
     public int numberOfSegments() {
-        return segments == null ? 0 : segments.length;
+        return segments.size();
     }
 
     // the line segments
     public LineSegment[] segments() {
-        if (segments == null)
-            return new LineSegment[0];
-
-        LineSegment[] copy = new LineSegment[segments.length];
-        for (int i = 0; i < segments.length; i++)
-            copy[i] = segments[i];
-        return copy;
+        LineSegment[] segmentsCopy = new LineSegment[segments.size()];
+        return segments.toArray(segmentsCopy);
     }
 
     public static void main(String[] args) {
         // read the n points from a file
-        // In in = new In(args[0]);
-        In in = new In("input9.txt");
+        In in = new In(args[0]);
+        // In in = new In("input9.txt");
         int n = in.readInt();
         Point[] points = new Point[n];
         for (int i = 0; i < n; i++) {
