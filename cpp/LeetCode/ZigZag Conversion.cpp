@@ -65,7 +65,14 @@ public:
                 else
                 {
                     // Mid row
-                    
+                    if (col%2)
+                    {
+                        // Odd
+                    }
+                    else
+                    {
+                        // Even
+                    }
                 }
                 col++;
             }
