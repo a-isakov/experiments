@@ -35,47 +35,37 @@ using namespace std;
 class Solution {
 public:
     string convert(string s, int numRows) {
-        if (numRows == 0)
-            return "";
-        if (numRows == 1)
+        if (numRows < 2)
             return s;
         
         int mids = numRows > 2 ? numRows - 2 : 0;
         int curveSize = numRows + mids;
         
-        string result = "";
+        string ret;
+        ret.reserve(s.length());
         for (int row = 0; row < numRows; row++)
         {
             int col = 0;
             int index = 0;
             while (index < s.length())
             {
-                if (row == 0)
-                {
-                    // First row
+                if (row == 0) // First row
                     index = col*curveSize;
-                    result += s[index];
-                }
-                else if (row == numRows - 1)
-                {
-                    // Last row
-                    index = col*curveSize + numRows - 1;
-                    result += s[index];
-                }
+                else if (row == numRows - 1) // Last row
+                    index = col*curveSize + row;
                 else
                 {
                     // Mid row
-                    if (col%2)
-                    {
-                        // Odd
-                    }
-                    else
-                    {
-                        // Even
-                    }
+                    if (col%2) // Odd
+                        index = (col/2 + 1)*curveSize - row;
+                    else // Even (vertical)
+                        index = (col/2)*curveSize + row;
                 }
+                if (index < s.length())
+                    ret += s[index];
                 col++;
             }
         }
+        return ret;
     }
 };
