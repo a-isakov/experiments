@@ -22,7 +22,7 @@ public class Board {
         int h = 0;
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board[i].length; j++) {
-                int index = j*board.length + i;
+                int index = i*board.length + j + 1;
                 if (board[i][j] == index)
                     h++;
             }
@@ -35,7 +35,7 @@ public class Board {
         int m = 0;
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board[i].length; j++) {
-                int index = j*board.length + i;
+                int index = i*board.length + j + 1;
                 int x = index % board.length;
                 int y = index/board.length;
                 m += Math.abs(x - i) + Math.abs(y - j);
@@ -49,9 +49,8 @@ public class Board {
         int index = 1;
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board[i].length; j++) {
-                if (board[i][j] != index)
+                if (board[i][j] != index++)
                     return false;
-                index++;
             }
         }
         return true;
@@ -59,14 +58,33 @@ public class Board {
 
     // a board that is obtained by exchanging any pair of blocks
     public Board twin() {
-        // TODO:
-        return null;
+        Board twin = new Board(board);
+        if (board[0][0] == 0) {
+            twin.board[0][1] = board[0][2];
+            twin.board[0][2] = board[0][1];
+        } else if (board[0][1] == 0) {
+            twin.board[0][0] = board[0][2];
+            twin.board[0][2] = board[0][0];
+        } else {
+            twin.board[0][0] = board[0][1];
+            twin.board[0][1] = board[0][0];
+        }
+        return twin;
     }
 
     // does this board equal y?
     public boolean equals(Object y) {
-        // TODO:
-        return false;
+        if (y == this) return true;
+        if (y == null) return false;
+        if (y.getClass() != this.getClass()) return false;
+        Board that = (Board) y;
+        for (int i = 0; i < board.length; i++) {
+            for (int j = 0; j < board[i].length; j++) {
+                if (board[i][j] != that.board[i][j])
+                    return false;
+            }
+        }
+        return true;
     }
 
     // all neighboring boards
@@ -77,8 +95,15 @@ public class Board {
 
     // string representation of this board (in the output format specified below)
     public String toString() {
-        // TODO:
-        return "";
+        StringBuilder s = new StringBuilder();
+        s.append(board.length + "\n");
+        for (int i = 0; i < board.length; i++) {
+            for (int j = 0; j < board.length; j++) {
+                s.append(String.format("%2d ", board[i][j]));
+            }
+            s.append("\n");
+        }
+        return s.toString();
     }
 
     public static void main(String[] args) {
