@@ -2,6 +2,7 @@ import edu.princeton.cs.algs4.Stack;
 
 public class Board {
     private int[][] board;
+    private int hamming = -1;
     private int manhattanValue = -1;
 
     // construct a board from an n-by-n array of blocks
@@ -25,28 +26,30 @@ public class Board {
 
     // number of blocks out of place
     public int hamming() {
-        int h = 0;
-        for (int i = 0; i < board.length; i++) {
-            for (int j = 0; j < board[i].length; j++) {
-                int index = i*board.length + j + 1;
-                if (board[i][j] == index)
-                    h++;
+        if (hamming == -1) {
+            hamming = 0;
+            for (int i = 0; i < board.length; i++) {
+                for (int j = 0; j < board[i].length; j++) {
+                    int index = i * board.length + j + 1;
+                    if (board[i][j] == index)
+                        hamming++;
+                }
             }
         }
-        return h;
+        return hamming;
     }
 
     // sum of Manhattan distances between blocks and goal
     public int manhattan() {
-        if (manhattanValue != -1)
-            return manhattanValue;
-        manhattanValue = 0;
-        for (int i = 0; i < board.length; i++) {
-            for (int j = 0; j < board[i].length; j++) {
-                int index = i*board.length + j + 1;
-                int x = index % board.length;
-                int y = index/board.length;
-                manhattanValue += Math.abs(x - i) + Math.abs(y - j);
+        if (manhattanValue == -1) {
+            manhattanValue = 0;
+            for (int i = 0; i < board.length; i++) {
+                for (int j = 0; j < board[i].length; j++) {
+                    int index = i * board.length + j;
+                    int x = index % board.length;
+                    int y = index / board.length;
+                    manhattanValue += Math.abs(x - i) + Math.abs(y - j);
+                }
             }
         }
         return manhattanValue;
@@ -57,8 +60,9 @@ public class Board {
         int index = 1;
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board[i].length; j++) {
-                if (board[i][j] != index++)
+                if (board[i][j] != index)
                     return false;
+                index++;
             }
         }
         return true;

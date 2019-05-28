@@ -2,9 +2,9 @@ import edu.princeton.cs.algs4.MinPQ;
 import edu.princeton.cs.algs4.Stack;
 
 public class Solver {
-    private Stack<Board> solution = null;
-    private boolean solvable = false;
-    private int moves = -1;
+    private Stack<Board> solution;
+    private boolean solvable;
+    private int counter;
 
     // find a solution to the initial board (using the A* algorithm)
     public Solver(Board initial) {
@@ -51,7 +51,7 @@ public class Solver {
 
             i++;
         }
-        moves = i;
+        counter = i;
 
         if (searchInit.isGoal()) {
             solution = solInit;
@@ -69,7 +69,7 @@ public class Solver {
 
     // min number of moves to solve initial board; -1 if unsolvable
     public int moves() {
-        return moves;
+        return counter;
     }
 
     // sequence of boards in a shortest solution; null if unsolvable
@@ -78,6 +78,6 @@ public class Solver {
     }
 
     public static void main(String[] args) {
-
+        // nothing here
     }
 }
