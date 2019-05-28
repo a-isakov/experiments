@@ -1,7 +1,22 @@
+import edu.princeton.cs.algs4.MinPQ;
+import edu.princeton.cs.algs4.Stack;
+
 public class Solver {
+    MinPQ<Board> pq;
+
     // find a solution to the initial board (using the A* algorithm)
     public Solver(Board initial) {
-
+        pq = new MinPQ<>();
+        pq.insert(initial);
+        Board b = null;
+        while (b == null || !b.isGoal()) {
+            b = pq.delMin();
+            Stack<Board> neighbors = (Stack<Board>) b.neighbors();
+            while (!neighbors.isEmpty()) {
+                Board neighbor = neighbors.pop();
+                pq.insert(neighbor);
+            }
+        }
     }
 
     // is the initial board solvable?
