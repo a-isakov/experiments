@@ -1,3 +1,5 @@
+import edu.princeton.cs.algs4.Stack;
+
 public class Board {
     private int[][] board;
 
@@ -89,8 +91,50 @@ public class Board {
 
     // all neighboring boards
     public Iterable<Board> neighbors() {
-        // TODO:
-        return null;
+        Stack<Board> neighbors = new Stack<Board>();
+        int row = -1;
+        int col = -1;
+        boolean dMove = false;
+        boolean uMove = false;
+        boolean lMove = false;
+        boolean rMove = false;
+        for (int i = 0; i < board.length; i++) {
+            for (int j = 0; j < board[i].length; j++) {
+                if (board[i][j] == 0) {
+                    row = i;
+                    col = j;
+                    uMove = row > 0;
+                    dMove = row < board.length - 1;
+                    lMove = col > 0;
+                    rMove = col < board.length - 1;
+                }
+            }
+        }
+        if (dMove) {
+            Board downBoard = new Board(board);
+            downBoard.board[row + 1][col] = board[row][col];
+            downBoard.board[row][col] = board[row + 1][col];
+            neighbors.push(downBoard);
+        }
+        if (uMove) {
+            Board upBoard = new Board(board);
+            upBoard.board[row - 1][col] = board[row][col];
+            upBoard.board[row][col] = board[row - 1][col];
+            neighbors.push(upBoard);
+        }
+        if (lMove) {
+            Board leftBoard = new Board(board);
+            leftBoard.board[row][col - 1] = board[row][col];
+            leftBoard.board[row][col] = board[row][col - 1];
+            neighbors.push(leftBoard);
+        }
+        if (rMove) {
+            Board rightBoard = new Board(board);
+            rightBoard.board[row][col - 1] = board[row][col];
+            rightBoard.board[row][col] = board[row][col - 1];
+            neighbors.push(rightBoard);
+        }
+        return neighbors;
     }
 
     // string representation of this board (in the output format specified below)
