@@ -8,14 +8,17 @@ public class Solver {
     public Solver(Board initial) {
         pq = new MinPQ<>();
         pq.insert(initial);
-        Board b = null;
-        while (b == null || !b.isGoal()) {
-            b = pq.delMin();
-            Stack<Board> neighbors = (Stack<Board>) b.neighbors();
+        Board pBoard = null;
+        Board searchBoard = pq.delMin();
+        while (!searchBoard.isGoal()) {
+            Stack<Board> neighbors = (Stack<Board>) searchBoard.neighbors();
             while (!neighbors.isEmpty()) {
                 Board neighbor = neighbors.pop();
-                pq.insert(neighbor);
+                if (!neighbor.equals(pBoard))
+                    pq.insert(neighbor);
             }
+            pBoard = searchBoard;
+            searchBoard = pq.delMin();
         }
     }
 
