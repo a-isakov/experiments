@@ -2,10 +2,14 @@ import edu.princeton.cs.algs4.Stack;
 
 public class Board {
     private int[][] board;
+    private int manhattanValue = -1;
 
     // construct a board from an n-by-n array of blocks
     // (where blocks[i][j] = block in row i, column j)
     public Board(int[][] blocks) {
+        if (blocks == null)
+            throw new java.lang.IllegalArgumentException();
+
         board = new int[blocks.length][blocks[0].length];
         for (int i = 0; i < blocks.length; i++) {
             for (int j = 0; j < blocks[i].length; j++) {
@@ -34,16 +38,18 @@ public class Board {
 
     // sum of Manhattan distances between blocks and goal
     public int manhattan() {
-        int m = 0;
+        if (manhattanValue != -1)
+            return manhattanValue;
+        manhattanValue = 0;
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board[i].length; j++) {
                 int index = i*board.length + j + 1;
                 int x = index % board.length;
                 int y = index/board.length;
-                m += Math.abs(x - i) + Math.abs(y - j);
+                manhattanValue += Math.abs(x - i) + Math.abs(y - j);
             }
         }
-        return m;
+        return manhattanValue;
     }
 
     // is this board the goal board?

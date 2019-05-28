@@ -2,42 +2,79 @@ import edu.princeton.cs.algs4.MinPQ;
 import edu.princeton.cs.algs4.Stack;
 
 public class Solver {
-    MinPQ<Board> pq;
+    private Stack<Board> solution = null;
+    private boolean solvable = false;
+    private int moves = -1;
 
     // find a solution to the initial board (using the A* algorithm)
     public Solver(Board initial) {
-        pq = new MinPQ<>();
-        pq.insert(initial);
-        Board pBoard = null;
-        Board searchBoard = pq.delMin();
-        while (!searchBoard.isGoal()) {
-            Stack<Board> neighbors = (Stack<Board>) searchBoard.neighbors();
-            while (!neighbors.isEmpty()) {
-                Board neighbor = neighbors.pop();
-                if (!neighbor.equals(pBoard))
-                    pq.insert(neighbor);
+        if (initial == null)
+            throw new java.lang.IllegalArgumentException();
+
+        Board twin = initial.twin();
+
+        Stack<Board> solInit = new Stack<>();
+        Stack<Board> solTwin = new Stack<>();
+
+        MinPQ<Board> pqInit = new MinPQ<>();
+        MinPQ<Board> pqTwin = new MinPQ<>();
+
+        pqInit.insert(initial);
+        pqTwin.insert(twin);
+
+        Board prevInit = null;
+        Board prevTwin = null;
+
+        Board searchInit = pqInit.delMin();
+        Board searchTwin = pqTwin.delMin();
+
+        int i = 0;
+        while (!searchInit.isGoal() && !searchTwin.isGoal()) {
+            Stack<Board> neighborsInit = (Stack<Board>) searchInit.neighbors();
+            Stack<Board> neighborsTwin = (Stack<Board>) searchTwin.neighbors();
+            for (Board neighbor: neighborsInit) {
+                if (!neighbor.equals(prevInit))
+                    pqInit.insert(neighbor);
             }
-            pBoard = searchBoard;
-            searchBoard = pq.delMin();
+            for (Board neighbor: neighborsTwin) {
+                if (!neighbor.equals(prevTwin))
+                    pqTwin.insert(neighbor);
+            }
+            prevInit = searchInit;
+            prevTwin = searchTwin;
+
+            searchInit = pqInit.delMin();
+            searchTwin = pqTwin.delMin();
+
+            solInit.push(searchInit);
+            solTwin.push(searchTwin);
+
+            i++;
+        }
+        moves = i;
+
+        if (searchInit.isGoal()) {
+            solution = solInit;
+            solvable = true;
+        } else {
+            solution = solTwin;
+            solvable = false;
         }
     }
 
     // is the initial board solvable?
     public boolean isSolvable() {
-        // TODO:
-        return false;
+        return solvable;
     }
 
     // min number of moves to solve initial board; -1 if unsolvable
     public int moves() {
-        // TODO:
-        return 0;
+        return moves;
     }
 
     // sequence of boards in a shortest solution; null if unsolvable
     public Iterable<Board> solution() {
-        // TODO:
-        return null;
+        return solution;
     }
 
     public static void main(String[] args) {
