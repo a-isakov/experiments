@@ -6,6 +6,18 @@ public class Solver {
     private boolean solvable;
     private int counter;
 
+    private class SolutionNode implements Comparable<SolutionNode> {
+        private int manhattan;
+        private int step;
+        private final SolutionNode previousNode;
+        private final Board board;
+
+        public SolutionNode(SolutionNode previousNode, Board board) {
+            this.previousNode = previousNode;
+            this.board = board;
+        }
+    }
+
     // find a solution to the initial board (using the A* algorithm)
     public Solver(Board initial) {
         if (initial == null)
