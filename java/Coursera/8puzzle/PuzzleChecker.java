@@ -48,7 +48,7 @@ public class PuzzleChecker {
 
             // solve the slider puzzle
             Board initial = new Board(tiles);
-            boolean isGoal = initial.isGoal();
+            // boolean isGoal = initial.isGoal();
             // int man = initial.manhattan();
             // man = initial.hamming();
             // Iterable<Board> ret = initial.neighbors();
