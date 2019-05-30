@@ -149,17 +149,17 @@ public class Board {
             upBoard.board[row][col] = board[row - 1][col];
             neighbors.push(upBoard);
         }
-        if (lMove) {
-            Board leftBoard = new Board(board);
-            leftBoard.board[row][col - 1] = board[row][col];
-            leftBoard.board[row][col] = board[row][col - 1];
-            neighbors.push(leftBoard);
-        }
         if (rMove) {
             Board rightBoard = new Board(board);
             rightBoard.board[row][col + 1] = board[row][col];
             rightBoard.board[row][col] = board[row][col + 1];
             neighbors.push(rightBoard);
+        }
+        if (lMove) {
+            Board leftBoard = new Board(board);
+            leftBoard.board[row][col - 1] = board[row][col];
+            leftBoard.board[row][col] = board[row][col - 1];
+            neighbors.push(leftBoard);
         }
         return neighbors;
     }

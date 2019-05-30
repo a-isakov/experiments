@@ -22,7 +22,7 @@ public class Solver {
         public int compareTo(SolutionNode that) {
             final int thisScore = manhattan + step;
             final int thatScore = that.board.manhattan() + that.step;
-            return thisScore - thatScore;
+            return thisScore == thatScore ? that.step - step : thisScore - thatScore;
         }
     }
 
@@ -42,47 +42,32 @@ public class Solver {
         SolutionNode searchNodeInit = new SolutionNode(initial, 0, null);
         SolutionNode searchNodeTwin = new SolutionNode(twin, 0, null);
 
-        pqInit.insert(searchNodeInit);
-        pqTwin.insert(searchNodeTwin);
-
-        searchNodeInit = pqInit.delMin();
-        searchNodeTwin = pqTwin.delMin();
-
         int step = 0;
         while (!searchNodeInit.board.isGoal() && !searchNodeTwin.board.isGoal()) {
             step++;
 
             Iterable<Board> neighborsInit = searchNodeInit.board.neighbors();
             Iterable<Board> neighborsTwin = searchNodeTwin.board.neighbors();
+
+            SolutionNode checkNode = searchNodeInit.prev;
             for (Board neighbor: neighborsInit) {
-                SolutionNode checkNode = searchNodeInit.prev;
-                boolean historyDetected = false;
-                while (checkNode != null) {
-                    if (neighbor.equals(checkNode.board)) {
-                        historyDetected = true;
-                        break;
-                    }
-                    checkNode = checkNode.prev;
-                }
-                if (!historyDetected)
+                if (checkNode == null || !checkNode.board.equals(neighbor))
                     pqInit.insert(new SolutionNode(neighbor, step, searchNodeInit));
             }
+            checkNode = searchNodeTwin.prev;
             for (Board neighbor: neighborsTwin) {
-                SolutionNode checkNode = searchNodeTwin.prev;
-                boolean historyDetected = false;
-                while (checkNode != null) {
-                    if (neighbor.equals(checkNode.board)) {
-                        historyDetected = true;
-                        break;
-                    }
-                    checkNode = checkNode.prev;
-                }
-                if (!historyDetected)
+                if (checkNode == null || !checkNode.board.equals(neighbor))
                     pqTwin.insert(new SolutionNode(neighbor, step, searchNodeTwin));
             }
 
             searchNodeInit = pqInit.delMin();
             searchNodeTwin = pqTwin.delMin();
+
+            // StdOut.print("Step: ");
+            // StdOut.println(searchNodeInit.step);
+            // StdOut.print("Manh: ");
+            // StdOut.println(searchNodeInit.manhattan);
+            // StdOut.print(searchNodeInit.board.toString());
 
             solInit.push(searchNodeInit.board);
             solTwin.push(searchNodeTwin.board);
