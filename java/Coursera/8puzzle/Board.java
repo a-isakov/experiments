@@ -130,7 +130,7 @@ public class Board {
                     uMove = row > 0;
                     dMove = row < board.length - 1;
                     lMove = col > 0;
-                    rMove = col < board.length - 1;
+                    rMove = col < board[i].length - 1;
                     break;
                 }
             }

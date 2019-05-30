@@ -46,8 +46,8 @@ public class Solver {
 
         int step = 0;
         while (!searchInit.isGoal() && !searchTwin.isGoal()) {
-            Stack<Board> neighborsInit = (Stack<Board>) searchInit.neighbors();
-            Stack<Board> neighborsTwin = (Stack<Board>) searchTwin.neighbors();
+            Iterable<Board> neighborsInit = searchInit.neighbors();
+            Iterable<Board> neighborsTwin = searchTwin.neighbors();
             for (Board neighbor: neighborsInit) {
                 if (!neighbor.equals(prevInit))
                     pqInit.insert(new SolutionNode(neighbor, step));
