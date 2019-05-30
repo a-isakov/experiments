@@ -36,7 +36,7 @@ public class PuzzleChecker {
         // for (String filename : args) {
 
             // read in the board specified in the filename
-            String filename = "puzzle00.txt";
+            String filename = "puzzle01.txt";
             In in = new In(filename);
             int n = in.readInt();
             int[][] tiles = new int[n][n];
@@ -48,16 +48,22 @@ public class PuzzleChecker {
 
             // solve the slider puzzle
             Board initial = new Board(tiles);
+            StdOut.print(initial.toString());
             // boolean isGoal = initial.isGoal();
             // int man = initial.manhattan();
             // man = initial.hamming();
-            // Iterable<Board> ret = initial.neighbors();
-            // StdOut.print(initial.toString());
-            // for (Board board: ret) {
-            //     StdOut.print(board.toString());
-            // }
+            StdOut.println("Neighbors:");
+            Iterable<Board> ret = initial.neighbors();
+            for (Board board: ret) {
+                StdOut.print(board.toString());
+            }
             Solver solver = new Solver(initial);
             StdOut.println(filename + ": " + solver.moves());
+            StdOut.println("Steps:");
+            for (Board step: solver.solution()) {
+                StdOut.print(step.toString());
+            }
+            StdOut.println("Final");
         // }
     }
 }

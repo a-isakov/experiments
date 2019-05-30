@@ -8,16 +8,20 @@ public class Solver {
 
     private class SolutionNode implements Comparable<SolutionNode> {
         private final int step;
+        private final int manhattan;
         private final Board board;
+        private final SolutionNode prev;
 
-        public SolutionNode(Board board, int step) {
+        public SolutionNode(Board board, int step, SolutionNode prev) {
             this.step = step;
             this.board = board;
+            this.manhattan = board.manhattan();
+            this.prev = prev;
         }
 
         public int compareTo(SolutionNode that) {
-            final int thisScore = board.manhattan() + step;
-            final int thatScore = that.board.manhattan() + step;
+            final int thisScore = manhattan + step;
+            final int thatScore = that.board.manhattan() + that.step;
             return thisScore - thatScore;
         }
     }
@@ -35,40 +39,56 @@ public class Solver {
         MinPQ<SolutionNode> pqInit = new MinPQ<>();
         MinPQ<SolutionNode> pqTwin = new MinPQ<>();
 
-        pqInit.insert(new SolutionNode(initial, 0));
-        pqTwin.insert(new SolutionNode(twin, 0));
+        SolutionNode searchNodeInit = new SolutionNode(initial, 0, null);
+        SolutionNode searchNodeTwin = new SolutionNode(twin, 0, null);
 
-        Board prevInit = null;
-        Board prevTwin = null;
+        pqInit.insert(searchNodeInit);
+        pqTwin.insert(searchNodeTwin);
 
-        Board searchInit = pqInit.delMin().board;
-        Board searchTwin = pqTwin.delMin().board;
+        searchNodeInit = pqInit.delMin();
+        searchNodeTwin = pqTwin.delMin();
 
         int step = 0;
-        while (!searchInit.isGoal() && !searchTwin.isGoal()) {
-            Iterable<Board> neighborsInit = searchInit.neighbors();
-            Iterable<Board> neighborsTwin = searchTwin.neighbors();
+        while (!searchNodeInit.board.isGoal() && !searchNodeTwin.board.isGoal()) {
+            step++;
+
+            Iterable<Board> neighborsInit = searchNodeInit.board.neighbors();
+            Iterable<Board> neighborsTwin = searchNodeTwin.board.neighbors();
             for (Board neighbor: neighborsInit) {
-                if (!neighbor.equals(prevInit))
-                    pqInit.insert(new SolutionNode(neighbor, step));
+                SolutionNode checkNode = searchNodeInit.prev;
+                boolean historyDetected = false;
+                while (checkNode != null) {
+                    if (neighbor.equals(checkNode.board)) {
+                        historyDetected = true;
+                        break;
+                    }
+                    checkNode = checkNode.prev;
+                }
+                if (!historyDetected)
+                    pqInit.insert(new SolutionNode(neighbor, step, searchNodeInit));
             }
             for (Board neighbor: neighborsTwin) {
-                if (!neighbor.equals(prevTwin))
-                    pqTwin.insert(new SolutionNode(neighbor, step));
+                SolutionNode checkNode = searchNodeTwin.prev;
+                boolean historyDetected = false;
+                while (checkNode != null) {
+                    if (neighbor.equals(checkNode.board)) {
+                        historyDetected = true;
+                        break;
+                    }
+                    checkNode = checkNode.prev;
+                }
+                if (!historyDetected)
+                    pqTwin.insert(new SolutionNode(neighbor, step, searchNodeTwin));
             }
-            prevInit = searchInit;
-            prevTwin = searchTwin;
 
-            searchInit = pqInit.delMin().board;
-            searchTwin = pqTwin.delMin().board;
+            searchNodeInit = pqInit.delMin();
+            searchNodeTwin = pqTwin.delMin();
 
-            solInit.push(searchInit);
-            solTwin.push(searchTwin);
-
-            step++;
+            solInit.push(searchNodeInit.board);
+            solTwin.push(searchNodeTwin.board);
         }
 
-        if (searchInit.isGoal()) {
+        if (searchNodeInit.board.isGoal()) {
             solution = solInit;
             solvable = true;
             counter = step;
