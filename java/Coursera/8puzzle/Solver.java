@@ -16,6 +16,11 @@ public class Solver {
             this.previousNode = previousNode;
             this.board = board;
         }
+
+        public int compareTo(SolutionNode that) {
+            // TODO:
+            return 0;
+        }
     }
 
     // find a solution to the initial board (using the A* algorithm)
