@@ -31,11 +31,12 @@ public class Board {
             for (int i = 0; i < board.length; i++) {
                 for (int j = 0; j < board[i].length; j++) {
                     int index = i * board.length + j + 1;
-                    if (board[i][j] == index)
+                    if (board[i][j] != index)
                         hamming++;
                 }
             }
         }
+        hamming--; // Decrease empty block
         return hamming;
     }
 
@@ -45,10 +46,16 @@ public class Board {
             manhattanValue = 0;
             for (int i = 0; i < board.length; i++) {
                 for (int j = 0; j < board[i].length; j++) {
-                    int index = i * board.length + j;
-                    int x = index % board.length;
-                    int y = index / board.length;
-                    manhattanValue += Math.abs(x - i) + Math.abs(y - j);
+                    int value = board[i][j];
+                    if (value != 0) {
+                        int index = i * board.length + j + 1;
+                        if (value != index) {
+                            value--; // Switch to zero based
+                            int x = value % board.length;
+                            int y = value / board.length;
+                            manhattanValue += Math.abs(x - j) + Math.abs(y - i);
+                        }
+                    }
                 }
             }
         }
@@ -58,9 +65,11 @@ public class Board {
     // is this board the goal board?
     public boolean isGoal() {
         int index = 1;
+        int lastIndex = board.length*board.length;
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board[i].length; j++) {
-                if (board[i][j] != index)
+                int value = board[i][j];
+                if (value != index && index != lastIndex)
                     return false;
                 index++;
             }
@@ -72,11 +81,14 @@ public class Board {
     public Board twin() {
         Board twin = new Board(board);
         if (board[0][0] == 0) {
-            twin.board[0][1] = board[0][2];
-            twin.board[0][2] = board[0][1];
+            twin.board[0][1] = board[1][1];
+            twin.board[1][1] = board[0][1];
         } else if (board[0][1] == 0) {
-            twin.board[0][0] = board[0][2];
-            twin.board[0][2] = board[0][0];
+            twin.board[0][0] = board[1][0];
+            twin.board[1][0] = board[0][0];
+        // } else if (board[1][0] == 0) {
+        //     twin.board[0][0] = board[0][1];
+        //     twin.board[0][1] = board[0][0];
         } else {
             twin.board[0][0] = board[0][1];
             twin.board[0][1] = board[0][0];
@@ -117,8 +129,11 @@ public class Board {
                     dMove = row < board.length - 1;
                     lMove = col > 0;
                     rMove = col < board.length - 1;
+                    break;
                 }
             }
+            if (uMove || dMove || lMove || rMove)
+                break;
         }
         if (dMove) {
             Board downBoard = new Board(board);
@@ -140,8 +155,8 @@ public class Board {
         }
         if (rMove) {
             Board rightBoard = new Board(board);
-            rightBoard.board[row][col - 1] = board[row][col];
-            rightBoard.board[row][col] = board[row][col - 1];
+            rightBoard.board[row][col + 1] = board[row][col];
+            rightBoard.board[row][col] = board[row][col + 1];
             neighbors.push(rightBoard);
         }
         return neighbors;
