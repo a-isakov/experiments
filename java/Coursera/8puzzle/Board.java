@@ -86,9 +86,6 @@ public class Board {
         } else if (board[0][1] == 0) {
             twin.board[0][0] = board[1][0];
             twin.board[1][0] = board[0][0];
-        // } else if (board[1][0] == 0) {
-        //     twin.board[0][0] = board[0][1];
-        //     twin.board[0][1] = board[0][0];
         } else {
             twin.board[0][0] = board[0][1];
             twin.board[0][1] = board[0][0];

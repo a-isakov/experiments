@@ -33,18 +33,15 @@ public class Solver {
 
         Board twin = initial.twin();
 
-        Stack<Board> solInit = new Stack<>();
-        Stack<Board> solTwin = new Stack<>();
-
         MinPQ<SolutionNode> pqInit = new MinPQ<>();
         MinPQ<SolutionNode> pqTwin = new MinPQ<>();
 
         SolutionNode searchNodeInit = new SolutionNode(initial, 0, null);
         SolutionNode searchNodeTwin = new SolutionNode(twin, 0, null);
 
-        int step = 0;
+        // int step = 0;
         while (!searchNodeInit.board.isGoal() && !searchNodeTwin.board.isGoal()) {
-            step++;
+            // step++;
 
             Iterable<Board> neighborsInit = searchNodeInit.board.neighbors();
             Iterable<Board> neighborsTwin = searchNodeTwin.board.neighbors();
@@ -52,33 +49,28 @@ public class Solver {
             SolutionNode checkNode = searchNodeInit.prev;
             for (Board neighbor: neighborsInit) {
                 if (checkNode == null || !checkNode.board.equals(neighbor))
-                    pqInit.insert(new SolutionNode(neighbor, step, searchNodeInit));
+                    pqInit.insert(new SolutionNode(neighbor, searchNodeInit.step + 1, searchNodeInit));
             }
             checkNode = searchNodeTwin.prev;
             for (Board neighbor: neighborsTwin) {
                 if (checkNode == null || !checkNode.board.equals(neighbor))
-                    pqTwin.insert(new SolutionNode(neighbor, step, searchNodeTwin));
+                    pqTwin.insert(new SolutionNode(neighbor, searchNodeInit.step + 1, searchNodeTwin));
             }
 
             searchNodeInit = pqInit.delMin();
             searchNodeTwin = pqTwin.delMin();
-
-            // StdOut.print("Step: ");
-            // StdOut.println(searchNodeInit.step);
-            // StdOut.print("Manh: ");
-            // StdOut.println(searchNodeInit.manhattan);
-            // StdOut.print(searchNodeInit.board.toString());
-
-            solInit.push(searchNodeInit.board);
-            solTwin.push(searchNodeTwin.board);
         }
 
         if (searchNodeInit.board.isGoal()) {
-            solution = solInit;
             solvable = true;
-            counter = step;
+            counter = searchNodeInit.step;
+            solution = new Stack<>();
+            while (searchNodeInit != null) {
+                solution.push(searchNodeInit.board);
+                searchNodeInit = searchNodeInit.prev;
+            }
         } else {
-            solution = solTwin;
+            // solution = solTwin;
             solvable = false;
         }
     }
