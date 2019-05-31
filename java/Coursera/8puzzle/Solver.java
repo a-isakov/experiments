@@ -21,7 +21,7 @@ public class Solver {
 
         public int compareTo(SolutionNode that) {
             final int thisScore = manhattan + step;
-            final int thatScore = that.board.manhattan() + that.step;
+            final int thatScore = that.manhattan + that.step;
             return thisScore == thatScore ? that.step - step : thisScore - thatScore;
         }
     }
