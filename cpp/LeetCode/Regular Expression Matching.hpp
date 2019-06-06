@@ -85,11 +85,18 @@ protected:
 		case '.':
 			return isMatch(s, p, sIndex + 1, pIndex + 1);
 		case '*':
+		{
+			bool res = false;
 			if (s[sIndex] == p[pIndex - 1] || p[pIndex - 1] == '.')
-				return isMatch(s, p, sIndex + 1, pIndex);
+			{
+				res = isMatch(s, p, sIndex + 1, pIndex);
+				if (!res)
+					res = isMatch(s, p, sIndex + 1, pIndex + 1);
+			}
 			else
-				return isMatch(s, p, sIndex, pIndex + 1);
-			//break;
+				res = isMatch(s, p, sIndex, pIndex + 1);
+			return res;
+		}
 		default:
 			if (s[sIndex] == p[pIndex]) // Characters are matching
 				return isMatch(s, p, sIndex + 1, pIndex + 1);

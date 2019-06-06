@@ -27,7 +27,10 @@ int main()
 	std::cout << "Test 6 " << resultString << "\n";
 
 	resultString = sol.isMatch("aaa", "a*a") ? "passed" : "FAILED"; // Should be true
-	std::cout << "Test 6 " << resultString << "\n";
+	std::cout << "Test 7 " << resultString << "\n";
+
+	resultString = sol.isMatch("aaa", "ab*a*c*a") ? "passed" : "FAILED"; // Should be true
+	std::cout << "Test 8 " << resultString << "\n";
 
 	std::cout << "Hello World!\n";
 }
