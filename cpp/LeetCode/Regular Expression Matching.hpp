@@ -57,10 +57,28 @@ public:
 
 		vector<Rule> rules;
 		ParseRules(p, rules);
+		if (rules.empty())
+			return s.empty();
 
-		bool result = isMatch(s, rules, 0, 0);
+		buildPositions(s, rules);
 
-		return result;
+		//bool result = false;// isMatch(s, rules, 0, 0);
+		size_t lastRuleIndex = rules.size() - 1;
+		while (lastRuleIndex >= 0 && rules[lastRuleIndex].sPositions.empty() && rules[lastRuleIndex].repeat)
+		{
+			lastRuleIndex--;
+		}
+		if (lastRuleIndex >= 0)
+		{
+			Rule& lastRule = rules[lastRuleIndex];
+			for (int i = lastRule.sPositions.size() - 1; i >= 0; i--)
+			{
+				if (lastRule.sPositions[i] + 1 == s.length())
+					return true;
+			}
+		}
+
+		return false;
     }
 protected:
 	struct Rule {
@@ -70,41 +88,8 @@ protected:
 		}
 		bool repeat;
 		char c;
+		vector<int> sPositions; // Indexes of the characters where rule applied
 	};
-
-	bool isMatch(const string& s, const vector<Rule>& rules, const size_t sIndex, const size_t rIndex) {
-		if (rIndex == rules.size() && sIndex == s.length()) // Reached end at the same time
-			return true;
-		else if (rIndex == rules.size())
-			return false;
-		else if (sIndex == s.length())
-		{
-			if (!rules[rIndex].repeat)
-				return false;
-			else
-				return isMatch(s, rules, sIndex, rIndex + 1);
-		}
-
-		bool result = false;
-		if (s[sIndex] == rules[rIndex].c || rules[rIndex].c == '.')
-		{
-			result = isMatch(s, rules, sIndex + 1, rIndex + 1);
-			if (!result && rules[rIndex].repeat)
-			{
-				result = isMatch(s, rules, sIndex + 1, rIndex);
-				if (!result && rules[rIndex].repeat)
-				{
-					result = isMatch(s, rules, sIndex, rIndex + 1);
-				}
-			}
-		}
-		else if (rules[rIndex].repeat)
-		{
-			result = isMatch(s, rules, sIndex, rIndex + 1);
-		}
-
-		return result;
-	}
 
 	void ParseRules(string& p, vector<Rule>& rules) {
 		size_t rIndex = 0;
@@ -128,6 +113,97 @@ protected:
 		}
 	}
 
+	void buildPositions(const string& s, vector<Rule>& rules) {
+		for (size_t rIndex = 0; rIndex < rules.size(); rIndex++)
+		{
+			if (!rIndex)
+			{
+				size_t sIndex = 0;
+				if (rules[rIndex].repeat)
+				{
+					rules[rIndex].sPositions.push_back(sIndex - 1);
+				}
+				while (sIndex < s.length())
+				{
+					if (s[sIndex] == rules[rIndex].c || rules[rIndex].c == '.')
+						rules[rIndex].sPositions.push_back(sIndex);
+					else if (rules[rIndex].repeat)
+					{
+						rules[rIndex].sPositions.push_back(sIndex - 1);
+						break;
+					}
+					
+					if (!rules[rIndex].repeat)
+						break;
+
+					sIndex++;
+				}
+			}
+			else
+			{
+				for (size_t i = 0; i < rules[rIndex - 1].sPositions.size(); i++)
+				{
+					size_t sIndex = rules[rIndex - 1].sPositions[i] + 1;
+					if (rules[rIndex].repeat)
+					{
+						rules[rIndex].sPositions.push_back(sIndex - 1);
+					}
+					while (sIndex < s.length())
+					{
+						if (s[sIndex] == rules[rIndex].c || rules[rIndex].c == '.')
+							rules[rIndex].sPositions.push_back(sIndex);
+						else if (rules[rIndex].repeat)
+						{
+							rules[rIndex].sPositions.push_back(sIndex - 1);
+							break;
+						}
+
+						if (!rules[rIndex].repeat)
+							break;
+
+						sIndex++;
+					}
+				}
+			}
+		}
+	}
+
+	// Works but slow
+	//bool isMatch(const string& s, const vector<Rule>& rules, const size_t sIndex, const size_t rIndex) {
+	//	if (rIndex == rules.size() && sIndex == s.length()) // Reached end at the same time
+	//		return true;
+	//	else if (rIndex == rules.size())
+	//		return false;
+	//	else if (sIndex == s.length())
+	//	{
+	//		if (!rules[rIndex].repeat)
+	//			return false;
+	//		else
+	//			return isMatch(s, rules, sIndex, rIndex + 1);
+	//	}
+
+	//	bool result = false;
+	//	if (s[sIndex] == rules[rIndex].c || rules[rIndex].c == '.')
+	//	{
+	//		result = isMatch(s, rules, sIndex + 1, rIndex + 1);
+	//		if (!result && rules[rIndex].repeat)
+	//		{
+	//			result = isMatch(s, rules, sIndex + 1, rIndex);
+	//			if (!result && rules[rIndex].repeat)
+	//			{
+	//				result = isMatch(s, rules, sIndex, rIndex + 1);
+	//			}
+	//		}
+	//	}
+	//	else if (rules[rIndex].repeat)
+	//	{
+	//		result = isMatch(s, rules, sIndex, rIndex + 1);
+	//	}
+
+	//	return result;
+	//}
+
+	// Does not work
 	//bool isMatch(string& s, string& p, size_t sIndex, size_t pIndex) {
 	//	if (pIndex == p.length() && sIndex == s.length())
 	//		return true;
