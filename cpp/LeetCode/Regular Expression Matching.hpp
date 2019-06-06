@@ -55,13 +55,6 @@ public:
 		if (p[0] == '*')
 			return false;
 
-		// ParseRules(p);
-		//size_t pIndex = 0; // Index of the p character
-		//size_t sIndex = 0; // Index of the s character
-		//while (sIndex < s.length() && pIndex < p.length())
-		//{
-
-		//}
 		bool result = isMatch(s, p, 0, 0);
 
 		return result;
@@ -115,42 +108,4 @@ protected:
 
 		return false;
 	}
-
-	void ParseRules(string& p) {
-		for (size_t i = 0; i < p.length(); i++)
-		{
-			switch (p[i])
-			{
-			case '.':
-				rules.push_back(Rule());
-				break;
-			case '*':
-				rules[rules.size() - 1] = Rule(RuleType::repeat, p[i - 1]); // Replace last rule with repeater
-				// TODO: Probably need to check if last one wasn't . or *
-				break;
-			default:
-				rules.push_back(Rule(RuleType::character, p[i]));
-			}
-		}
-	}
-
-	enum RuleType {
-		character,
-		any,
-		repeat
-	};
-
-	struct Rule {
-		Rule() {
-			type = RuleType::any;
-		}
-		Rule(RuleType _type, char _c) {
-			type = _type;
-			c = _c;
-		}
-		RuleType type;
-		char c = 0;
-	};
-
-	vector<Rule> rules;
 };
