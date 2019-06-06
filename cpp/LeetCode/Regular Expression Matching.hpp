@@ -99,7 +99,12 @@ protected:
 		}
 		default:
 			if (s[sIndex] == p[pIndex]) // Characters are matching
-				return isMatch(s, p, sIndex + 1, pIndex + 1);
+			{
+				bool res = isMatch(s, p, sIndex + 1, pIndex + 1);
+				if (!res && pIndex < p.length() - 1 && p[pIndex + 1] == '*')
+					res = isMatch(s, p, sIndex, pIndex + 1);
+				return res;
+			}
 			else if (pIndex == p.length() - 1) // Last in the rule
 				return false;
 			else if (p[pIndex + 1] != '*') // Next one is not *
