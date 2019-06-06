@@ -74,7 +74,7 @@ protected:
 			return false;
 		else if (sIndex == s.length())
 		{
-			if (p[pIndex] == '*' && pIndex == p.length() - 1)
+			if (p[pIndex] == '*' && pIndex == p.length() - 1) // This is the last rule
 				return true;
 			else
 				return false;
