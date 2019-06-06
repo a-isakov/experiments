@@ -119,3 +119,5 @@ ipch/
 
 # Visual Studio Trace Files
 *.e2e
+*.jar
+/java/Coursera/8puzzle/.lift/checkstyle-coursera.xml
