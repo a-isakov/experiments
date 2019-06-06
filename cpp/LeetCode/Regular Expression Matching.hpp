@@ -74,7 +74,7 @@ protected:
 			return false;
 		else if (sIndex == s.length())
 		{
-			if (p[pIndex] == '*')
+			if (p[pIndex] == '*' && pIndex == p.length() - 1)
 				return true;
 			else
 				return false;
@@ -98,7 +98,7 @@ protected:
 			else if (p[pIndex + 1] != '*') // Next one is not *
 				return false;
 			else // Next one is *
-				return isMatch(s, p, sIndex + 1, pIndex + 1);
+				return isMatch(s, p, sIndex, pIndex + 1);
 		}
 
 		return false;
