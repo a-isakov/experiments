@@ -92,6 +92,10 @@ protected:
 			if (!result && rules[rIndex].repeat)
 			{
 				result = isMatch(s, rules, sIndex + 1, rIndex);
+				if (!result && rules[rIndex].repeat)
+				{
+					result = isMatch(s, rules, sIndex, rIndex + 1);
+				}
 			}
 		}
 		else if (rules[rIndex].repeat)
