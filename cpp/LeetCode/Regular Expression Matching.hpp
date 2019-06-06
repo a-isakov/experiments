@@ -103,15 +103,23 @@ protected:
 	}
 
 	void ParseRules(string& p, vector<Rule>& rules) {
+		size_t rIndex = 0;
 		for (size_t i = 0; i < p.length(); i++)
 		{
 			switch (p[i])
 			{
 			case '*':
-				rules[rules.size() - 1].repeat = true;
+				if (rIndex > 1 && rules[rIndex - 2].c == '.' && rules[rIndex - 2].repeat)
+				{
+					rules.pop_back();
+					rIndex--;
+				}
+				else
+					rules[rIndex - 1].repeat = true;
 				break;
 			default:
 				rules.push_back(Rule(false, p[i]));
+				rIndex++;
 			}
 		}
 	}
