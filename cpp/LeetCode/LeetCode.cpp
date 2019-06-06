@@ -38,5 +38,8 @@ int main()
 	resultString = sol.isMatch("a", "ab*") ? "passed" : "FAILED"; // Should be true
 	std::cout << "Test 10 " << resultString << "\n";
 
+	resultString = sol.isMatch("bbbba", ".*a*a") ? "passed" : "FAILED"; // Should be true
+	std::cout << "Test 11 " << resultString << "\n";
+
 	std::cout << "Hello World!\n";
 }
