@@ -10,12 +10,16 @@ int main()
 	Solution sol;
 	resultString = sol.isMatch("aa", "a") ? "FAILED" : "passed"; // Should be false
 	std::cout << "Test 1 " << resultString << "\n";
+
 	resultString = sol.isMatch("aa", "a*") ? "passed" : "FAILED"; // Should be true
 	std::cout << "Test 2 " << resultString << "\n";
+
 	resultString = sol.isMatch("ab", ".*") ? "passed" : "FAILED"; // Should be true
 	std::cout << "Test 3 " << resultString << "\n";
+
 	resultString = sol.isMatch("aab", "c*a*b") ? "passed" : "FAILED"; // Should be true
 	std::cout << "Test 4 " << resultString << "\n";
+
 	resultString = sol.isMatch("mississippi", "mis*is*p*.") ? "FAILED" : "passed"; // Should be false
 	std::cout << "Test 5 " << resultString << "\n";
 
