@@ -46,6 +46,7 @@ Output: false
 */
 #include <string>
 #include <vector>
+#include <unordered_map>
 
 using namespace std;
 
@@ -62,18 +63,17 @@ public:
 
 		buildPositions(s, rules);
 
-		//bool result = false;// isMatch(s, rules, 0, 0);
 		size_t lastRuleIndex = rules.size() - 1;
-		while (lastRuleIndex >= 0 && rules[lastRuleIndex].sPositions.empty() && rules[lastRuleIndex].repeat)
+		while (lastRuleIndex >= 0 && rules[lastRuleIndex].positions.empty() && rules[lastRuleIndex].repeat)
 		{
 			lastRuleIndex--;
 		}
 		if (lastRuleIndex >= 0)
 		{
 			Rule& lastRule = rules[lastRuleIndex];
-			for (int i = lastRule.sPositions.size() - 1; i >= 0; i--)
+			for (unordered_map<int, bool>::iterator i = lastRule.positions.begin(); i != lastRule.positions.end(); i++)
 			{
-				if (lastRule.sPositions[i] + 1 == s.length())
+				if (i->first + 1 == s.length())
 					return true;
 			}
 		}
@@ -88,7 +88,7 @@ protected:
 		}
 		bool repeat;
 		char c;
-		vector<int> sPositions; // Indexes of the characters where rule applied
+		unordered_map<int, bool> positions;
 	};
 
 	void ParseRules(string& p, vector<Rule>& rules) {
@@ -121,15 +121,15 @@ protected:
 				size_t sIndex = 0;
 				if (rules[rIndex].repeat)
 				{
-					rules[rIndex].sPositions.push_back(sIndex - 1);
+					rules[rIndex].positions[sIndex - 1] = true;
 				}
 				while (sIndex < s.length())
 				{
 					if (s[sIndex] == rules[rIndex].c || rules[rIndex].c == '.')
-						rules[rIndex].sPositions.push_back(sIndex);
+						rules[rIndex].positions[sIndex] = true;
 					else if (rules[rIndex].repeat)
 					{
-						rules[rIndex].sPositions.push_back(sIndex - 1);
+						rules[rIndex].positions[sIndex - 1] = true;
 						break;
 					}
 					
@@ -141,20 +141,20 @@ protected:
 			}
 			else
 			{
-				for (size_t i = 0; i < rules[rIndex - 1].sPositions.size(); i++)
+				for(unordered_map<int, bool>::iterator i = rules[rIndex - 1].positions.begin(); i != rules[rIndex - 1].positions.end(); i++)
 				{
-					size_t sIndex = rules[rIndex - 1].sPositions[i] + 1;
+					size_t sIndex = i->first + 1;
 					if (rules[rIndex].repeat)
 					{
-						rules[rIndex].sPositions.push_back(sIndex - 1);
+						rules[rIndex].positions[sIndex - 1] = true;
 					}
 					while (sIndex < s.length())
 					{
 						if (s[sIndex] == rules[rIndex].c || rules[rIndex].c == '.')
-							rules[rIndex].sPositions.push_back(sIndex);
+							rules[rIndex].positions[sIndex] = true;
 						else if (rules[rIndex].repeat)
 						{
-							rules[rIndex].sPositions.push_back(sIndex - 1);
+							rules[rIndex].positions[sIndex - 1];
 							break;
 						}
 
