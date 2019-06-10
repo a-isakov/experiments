@@ -63,6 +63,7 @@ public:
 
 		buildPositions(s, rules);
 
+		// Find last rule without repeat
 		size_t lastRuleIndex = rules.size() - 1;
 		while (lastRuleIndex >= 0 && rules[lastRuleIndex].positions.empty() && rules[lastRuleIndex].repeat)
 		{
@@ -73,6 +74,7 @@ public:
 			Rule& lastRule = rules[lastRuleIndex];
 			for (unordered_map<int, bool>::iterator i = lastRule.positions.begin(); i != lastRule.positions.end(); i++)
 			{
+				// If reached out last char in the string then it matches
 				if (i->first + 1 == s.length())
 					return true;
 			}
@@ -90,7 +92,8 @@ protected:
 		char c;
 		unordered_map<int, bool> positions;
 	};
-
+	
+	// Transform rules into convenient format
 	void ParseRules(string& p, vector<Rule>& rules) {
 		size_t rIndex = 0;
 		for (size_t i = 0; i < p.length(); i++)
@@ -113,6 +116,9 @@ protected:
 		}
 	}
 
+	// Gather string position for each rule
+	// 1st rule: find for characters in the string which may match to the 1st rule.
+	// Nth rule: get string indexes from previous rule and compare next char against Nth rule. Build new map of positions
 	void buildPositions(const string& s, vector<Rule>& rules) {
 		for (size_t rIndex = 0; rIndex < rules.size(); rIndex++)
 		{
