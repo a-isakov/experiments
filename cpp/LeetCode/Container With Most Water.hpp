@@ -13,12 +13,62 @@ Output: 49
 */
 
 #include <vector>
+#include <queue>
 
 using namespace std;
 
 class Solution {
 public:
 	int maxArea(vector<int>& height) {
+		int leftIndex = 0;
+		int rightIndex = height.size() - 1;
+		int max = -1;
 
+		priority_queue<pair<size_t, int>, vector<pair<size_t, int>>, CompareHeight> pq;
+		for (size_t i = 0; i < height.size(); i++)
+		{
+
+			pq.push(pair<size_t, int>(i, height[i]));
+		}
+
+		pair<size_t, int> i1 = pq.top();
+		pq.pop();
+		pair<size_t, int> i2 = pq.top();
+		pq.pop();
+		max = min(i1.second, i2.second) * abs(int(i2.first) - int(i1.first));
+		while (!pq.empty())
+		{
+			pair<size_t, int> iN = pq.top();
+			pq.pop();
+
+			int square1 = min(i1.second, iN.second) * abs(int(iN.first) - int(i1.first));
+			int square2 = min(i2.second, iN.second) * abs(int(iN.first) - int(i2.first));
+			if (square1 < square2)
+			{
+				i2 = iN;
+				if (square2 > max)
+					max = square2;
+			}
+			else
+			{
+				i1 = iN;
+				if (square1 > max)
+					max = square1;
+			}
+		}
+
+		return max;
+	}
+protected:
+	struct CompareHeight
+	{
+		bool operator()(pair<size_t, int> const& p1, pair<size_t, int> const& p2) {
+			return p1.second < p2.second;
+		}
+	};
+
+	int min(int a, int b)
+	{
+		return a < b ? a : b;
 	}
 };
