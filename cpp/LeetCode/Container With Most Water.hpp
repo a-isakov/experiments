@@ -23,51 +23,21 @@ public:
 	int maxArea(vector<int>& height) {
 		int max = -1;
 
-		priority_queue<pair<size_t, int>, vector<pair<size_t, int>>, CompareHeight> pq;
-		for (size_t i = 0; i < height.size(); i++)
+		size_t left = 0;
+		size_t right = height.size() - 1;
+		while (left < right)
 		{
-			pq.push(pair<size_t, int>(i, height[i]));
-		}
+			int min = height[left] < height[right] ? height[left] : height[right];
+			int square = min * (right - left);
+			if (square > max)
+				max = square;
 
-		// Pull min and check against longest distance
-		size_t lStart = 0;
-		size_t rStart = height.size() - 1;
-		while (!pq.empty())
-		{
-			pair<size_t, int> heightItem = pq.top();
-			pq.pop();
-
-			// Looking for left and right items for distances
-			while (height[lStart] < heightItem.second)
-				lStart++;
-			while (height[rStart] < heightItem.second)
-					rStart--;
-
-			// Need to find maximum left and right distances
-			size_t lDistance = heightItem.first - lStart;
-			size_t rDistance = rStart - heightItem.first;
-			if (lDistance == rDistance)
-				continue;
-			else
-			{
-				int square = (lDistance < rDistance) ? heightItem.second * rDistance : heightItem.second * lDistance;
-				if (square > max)
-					max = square;
-			}
+			while (height[left] == min && left < right)
+				left++;
+			while (height[right] == min && left < right)
+				right--;
 		}
 
 		return max;
 	}
-protected:
-	struct CompareHeight
-	{
-		bool operator()(pair<size_t, int> const& p1, pair<size_t, int> const& p2) {
-			return p1.second > p2.second; //  To implement minPQ
-		}
-	};
-
-	//int min(int a, int b)
-	//{
-	//	return a < b ? a : b;
-	//}
 };

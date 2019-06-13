@@ -70,6 +70,9 @@ void testContainer()
 
 	v = { 6, 4, 3, 1, 4, 6, 99, 62, 1, 2, 6 };
 	std::cout << "Test 4 " << std::string(sol.maxArea(v) == 62 ? "passed" : "FAILED") << "\n";
+
+	v = { 1, 1 };
+	std::cout << "Test 5 " << std::string(sol.maxArea(v) == 1 ? "passed" : "FAILED") << "\n";
 }
 
 int main()
