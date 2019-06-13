@@ -34,7 +34,11 @@ public:
 
 			while (height[left] == min && left < right)
 				left++;
+			while (height[left] < min && left < right)
+				left++;
 			while (height[right] == min && left < right)
+				right--;
+			while (height[right] < min && left < right)
 				right--;
 		}
 
