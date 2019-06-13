@@ -21,19 +21,15 @@ using namespace std;
 class Solution {
 public:
 	int maxArea(vector<int>& height) {
-		//int leftIndex = 0;
-		//int rightIndex = height.size() - 1;
 		int max = -1;
 
 		priority_queue<pair<size_t, int>, vector<pair<size_t, int>>, CompareHeight> pq;
 		for (size_t i = 0; i < height.size(); i++)
 		{
-
 			pq.push(pair<size_t, int>(i, height[i]));
 		}
 
-		// Pull min and heck against longest distance
-		unordered_set<size_t> ignores;
+		// Pull min and check against longest distance
 		size_t lStart = 0;
 		size_t rStart = height.size() - 1;
 		while (!pq.empty())
@@ -42,20 +38,14 @@ public:
 			pq.pop();
 
 			// Looking for left and right items for distances
-			size_t lPos = lStart;
-			while (ignores.find(lPos) != ignores.end())
-				lPos++;
-			if (lPos > lStart)
-				lStart = lPos;
-			size_t rPos = rStart;
-			while (ignores.find(rPos) != ignores.end())
-				rPos--;
-			if (rPos < rStart)
-				rStart = rPos;
+			while (height[lStart] < heightItem.second)
+				lStart++;
+			while (height[rStart] < heightItem.second)
+					rStart--;
 
 			// Need to find maximum left and right distances
-			size_t lDistance = heightItem.first - lPos;
-			size_t rDistance = rPos - heightItem.first;
+			size_t lDistance = heightItem.first - lStart;
+			size_t rDistance = rStart - heightItem.first;
 			if (lDistance == rDistance)
 				continue;
 			else
@@ -64,36 +54,7 @@ public:
 				if (square > max)
 					max = square;
 			}
-
-			ignores.insert(heightItem.first);
 		}
-
-		// This strategy doesn't work
-		//pair<size_t, int> i1 = pq.top();
-		//pq.pop();
-		//pair<size_t, int> i2 = pq.top();
-		//pq.pop();
-		//max = min(i1.second, i2.second) * abs(int(i2.first) - int(i1.first));
-		//while (!pq.empty())
-		//{
-		//	pair<size_t, int> iN = pq.top();
-		//	pq.pop();
-
-		//	int square1 = min(i1.second, iN.second) * abs(int(iN.first) - int(i1.first));
-		//	int square2 = min(i2.second, iN.second) * abs(int(iN.first) - int(i2.first));
-		//	if (square1 < square2)
-		//	{
-		//		i2 = iN;
-		//		if (square2 > max)
-		//			max = square2;
-		//	}
-		//	else
-		//	{
-		//		i1 = iN;
-		//		if (square1 > max)
-		//			max = square1;
-		//	}
-		//}
 
 		return max;
 	}
