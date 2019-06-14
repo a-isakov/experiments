@@ -28,29 +28,30 @@ using namespace std;
 class Solution {
 public:
 	bool hasAlternatingBits(int n) {
-		int c1 = n | BIG_INT_1;
-		int c2 = n & BIG_INT_1;
-		int c3 = n | BIG_INT_0;
-		int c4 = n & BIG_INT_0;
+		int BIG_INT_1 = 0b1010101010101010101010101010101;
+		int BIG_INT_0 = 0b0101010101010101010101010101010;
+
+		int n1 = n;
+		unsigned int mask = 0;
+		while (n1)
+		{
+			n1 >>= 1;
+			mask <<= 1;
+			mask |= 1;
+		}
 
 		if (n & 1)
 		{
-			if ((n | BIG_INT_1) == BIG_INT_1 && (n & BIG_INT_1) == n && !(n & BIG_INT_0))
+			BIG_INT_1 &= mask;
+			if ((BIG_INT_1 & n) == BIG_INT_1 && !(n & BIG_INT_0))
 				return true;
 		}
 		else
 		{
-			if ((n | BIG_INT_0) == BIG_INT_0 && (n & BIG_INT_0) == n && !(n & BIG_INT_1))
+			BIG_INT_0 &= mask;
+			if ((BIG_INT_0 & n) == BIG_INT_0 && !(n && BIG_INT_1))
 				return true;
 		}
-
-		//if ((n | BIG_INT_1) == BIG_INT_1 && (n & BIG_INT_1) == n && !(n & BIG_INT_0))
-		//	return true;
-		//if ((n | BIG_INT_0) == BIG_INT_0 && (n & BIG_INT_0) == n && !(n & BIG_INT_1))
-		//	return true;
 		return false;
 	}
-protected:
-	const int BIG_INT_1 = 0b1010101010101010101010101010101;
-	const int BIG_INT_0 = 0b0101010101010101010101010101010;
 };
