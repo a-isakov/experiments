@@ -152,10 +152,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="LeetCode.cpp" />
-    <ClCompile Include="Regular Expression Matching.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Container With Most Water.hpp" />
+    <ClInclude Include="Binary Number with Alternating Bits.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

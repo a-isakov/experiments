@@ -18,12 +18,9 @@
     <ClCompile Include="LeetCode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Regular Expression Matching.hpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Container With Most Water.hpp">
+    <ClInclude Include="Binary Number with Alternating Bits.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
