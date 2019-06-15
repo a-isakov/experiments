@@ -28,9 +28,6 @@ using namespace std;
 class Solution {
 public:
 	bool hasAlternatingBits(int n) {
-		int BIG_INT_1 = 0b1010101010101010101010101010101;
-		int BIG_INT_0 = 0b0101010101010101010101010101010;
-
 		int n1 = n;
 		unsigned int mask = 0;
 		while (n1)
@@ -40,18 +37,21 @@ public:
 			mask |= 1;
 		}
 
+		BIG_INT_0 &= mask;
+		BIG_INT_1 &= mask;
 		if (n & 1)
 		{
-			BIG_INT_1 &= mask;
-			if ((BIG_INT_1 & n) == BIG_INT_1 && !(n & BIG_INT_0))
+			if ((BIG_INT_0 | n) == mask && (BIG_INT_1 & n) == n)
 				return true;
 		}
 		else
 		{
-			BIG_INT_0 &= mask;
-			if ((BIG_INT_0 & n) == BIG_INT_0 && !(n && BIG_INT_1))
+			if ((BIG_INT_1 | n) == mask && (BIG_INT_0 & n) == n)
 				return true;
 		}
 		return false;
 	}
+protected:
+	int BIG_INT_1 = 0b1010101010101010101010101010101;
+	int BIG_INT_0 = 0b0101010101010101010101010101010;
 };
