@@ -36,11 +36,42 @@ class Solution {
 public:
 	TreeNode* subtreeWithAllDeepest(TreeNode* root) {
 		TreeNode* subTree = nullptr;
+
+		vector<int> v(500, INT_MIN); // Change to TreeNode
+		size_t max = 0;
+		plain(root, v, 0, max);
+
+		bool found = false;
+		while (!found)
+		{
+			if (!(max & 1)) // Even
+			{
+				if (v[max] != INT_MIN && v[max - 1] != INT_MIN)
+				{
+					found = true;
+				}
+			}
+		}
+
+		// Remove before submit
 		clean(root);
 
 		return subTree;
 	}
 
+protected:
+	void plain(TreeNode* node, vector<int>& v, size_t i, size_t& max)
+	{
+		v[i] = node->val;
+		if (node->left)
+			plain(node->left, v, (i + 1) * 2 - 1, max);
+		if (node->right)
+			plain(node->right, v, (i + 1) * 2, max);
+		if (i > max)
+			max = i;
+	}
+
+public:
 	TreeNode* buildTree(vector<int> v)
 	{
 		vector<TreeNode*> t(v.size());
