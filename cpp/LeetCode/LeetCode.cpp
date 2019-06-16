@@ -85,7 +85,18 @@
 //	std::cout << "Test 6 " << std::string(!sol.hasAlternatingBits(8) ? "passed" : "FAILED") << "\n";
 //}
 
+#include "Smallest Subtree with all the Deepest Nodes.hpp"
+void testSmallestTree()
+{
+	Solution sol;
+	std::vector<int> v = { 3,5,1,6,2,0,8,INT_MIN,INT_MIN,7,4 };
+	std::vector<int> vc = { 2,7,4 };
+	if (sol.serialize(sol.subtreeWithAllDeepest(sol.buildTree(v))) == vc)
+		std::cout << "1\n";
+}
+
 int main()
 {
+	testSmallestTree();
 	std::cout << "Hello World!\n";
 }

@@ -21,6 +21,10 @@ The output "[2, 7, 4]" is a serialization of the subtree rooted at the node with
 Both the input and output have TreeNode type.
 */
 
+#include <vector>
+
+using namespace std;
+
 struct TreeNode {
 	int val;
 	TreeNode* left;
@@ -31,6 +35,56 @@ struct TreeNode {
 class Solution {
 public:
 	TreeNode* subtreeWithAllDeepest(TreeNode* root) {
+		TreeNode* subTree = nullptr;
+		clean(root);
 
+		return subTree;
+	}
+
+	TreeNode* buildTree(vector<int> v)
+	{
+		vector<TreeNode*> t(v.size());
+		for (size_t i = 0; i < v.size(); i++)
+		{
+			if (v[i] == INT_MIN)
+				t[i] = nullptr;
+			else
+				t[i] = new TreeNode(v[i]);
+			if (i)
+			{
+				size_t parent = (i - 1) / 2;
+				if (i & 1) // Odd
+					t[parent]->left = t[i];
+				else // Even
+					t[parent]->right = t[i];
+			}
+		}
+		return t[0];
+	}
+
+	vector<int> serialize(TreeNode* root)
+	{
+		vector<int> v;
+		intoV(root, v);
+		return v;
+	}
+protected:
+	void intoV(TreeNode* node, vector<int>& v)
+	{
+		if (node)
+		{
+			v.push_back(node->val);
+			intoV(node->left, v);
+			intoV(node->right, v);
+		}
+	}
+
+	void clean(TreeNode* node)
+	{
+		if (node->left)
+			clean(node->left);
+		if (node->right)
+			clean(node->right);
+		delete node;
 	}
 };
