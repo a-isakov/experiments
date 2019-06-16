@@ -20,7 +20,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Binary Number with Alternating Bits.hpp">
+    <ClInclude Include="Smallest Subtree with all the Deepest Nodes.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
