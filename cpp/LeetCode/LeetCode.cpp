@@ -89,10 +89,13 @@
 void testSmallestTree()
 {
 	Solution sol;
-	std::vector<int> v = { 3,5,1,6,2,0,8,INT_MIN,INT_MIN,7,4 };
+	std::vector<int> v = { 3,5,1,6,2,0,8,INT32_MIN,INT32_MIN,7,4 };
 	std::vector<int> vc = { 2,7,4 };
-	if (sol.serialize(sol.subtreeWithAllDeepest(sol.buildTree(v))) == vc)
-		std::cout << "1\n";
+	std::cout << "Test 1 " << std::string(sol.serialize(sol.subtreeWithAllDeepest(sol.buildTree(v))) == vc ? "passed" : "FAILED") << "\n";
+	v = { 1 };
+	vc = { 1 };
+	std::cout << "Test 2 " << std::string(sol.serialize(sol.subtreeWithAllDeepest(sol.buildTree(v))) == vc ? "passed" : "FAILED") << "\n";
+	
 }
 
 int main()

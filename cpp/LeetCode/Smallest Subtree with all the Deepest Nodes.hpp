@@ -37,7 +37,7 @@ public:
 	TreeNode* subtreeWithAllDeepest(TreeNode* root) {
 		TreeNode* subTree = nullptr;
 
-		vector<int> v(500, INT_MIN); // Change to TreeNode
+		vector<TreeNode*> v(500, nullptr); // Change to TreeNode
 		size_t max = 0;
 		plain(root, v, 0, max);
 
@@ -46,23 +46,24 @@ public:
 		{
 			if (!(max & 1)) // Even
 			{
-				if (v[max] != INT_MIN && v[max - 1] != INT_MIN)
+				if (v[max] && v[max - 1])
 				{
 					found = true;
+					subTree = v[(max - 1) / 2];
 				}
 			}
 		}
 
 		// Remove before submit
-		clean(root);
+		//clean(root);
 
 		return subTree;
 	}
 
 protected:
-	void plain(TreeNode* node, vector<int>& v, size_t i, size_t& max)
+	void plain(TreeNode* node, vector<TreeNode*>& v, size_t i, size_t& max)
 	{
-		v[i] = node->val;
+		v[i] = node;
 		if (node->left)
 			plain(node->left, v, (i + 1) * 2 - 1, max);
 		if (node->right)
@@ -77,7 +78,7 @@ public:
 		vector<TreeNode*> t(v.size());
 		for (size_t i = 0; i < v.size(); i++)
 		{
-			if (v[i] == INT_MIN)
+			if (v[i] == INT32_MIN)
 				t[i] = nullptr;
 			else
 				t[i] = new TreeNode(v[i]);
