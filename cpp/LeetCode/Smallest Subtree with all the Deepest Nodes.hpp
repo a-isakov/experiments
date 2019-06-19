@@ -40,7 +40,7 @@ public:
 
 		TreeNode* subTree =  nullptr;
 
-		vector<TreeNode*> v(500, nullptr); // Change to TreeNode
+		vector<TreeNode*> v(5000000, nullptr); // Change to TreeNode
 		size_t max = 0;
 		plain(root, v, 0, max);
 		size_t rEnd = max;
@@ -55,8 +55,11 @@ public:
 					TreeNode* parent = v[(rEnd - 1) / 2];
 					if (parent->left && parent->right)
 					{
-						found = true;
-						subTree = v[(rEnd - 1) / 2];
+						if (!parent->left->left && !parent->left->right && !parent->right->left && !parent->right->right)
+						{
+							found = true;
+							subTree = v[(rEnd - 1) / 2];
+						}
 					}
 				}
 			}
@@ -97,42 +100,48 @@ protected:
 public:
 	TreeNode* buildTree(vector<int> v)
 	{
-		vector<TreeNode*> t(v.size());
-		size_t parentIndex = 0;
-		//size_t parentsInLevel = 1;
-		for (size_t i = 0; i < v.size(); i++)
+		vector<int>::iterator it = v.begin();
+		TreeNode* root = new TreeNode(*it);
+		if (it != v.end())
 		{
-			if (!i) // Root
-				t[i] = new TreeNode(v[i]);
-			else
-			{
-				if (v[i] == INT32_MIN)
-					t[i] = nullptr;
-				else
-					t[i] = new TreeNode(v[i]);
-
-				if (i & 1) // Odd
-					t[parentIndex]->left = t[i];
-				else // Even
-				{
-					t[parentIndex]->right = t[i];
-					parentIndex++;
-				}
-			}
-			//if (v[i] == INT32_MIN)
-			//	t[i] = nullptr;
-			//else
-			//	t[i] = new TreeNode(v[i]);
-			//if (i)
-			//{
-			//	size_t parent = (i - 1) / 2;
-			//	if (i & 1) // Odd
-			//		t[parent]->left = t[i];
-			//	else // Even
-			//		t[parent]->right = t[i];
-			//}
+			vector<TreeNode*> parents = {root};
+			readChildren(parents, ++it, v.end());
 		}
-		return t[0];
+		return root;
+	}
+
+	void readChildren(vector<TreeNode*>& parents, vector<int>::iterator& it, vector<int>::iterator end)
+	{
+		vector<TreeNode*> children;
+		for (vector<TreeNode*>::iterator pi = parents.begin(); pi != parents.end(); pi++)
+		{
+			if (*pi)
+			{
+				if (it == end)
+					return;
+				if (*it == INT32_MIN)
+					children.push_back(nullptr);
+				else
+				{
+					TreeNode* left = new TreeNode(*it);
+					(*pi)->left = left;
+					children.push_back(left);
+				}
+				it++;
+				if (it == end)
+					return;
+				if (*it == INT32_MIN)
+					children.push_back(nullptr);
+				else
+				{
+					TreeNode* right = new TreeNode(*it);
+					(*pi)->right = right;
+					children.push_back(right);
+				}
+				it++;
+			}
+		}
+		readChildren(children, it, end);
 	}
 
 	vector<int> serialize(TreeNode* root)
