@@ -10,13 +10,13 @@ Return the node with the largest depth such that it contains all the deepest nod
 
 Example 1:
 
-Input: [3,5,1,6,2,0,8,null,null,7,4]
+Input: [3,5,1,6,2,0,8,INT32_MIN,INT32_MIN,7,4]
 Output: [2,7,4]
 Explanation:
 
 We return the node with value 2, colored in yellow in the diagram.
 The nodes colored in blue are the deepest nodes of the tree.
-The input "[3, 5, 1, 6, 2, 0, 8, null, null, 7, 4]" is a serialization of the given tree.
+The input "[3, 5, 1, 6, 2, 0, 8, INT32_MIN, INT32_MIN, 7, 4]" is a serialization of the given tree.
 The output "[2, 7, 4]" is a serialization of the subtree rooted at the node with value 2.
 Both the input and output have TreeNode type.
 */
@@ -35,23 +35,45 @@ struct TreeNode {
 class Solution {
 public:
 	TreeNode* subtreeWithAllDeepest(TreeNode* root) {
-		TreeNode* subTree = nullptr;
+		if (!root || (!root->left && !root->right))
+			return root;
+
+		TreeNode* subTree =  nullptr;
 
 		vector<TreeNode*> v(500, nullptr); // Change to TreeNode
 		size_t max = 0;
 		plain(root, v, 0, max);
+		size_t rEnd = max;
 
 		bool found = false;
-		while (!found)
+		while (!found && rEnd)
 		{
-			if (!(max & 1)) // Even
+			if (!(rEnd & 1)) // Even
 			{
-				if (v[max] && v[max - 1])
+				if (v[rEnd] && v[rEnd - 1])
 				{
-					found = true;
-					subTree = v[(max - 1) / 2];
+					TreeNode* parent = v[(rEnd - 1) / 2];
+					if (parent->left && parent->right)
+					{
+						found = true;
+						subTree = v[(rEnd - 1) / 2];
+					}
 				}
 			}
+			if (!found && v[rEnd])
+			{
+				if (v[rEnd]->right)
+				{
+					found = true;
+					subTree = v[rEnd]->right;
+				}
+				if (v[rEnd]->left)
+				{
+					found = true;
+					subTree = v[rEnd]->left;
+				}
+			}
+			rEnd--;
 		}
 
 		// Remove before submit
@@ -76,20 +98,39 @@ public:
 	TreeNode* buildTree(vector<int> v)
 	{
 		vector<TreeNode*> t(v.size());
+		size_t parentIndex = 0;
+		//size_t parentsInLevel = 1;
 		for (size_t i = 0; i < v.size(); i++)
 		{
-			if (v[i] == INT32_MIN)
-				t[i] = nullptr;
-			else
+			if (!i) // Root
 				t[i] = new TreeNode(v[i]);
-			if (i)
+			else
 			{
-				size_t parent = (i - 1) / 2;
+				if (v[i] == INT32_MIN)
+					t[i] = nullptr;
+				else
+					t[i] = new TreeNode(v[i]);
+
 				if (i & 1) // Odd
-					t[parent]->left = t[i];
+					t[parentIndex]->left = t[i];
 				else // Even
-					t[parent]->right = t[i];
+				{
+					t[parentIndex]->right = t[i];
+					parentIndex++;
+				}
 			}
+			//if (v[i] == INT32_MIN)
+			//	t[i] = nullptr;
+			//else
+			//	t[i] = new TreeNode(v[i]);
+			//if (i)
+			//{
+			//	size_t parent = (i - 1) / 2;
+			//	if (i & 1) // Odd
+			//		t[parent]->left = t[i];
+			//	else // Even
+			//		t[parent]->right = t[i];
+			//}
 		}
 		return t[0];
 	}

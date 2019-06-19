@@ -92,10 +92,19 @@ void testSmallestTree()
 	std::vector<int> v = { 3,5,1,6,2,0,8,INT32_MIN,INT32_MIN,7,4 };
 	std::vector<int> vc = { 2,7,4 };
 	std::cout << "Test 1 " << std::string(sol.serialize(sol.subtreeWithAllDeepest(sol.buildTree(v))) == vc ? "passed" : "FAILED") << "\n";
+
 	v = { 1 };
 	vc = { 1 };
 	std::cout << "Test 2 " << std::string(sol.serialize(sol.subtreeWithAllDeepest(sol.buildTree(v))) == vc ? "passed" : "FAILED") << "\n";
-	
+
+	v = { 0,1,3,INT32_MIN,2 };
+	vc = { 2 };
+	std::cout << "Test 3 " << std::string(sol.serialize(sol.subtreeWithAllDeepest(sol.buildTree(v))) == vc ? "passed" : "FAILED") << "\n";
+
+	v = { 0,1,29,2,3,41,43,11,4,INT32_MIN,5,INT32_MIN,INT32_MIN,INT32_MIN,INT32_MIN,27,15,18,7,19,6,INT32_MIN,36,INT32_MIN,33,INT32_MIN,INT32_MIN,8,10,INT32_MIN,22,INT32_MIN,17,INT32_MIN,INT32_MIN,INT32_MIN,INT32_MIN,16,9,20,12,23,28,INT32_MIN,39,34,INT32_MIN,14,INT32_MIN,46,42,26,13,31,INT32_MIN,30,48,INT32_MIN,INT32_MIN,INT32_MIN,INT32_MIN,INT32_MIN,37,INT32_MIN,47,INT32_MIN,INT32_MIN,45,INT32_MIN,21,44,INT32_MIN,INT32_MIN,INT32_MIN,35,INT32_MIN,49,INT32_MIN,INT32_MIN,INT32_MIN,INT32_MIN,INT32_MIN,INT32_MIN,24,32,INT32_MIN,INT32_MIN,INT32_MIN,INT32_MIN,INT32_MIN,INT32_MIN,25,INT32_MIN,INT32_MIN,INT32_MIN,INT32_MIN,38,INT32_MIN,40 };
+	vc = { 2 };
+	std::cout << "Test 4 " << std::string(sol.serialize(sol.subtreeWithAllDeepest(sol.buildTree(v))) == vc ? "passed" : "FAILED") << "\n";
+
 }
 
 int main()
