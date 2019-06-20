@@ -22,6 +22,8 @@ Both the input and output have TreeNode type.
 */
 
 #include <vector>
+#include <algorithm>
+#include <unordered_map>
 
 using namespace std;
 
@@ -33,15 +35,6 @@ struct TreeNode {
 };
 
 class Solution {
-protected:
-	struct Node {
-		TreeNode* node;
-		int level;
-		Node() : node(nullptr), level(-1) {}
-		Node(TreeNode* n) : node(n), level(-1) {}
-		Node(const Node &n) : node(n.node), level(-1) {}
-	};
-
 public:
 	TreeNode* subtreeWithAllDeepest(TreeNode* root) {
 		if (!root || (!root->left && !root->right))
@@ -49,88 +42,41 @@ public:
 
 		TreeNode* subTree = nullptr;
 
-		vector<Node> v(500);
-		v[0] = Node(root);
-		size_t lIndex = 0;
-		size_t rIndex = 0;
-		size_t i = 0;
+		unordered_map<TreeNode*, int> map;
+		count(root, map);
+		TreeNode* inspect = root;
 		while (true)
 		{
-			while (lIndex <= rIndex)
-			{
-				TreeNode* node = v[i].node;
-				if (node->left)
-					v[++i] = node->left;
-				if (node->right)
-					v[++i] = node->right;
-				lIndex++;
-			}
+			if (!inspect->left && !inspect->right)
+				return inspect;
+			int lLevel = inspect->left ? map[inspect->left] : -1;
+			int rLevel = inspect->right ? map[inspect->right] : -1;
+			if (inspect->left && inspect->right && lLevel == rLevel)
+				return inspect;
+			if (lLevel > rLevel)
+				inspect = inspect->left;
+			else
+				inspect = inspect->right;
 		}
 
 		return subTree;
 	}
-
-	TreeNode* subtreeWithAllDeepestNW(TreeNode* root) {
-		if (!root || (!root->left && !root->right))
-			return root;
-
-		TreeNode* subTree =  nullptr;
-
-		vector<TreeNode*> v(5000000, nullptr);
-		size_t max = 0;
-		plain(root, v, 0, max);
-		size_t rEnd = max;
-
-		bool found = false;
-		while (!found && rEnd)
-		{
-			if (!(rEnd & 1)) // Even
-			{
-				if (v[rEnd] && v[rEnd - 1])
-				{
-					TreeNode* parent = v[(rEnd - 1) / 2];
-					if (parent->left && parent->right)
-					{
-						if (!parent->left->left && !parent->left->right && !parent->right->left && !parent->right->right)
-						{
-							found = true;
-							subTree = v[(rEnd - 1) / 2];
-						}
-					}
-				}
-			}
-			if (!found && v[rEnd])
-			{
-				if (v[rEnd]->right)
-				{
-					found = true;
-					subTree = v[rEnd]->right;
-				}
-				if (v[rEnd]->left)
-				{
-					found = true;
-					subTree = v[rEnd]->left;
-				}
-			}
-			rEnd--;
-		}
-
-		// Remove before submit
-		//clean(root);
-
-		return subTree;
-	}
-
 protected:
-	void plain(TreeNode* node, vector<TreeNode*>& v, size_t i, size_t& max)
+	void count(TreeNode* node, unordered_map<TreeNode*, int>& map)
 	{
-		v[i] = node;
+		int lLevel = 0;
+		int rLevel = 0;
 		if (node->left)
-			plain(node->left, v, (i + 1) * 2 - 1, max);
+		{
+			count(node->left, map);
+			lLevel = map[node->left] + 1;
+		}
 		if (node->right)
-			plain(node->right, v, (i + 1) * 2, max);
-		if (i > max)
-			max = i;
+		{
+			count(node->right, map);
+			rLevel = map[node->right] + 1;
+		}
+		map[node] = max(lLevel, rLevel);
 	}
 
 public:
@@ -195,14 +141,5 @@ protected:
 			intoV(node->left, v);
 			intoV(node->right, v);
 		}
-	}
-
-	void clean(TreeNode* node)
-	{
-		if (node->left)
-			clean(node->left);
-		if (node->right)
-			clean(node->right);
-		delete node;
 	}
 };
