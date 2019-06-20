@@ -33,14 +33,50 @@ struct TreeNode {
 };
 
 class Solution {
+protected:
+	struct Node {
+		TreeNode* node;
+		int level;
+		Node() : node(nullptr), level(-1) {}
+		Node(TreeNode* n) : node(n), level(-1) {}
+		Node(const Node &n) : node(n.node), level(-1) {}
+	};
+
 public:
 	TreeNode* subtreeWithAllDeepest(TreeNode* root) {
 		if (!root || (!root->left && !root->right))
 			return root;
 
+		TreeNode* subTree = nullptr;
+
+		vector<Node> v(500);
+		v[0] = Node(root);
+		size_t lIndex = 0;
+		size_t rIndex = 0;
+		size_t i = 0;
+		while (true)
+		{
+			while (lIndex <= rIndex)
+			{
+				TreeNode* node = v[i].node;
+				if (node->left)
+					v[++i] = node->left;
+				if (node->right)
+					v[++i] = node->right;
+				lIndex++;
+			}
+		}
+
+		return subTree;
+	}
+
+	TreeNode* subtreeWithAllDeepestNW(TreeNode* root) {
+		if (!root || (!root->left && !root->right))
+			return root;
+
 		TreeNode* subTree =  nullptr;
 
-		vector<TreeNode*> v(5000000, nullptr); // Change to TreeNode
+		vector<TreeNode*> v(5000000, nullptr);
 		size_t max = 0;
 		plain(root, v, 0, max);
 		size_t rEnd = max;
