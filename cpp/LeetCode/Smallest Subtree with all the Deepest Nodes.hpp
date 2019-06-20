@@ -37,6 +37,11 @@ struct TreeNode {
 class Solution {
 public:
 	TreeNode* subtreeWithAllDeepest(TreeNode* root) {
+		char i = 0;
+		return find(root, i);
+	}
+
+	TreeNode* subtreeWithAllDeepestSlow(TreeNode* root) {
 		if (!root || (!root->left && !root->right))
 			return root;
 
@@ -58,6 +63,33 @@ public:
 		return nullptr;
 	}
 protected:
+	TreeNode* find(TreeNode* node, char& index)
+	{
+		if (!node)
+			return node;
+
+		char lIndex = 0;
+		TreeNode* left = find(node->left, lIndex);
+		char rIndex = 0;
+		TreeNode* right = find(node->right, rIndex);
+
+		if (lIndex == rIndex)
+		{
+			index = lIndex + 1;
+			return node;
+		}
+		else if (lIndex < rIndex)
+		{
+			index = rIndex + 1;
+			return right;
+		}
+		else
+		{
+			index = lIndex + 1;
+			return left;
+		}
+	}
+
 	void count(TreeNode* node, unordered_map<TreeNode*, char>& map)
 	{
 		char lLevel = 0;
