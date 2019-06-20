@@ -20,7 +20,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Smallest Subtree with all the Deepest Nodes.hpp">
+    <ClInclude Include="Unique Paths.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

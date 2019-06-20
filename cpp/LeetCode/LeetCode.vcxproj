@@ -154,7 +154,7 @@
     <ClCompile Include="LeetCode.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Smallest Subtree with all the Deepest Nodes.hpp" />
+    <ClInclude Include="Unique Paths.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
