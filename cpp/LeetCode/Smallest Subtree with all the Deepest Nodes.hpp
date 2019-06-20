@@ -40,32 +40,28 @@ public:
 		if (!root || (!root->left && !root->right))
 			return root;
 
-		TreeNode* subTree = nullptr;
-
-		unordered_map<TreeNode*, int> map;
+		unordered_map<TreeNode*, short int> map;
 		count(root, map);
 		TreeNode* inspect = root;
 		while (true)
 		{
-			if (!inspect->left && !inspect->right)
+			short int lLevel = inspect->left ? map[inspect->left] : -1;
+			short int rLevel = inspect->right ? map[inspect->right] : -1;
+			if (lLevel == rLevel)
 				return inspect;
-			int lLevel = inspect->left ? map[inspect->left] : -1;
-			int rLevel = inspect->right ? map[inspect->right] : -1;
-			if (inspect->left && inspect->right && lLevel == rLevel)
-				return inspect;
-			if (lLevel > rLevel)
+			else if (lLevel > rLevel)
 				inspect = inspect->left;
 			else
 				inspect = inspect->right;
 		}
 
-		return subTree;
+		return nullptr;
 	}
 protected:
-	void count(TreeNode* node, unordered_map<TreeNode*, int>& map)
+	void count(TreeNode* node, unordered_map<TreeNode*, short int>& map)
 	{
-		int lLevel = 0;
-		int rLevel = 0;
+		short int lLevel = 0;
+		short int rLevel = 0;
 		if (node->left)
 		{
 			count(node->left, map);
