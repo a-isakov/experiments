@@ -11,7 +11,7 @@ public class PointSET {
 
     // construct an empty set of points
     public PointSET() {
-
+        points = new SET<Point2D>();
     }
 
     // is the set empty?
