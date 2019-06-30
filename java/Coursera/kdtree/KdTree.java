@@ -8,6 +8,13 @@ import edu.princeton.cs.algs4.Point2D;
 import edu.princeton.cs.algs4.RectHV;
 
 public class KdTree {
+
+    private class Tree {
+        public Tree() {
+            // Implement later
+        }
+    }
+
     // construct an empty set of points
     public KdTree() {
 
@@ -25,7 +32,7 @@ public class KdTree {
 
     // add the point to the set (if it is not already in the set)
     public void insert(Point2D p) {
-
+        // implement later
     }
 
     // does the set contain point p?
@@ -35,7 +42,7 @@ public class KdTree {
 
     // draw all points to standard draw
     public void draw() {
-
+        // implement later
     }
 
     // all points that are inside the rectangle (or on the boundary)
@@ -49,6 +56,6 @@ public class KdTree {
     }
 
     public static void main(String[] args) {
-
+        // implement later
     }
 }
