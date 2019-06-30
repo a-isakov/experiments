@@ -14,17 +14,37 @@
  *
  ******************************************************************************/
 
+import edu.princeton.cs.algs4.Point2D;
+import edu.princeton.cs.algs4.RectHV;
 import edu.princeton.cs.algs4.StdRandom;
 import edu.princeton.cs.algs4.StdOut;
 
 public class KdTreeGenerator {
 
     public static void main(String[] args) {
-        int n = Integer.parseInt(args[0]);
-        for (int i = 0; i < n; i++) {
+        // int n = Integer.parseInt(args[0]);
+        PointSET set1 = new PointSET();
+        KdTree set2 = new KdTree();
+        for (int i = 0; i < 10; i++) {
             double x = StdRandom.uniform(0.0, 1.0);
             double y = StdRandom.uniform(0.0, 1.0);
             StdOut.printf("%8.6f %8.6f\n", x, y);
+            Point2D point = new Point2D(x, y);
+            set1.insert(point);
+            set2.insert(point);
         }
+
+        RectHV rect = new RectHV(0, 0, 1, 1);
+        for (Point2D point: set1.range(rect)) {
+            if (set2.contains(point))
+                StdOut.printf("%8.6f %8.6f passed\n", point.x(), point.y());
+            else
+                StdOut.printf("%8.6f %8.6f FAILED\n", point.x(), point.y());
+        }
+
+        RectHV rect2 = new RectHV(0.2, 0.2, 0.7, 0.7);
+        Iterable<Point2D> ret1 = set1.range(rect2);
+        Iterable<Point2D> ret2 = set2.range(rect2);
+        ret2 = null;
     }
 }
