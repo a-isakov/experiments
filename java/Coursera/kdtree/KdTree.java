@@ -11,7 +11,7 @@ import edu.princeton.cs.algs4.Stack;
 public class KdTree {
     private int size;
     private Node root;
-    private Node championNode;
+    private Point2D champion;
     private double championDistance;
 
     private class Node {
@@ -144,11 +144,11 @@ public class KdTree {
         if (root == null)
             return null;
 
-        championNode = null;
+        champion = null;
         championDistance = 0;
         nearest(root, p, false);
 
-        return championNode.point;
+        return champion;
     }
 
     // Return true if it does make sense to check another node
@@ -156,16 +156,10 @@ public class KdTree {
         if (node == null)
             return;
 
-        if (p.equals(node.point)) {
-            championDistance = 0;
-            championNode = node;
-            return;
-        }
-
         double d = p.distanceSquaredTo(node.point);
-        if (d < championDistance || championNode == null) {
+        if (d < championDistance || champion == null) {
             championDistance = d;
-            championNode = node;
+            champion = node.point;
         }
 
         if (horizontal) {
