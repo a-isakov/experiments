@@ -74,10 +74,10 @@ public class PointSET {
             throw new IllegalArgumentException("Point object is empty");
 
         Point2D np = null;
-        double nd = 1;
+        double nd = 0;
         for (Point2D point: points) {
             double distance = p.distanceSquaredTo(point);
-            if (distance < nd) {
+            if (distance <= nd || np == null) {
                 nd = distance;
                 np = point;
             }

@@ -13,7 +13,7 @@ public class KdTree {
     private Node root;
 
     private class Node {
-        private Point2D point;
+        private final Point2D point;
         private Node leftbottom;
         private Node righttop;
         // private boolean horizontal;
