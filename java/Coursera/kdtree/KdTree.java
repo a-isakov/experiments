@@ -151,6 +151,7 @@ public class KdTree {
         return championNode.point;
     }
 
+    // Return true if it does make sense to check another node
     private void nearest(Node node, Point2D p, boolean horizontal) {
         if (node == null)
             return;
@@ -164,21 +165,25 @@ public class KdTree {
         if (horizontal) {
             if (p.y() < node.point.y()) {
                 nearest(node.leftbottom, p, false);
-                if (championNode.point.y() >= node.point.y())
+                 // if (node.righttop != null && (node.point.y() - championNode.point.y())*(node.point.y() - championNode.point.y()) < championDistance)
+                // if (championNode.point.equals(node.point))
                     nearest(node.righttop, p, false);
             } else {
                 nearest(node.righttop, p, false);
-                if (championNode.point.y() <= node.point.y())
+                // if (node.leftbottom != null && (node.point.y() - championNode.point.y())*(node.point.y() - championNode.point.y()) < championDistance)
+                // if (championNode.point.equals(node.point))
                     nearest(node.leftbottom, p, false);
             }
         } else {
             if (p.x() < node.point.x()) {
                 nearest(node.leftbottom, p, true);
-                if (championNode.point.x() >= node.point.x())
+                // if (node.righttop != null && (node.point.x() - championNode.point.x())*(node.point.x() - championNode.point.x()) < championDistance)
+                // if (championNode.point.equals(node.point))
                     nearest(node.righttop, p, true);
             } else {
                 nearest(node.righttop, p, true);
-                if (championNode.point.x() <= node.point.x())
+                // if (node.leftbottom != null && (node.point.x() - championNode.point.x())*(node.point.x() - championNode.point.x()) < championDistance)
+                // if (championNode.point.equals(node.point))
                     nearest(node.leftbottom, p, true);
             }
         }

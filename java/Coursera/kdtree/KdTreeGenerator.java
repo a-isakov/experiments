@@ -25,7 +25,7 @@ public class KdTreeGenerator {
         // int n = Integer.parseInt(args[0]);
         PointSET set1 = new PointSET();
         KdTree set2 = new KdTree();
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 1000; i++) {
             double x = StdRandom.uniform(0.0, 1.0);
             double y = StdRandom.uniform(0.0, 1.0);
             StdOut.printf("%8.6f %8.6f\n", x, y);
@@ -46,7 +46,8 @@ public class KdTreeGenerator {
         Iterable<Point2D> ret1 = set1.range(rect2);
         Iterable<Point2D> ret2 = set2.range(rect2);
 
-        for (int i = 0; i < 10; i++) {
+        StdOut.print("-----------------\n");
+        for (int i = 0; i < 1000; i++) {
             double x = StdRandom.uniform(0.0, 1.0);
             double y = StdRandom.uniform(0.0, 1.0);
 
@@ -55,8 +56,10 @@ public class KdTreeGenerator {
             Point2D p2 = set2.nearest(p);
             if (p1.equals(p2))
                 StdOut.printf("%8.6f %8.6f passed\n", p.x(), p.y());
-            else
+            else {
                 StdOut.printf("%8.6f %8.6f FAILED\n", p.x(), p.y());
+                Point2D p3 = set2.nearest(p);
+            }
         }
 
         ret2 = null;
