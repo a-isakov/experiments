@@ -45,6 +45,20 @@ public class KdTreeGenerator {
         RectHV rect2 = new RectHV(0.2, 0.2, 0.7, 0.7);
         Iterable<Point2D> ret1 = set1.range(rect2);
         Iterable<Point2D> ret2 = set2.range(rect2);
+
+        for (int i = 0; i < 10; i++) {
+            double x = StdRandom.uniform(0.0, 1.0);
+            double y = StdRandom.uniform(0.0, 1.0);
+
+            Point2D p = new Point2D(x, y);
+            Point2D p1 = set1.nearest(p);
+            Point2D p2 = set2.nearest(p);
+            if (p1.equals(p2))
+                StdOut.printf("%8.6f %8.6f passed\n", p.x(), p.y());
+            else
+                StdOut.printf("%8.6f %8.6f FAILED\n", p.x(), p.y());
+        }
+
         ret2 = null;
     }
 }
