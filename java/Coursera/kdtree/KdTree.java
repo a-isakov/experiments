@@ -156,6 +156,12 @@ public class KdTree {
         if (node == null)
             return;
 
+        if (p.equals(node.point)) {
+            championDistance = 0;
+            championNode = node;
+            return;
+        }
+
         double d = p.distanceSquaredTo(node.point);
         if (d < championDistance || championNode == null) {
             championDistance = d;
@@ -163,27 +169,25 @@ public class KdTree {
         }
 
         if (horizontal) {
-            if (p.y() < node.point.y()) {
+            double dy = p.y() - node.point.y();
+            if (dy < 0) {
                 nearest(node.leftbottom, p, false);
-                 // if (node.righttop != null && (node.point.y() - championNode.point.y())*(node.point.y() - championNode.point.y()) < championDistance)
-                // if (championNode.point.equals(node.point))
+                if (dy*dy < championDistance)
                     nearest(node.righttop, p, false);
             } else {
                 nearest(node.righttop, p, false);
-                // if (node.leftbottom != null && (node.point.y() - championNode.point.y())*(node.point.y() - championNode.point.y()) < championDistance)
-                // if (championNode.point.equals(node.point))
+                if (dy*dy < championDistance)
                     nearest(node.leftbottom, p, false);
             }
         } else {
-            if (p.x() < node.point.x()) {
+            double dx = p.x() - node.point.x();
+            if (dx < 0) {
                 nearest(node.leftbottom, p, true);
-                // if (node.righttop != null && (node.point.x() - championNode.point.x())*(node.point.x() - championNode.point.x()) < championDistance)
-                // if (championNode.point.equals(node.point))
+                if (dx*dx < championDistance)
                     nearest(node.righttop, p, true);
             } else {
                 nearest(node.righttop, p, true);
-                // if (node.leftbottom != null && (node.point.x() - championNode.point.x())*(node.point.x() - championNode.point.x()) < championDistance)
-                // if (championNode.point.equals(node.point))
+                if (dx*dx < championDistance)
                     nearest(node.leftbottom, p, true);
             }
         }
