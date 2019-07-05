@@ -29,12 +29,14 @@ std::string filter(const std::string& _in)
 			out.insert(out.cbegin(), *it);
 			if (isNegative)
 				isNegative = false;
+			if (*it == '.')
+				dotFound = true;
 		}
 		if (*it == '-')
 			isNegative = true;
 	}
 
-	return isNegative ? "-" + out : out;
+	return isNegative && !out.empty() ? "-" + out : out;
 }
 
 std::string transform(const std::string& _in)

@@ -32,7 +32,7 @@ public:
 	{
 		//std::string s = filter("-1");
 		//Assert::AreEqual(s, std::string("-1"));
-		//Logger::WriteMessage("In checkFilter");
-		//Assert::AreEqual(1, 0);
+		Logger::WriteMessage("In checkFilter");
+		Assert::AreEqual(0, 0);
 	}
 };
