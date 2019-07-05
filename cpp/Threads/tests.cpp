@@ -1,5 +1,5 @@
 #include "CppUnitTest.h"
-#include "Solver.h"
+//#include "Solver.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
@@ -23,13 +23,16 @@ public:
 	{}
 
 	BEGIN_TEST_METHOD_ATTRIBUTE(checkFilter)
-		TEST_OWNER(L"owner")
+		TEST_OWNER(L"AI")
 		TEST_PRIORITY(1)
+		TEST_METHOD_ATTRIBUTE(L"MyTrait", L"1")
 	END_TEST_METHOD_ATTRIBUTE()
 
 	TEST_METHOD(checkFilter)
 	{
-		std::string s = filter("-1");
-		Assert::AreEqual(s, std::string("-1"));
+		//std::string s = filter("-1");
+		//Assert::AreEqual(s, std::string("-1"));
+		Logger::WriteMessage("In checkFilter");
+		Assert::AreEqual(1, 0);
 	}
 };
