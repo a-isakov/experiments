@@ -13,17 +13,17 @@ int main(int argc, char* argv[])
 		std::cout << "Only one agrument is supported\n";
 	else
 	{
-		std::string inputFileName(argv[1]);
-		std::string outputFileName = composeOutputFileName(inputFileName);
+		//std::string inputFileName(argv[1]);
+		//std::string outputFileName = composeOutputFileName(inputFileName);
 
-		std::queue<std::string> processedStrings;
+		//std::queue<std::string> processedStrings;
 
-		std::thread reader(readerThread, inputFileName, std::ref(processedStrings));
-		std::thread writer(writerThread);
+		//std::thread reader(readerThread, inputFileName, std::ref(processedStrings));
+		//std::thread writer(writerThread);
 
-		reader.join();
-		writer.join();
+		//reader.join();
+		//writer.join();
 
-		std::cout << "See result of processing in " << outputFileName << "\n";
+		//std::cout << "See result of processing in " << outputFileName << "\n";
 	}
 }
