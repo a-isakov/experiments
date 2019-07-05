@@ -13,24 +13,17 @@ int main(int argc, char* argv[])
 		std::cout << "Only one agrument is supported\n";
 	else
 	{
-		std::cout << (filter("-1") == "-1" ? "-1 passed" : "-1 FAILED") << "\n";
-		std::cout << (filter("1") == "1" ? "1 passed" : "1 FAILED") << "\n";
-		std::cout << (filter("--1") == "-1" ? "--1 passed" : "--1 FAILED") << "\n";
-		std::cout << (filter("-1-2") == "-12" ? "-1-2 passed" : "-1-2 FAILED") << "\n";
-		std::cout << (filter("1.2") == "1.2" ? "1.2 passed" : "1.2 FAILED") << "\n";
-		std::cout << (filter("1.2.3") == "12.3" ? "1.2.3 passed" : "1.2.3 FAILED") << "\n";
-		std::cout << "\n";
-		//std::string inputFileName(argv[1]);
-		//std::string outputFileName = composeOutputFileName(inputFileName);
+		std::string inputFileName(argv[1]);
+		std::string outputFileName = composeOutputFileName(inputFileName);
 
-		//std::queue<std::string> processedStrings;
+		std::queue<std::string> processedStrings;
 
-		//std::thread reader(readerThread, inputFileName, std::ref(processedStrings));
-		//std::thread writer(writerThread);
+		std::thread reader(readerThread, inputFileName, std::ref(processedStrings));
+		std::thread writer(writerThread);
 
-		//reader.join();
-		//writer.join();
+		reader.join();
+		writer.join();
 
-		//std::cout << "See result of processing in " << outputFileName << "\n";
+		std::cout << "See result of processing in " << outputFileName << "\n";
 	}
 }
