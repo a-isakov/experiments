@@ -4,6 +4,7 @@
 #include <fstream>
 #include <thread>
 #include <sstream>
+#include <condition_variable>
 
 std::string composeOutputFileName(const std::string& _in)
 {
@@ -24,32 +25,64 @@ std::string filter(const std::string& _in)
 	bool dotFound = false;
 	for (std::string::const_reverse_iterator it = _in.crbegin(); it != _in.crend(); it++)
 	{
-		if (isdigit(*it) || (!dotFound && *it == '.'))
+		unsigned char c(*it);
+		if (isdigit(c) || (!dotFound && c == '.'))
 		{
-			out.insert(out.cbegin(), *it);
+			out.insert(out.cbegin(), c);
 			if (isNegative)
 				isNegative = false;
-			if (*it == '.')
+			if (c == '.')
 				dotFound = true;
 		}
-		if (*it == '-')
+		if (c == '-')
 			isNegative = true;
 	}
 
 	return isNegative && !out.empty() ? "-" + out : out;
 }
 
+typedef std::pair<double, std::string> doubleStringPair;
+
 std::string transform(const std::string& _in)
 {
 	std::istringstream in(_in);
 	std::string str;
-	std::priority_queue<double, std::vector<double>, std::greater<double>> pq;
+
+	auto cmp = [](doubleStringPair left, doubleStringPair right) { return left.first > right.first; };
+	std::priority_queue<doubleStringPair, std::vector<doubleStringPair>, decltype(cmp)> pq(cmp);
+
+	// Parse numbers and order them
 	while (std::getline(in, str, ' '))
 	{
 		str = filter(str);
-		//std::pair<double, std::string> item;
+		if (!str.empty())
+		{
+			doubleStringPair item(::atof(str.c_str()), str);
+			pq.push(item);
+		}
 	}
-	return "";
+	if (pq.empty())
+		return "";
+
+	// Do calc
+	double sum = 0;
+	size_t size = pq.size();
+	std::string min = pq.top().second;
+	std::string max;
+	std::ostringstream result;
+	while (!pq.empty())
+	{
+		sum += pq.top().first;
+		result << pq.top().second << " ";
+
+		if (pq.size() == 1) // Last one
+			result << ": " << min << " " << pq.top().second << " " << sum << " " << sum / size;
+
+		pq.pop();
+	}
+
+
+	return result.str();
 }
 
 void readerThread(const std::string& _inputFileName, std::queue<std::string>& _processedStrings)
