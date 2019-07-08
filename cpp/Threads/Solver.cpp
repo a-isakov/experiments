@@ -100,10 +100,23 @@ void readerThread(const std::string& _inputFileName, std::queue<std::string>& _p
 	}
 	catch (const std::ifstream::failure& e)
 	{
-		std::cout << "Exception occured while file opened: " << e.what() << "\n";
+		std::cout << "Exception occured while input file opened: " << e.what() << "\n";
 	}
 }
 
-void writerThread()
+void writerThread(const std::string& _outputFileName, std::queue<std::string>& _processedStrings)
 {
+	std::ofstream outFile;
+	try
+	{
+		outFile.open(_outputFileName);
+		while (!_processedStrings.empty())
+		{
+			const std::string& str = _processedStrings.back();
+		}
+	}
+	catch (const std::ofstream::failure& e)
+	{
+		std::cout << "Exception occured while output file opened: " << e.what() << "\n";
+	}
 }

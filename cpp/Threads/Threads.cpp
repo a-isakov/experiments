@@ -19,7 +19,7 @@ int main(int argc, char* argv[])
 		std::queue<std::string> processedStrings;
 
 		std::thread reader(readerThread, inputFileName, std::ref(processedStrings));
-		std::thread writer(writerThread);
+		std::thread writer(writerThread, outputFileName, std::ref(processedStrings));
 
 		reader.join();
 		writer.join();
