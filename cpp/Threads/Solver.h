@@ -8,11 +8,15 @@ class Solver
 public:
 	Solver(const std::string& _inFile);
 
-protected:
-	std::string inFileName;
-	std::queue<std::string> processedStrings;
+	void readerThread();
+	void writerThread();
+
+	std::string getOutFileName();
 
 protected:
-	void readerThread();
-	void writerThread(const std::string& _outputFileName);
+	std::string inFileName;
+	std::string outFileName;
+	std::queue<std::string> processedStrings;
+
+	//std::condition_variable 
 };

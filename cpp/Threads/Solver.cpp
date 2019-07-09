@@ -7,9 +7,10 @@
 #include <condition_variable>
 #include "Util.h"
 
-Solver::Solver(const std::string& _inFile) : inFileName(_inFile)
+Solver::Solver(const std::string& _inFile) :
+	inFileName(_inFile),
+	outFileName(Util::composeOutputFileName(_inFile))
 {
-
 }
 
 void Solver::readerThread()
@@ -31,12 +32,12 @@ void Solver::readerThread()
 	}
 }
 
-void Solver::writerThread(const std::string& _outputFileName)
+void Solver::writerThread()
 {
 	std::ofstream outFile;
 	try
 	{
-		outFile.open(_outputFileName);
+		outFile.open(outFileName);
 		while (!processedStrings.empty())
 		{
 			const std::string& str = processedStrings.front();
@@ -47,4 +48,9 @@ void Solver::writerThread(const std::string& _outputFileName)
 	{
 		std::cout << "Exception occured while output file opened: " << e.what() << "\n";
 	}
+}
+
+std::string Solver::getOutFileName()
+{
+	return outFileName;
 }

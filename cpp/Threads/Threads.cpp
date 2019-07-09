@@ -14,17 +14,15 @@ int main(int argc, char* argv[])
 	else
 	{
 		std::string inputFileName(argv[1]);
-		//std::string outputFileName = composeOutputFileName(inputFileName);
 
-		//std::queue<std::string> processedStrings;
 		Solver solver(argv[1]);
 
-		//std::thread reader(readerThread, inputFileName, std::ref(processedStrings));
-		//std::thread writer(writerThread, outputFileName, std::ref(processedStrings));
+		std::thread reader(&Solver::readerThread, &solver);
+		std::thread writer(&Solver::writerThread, &solver);
 
-		//reader.join();
-		//writer.join();
+		reader.join();
+		writer.join();
 
-		//std::cout << "See result of processing in " << outputFileName << "\n";
+		std::cout << "See result of processing in " << solver.getOutFileName() << "\n";
 	}
 }
