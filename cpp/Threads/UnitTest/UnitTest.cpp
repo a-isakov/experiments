@@ -1,32 +1,32 @@
 #include "pch.h"
 #include "CppUnitTest.h"
-#include "..\\Solver.cpp"
+#include "..\\Util.cpp"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace UnitTest
 {
-	TEST_CLASS(UnitTest)
+	TEST_CLASS(SolverUnitTest)
 	{
 	private:
 		void checkOutPutNameComposerImpl(const std::string & _value, const std::string & _result)
 		{
 			Logger::WriteMessage(("Checking " + _value).c_str());
-			Assert::AreEqual(composeOutputFileName(_value), _result);
+			Assert::AreEqual(Util::composeOutputFileName(_value), _result);
 			Logger::WriteMessage("Passed");
 		}
 
 		void checkFilterImpl(const std::string & _value, const std::string & _result)
 		{
 			Logger::WriteMessage(("Checking " + _value).c_str());
-			Assert::AreEqual(filter(_value), _result);
+			Assert::AreEqual(Util::filterNumber(_value), _result);
 			Logger::WriteMessage("Passed");
 		}
 
 		void checkTransformImpl(const std::string& _value, const std::string& _result)
 		{
 			Logger::WriteMessage(("Checking " + _value).c_str());
-			Assert::AreEqual(transform(_value), _result);
+			Assert::AreEqual(Util::transform(_value), _result);
 			Logger::WriteMessage("Passed");
 		}
 

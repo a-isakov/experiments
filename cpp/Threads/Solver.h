@@ -3,12 +3,16 @@
 #include <string>
 #include <queue>
 
-std::string composeOutputFileName(const std::string& _in);
-std::string filter(const std::string& _in);
-std::string transform(const std::string& _in);
-void readerThread(const std::string& _inputFileName, std::queue<std::string>& _processedStrings);
-void writerThread();
-
 class Solver
 {
+public:
+	Solver(const std::string& _inFile);
+
+protected:
+	std::string inFileName;
+	std::queue<std::string> processedStrings;
+
+protected:
+	void readerThread();
+	void writerThread(const std::string& _outputFileName);
 };
