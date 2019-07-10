@@ -2,6 +2,10 @@
 
 #include <string>
 #include <queue>
+#include <thread>
+#include <condition_variable>
+#include <future>
+#include <chrono>
 
 class Solver
 {
@@ -18,5 +22,11 @@ protected:
 	std::string outFileName;
 	std::queue<std::string> processedStrings;
 
-	//std::condition_variable 
+	std::mutex coutMutex;
+	std::mutex containerMutex;
+	std::mutex writerStartMutex;
+	std::condition_variable writerStartCond;
+
+	std::promise<void> writerExit;
+	std::future<void> writerExitFuture;
 };
