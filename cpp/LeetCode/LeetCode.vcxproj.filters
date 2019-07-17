@@ -20,9 +20,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Unique Paths.hpp">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="386 Lexicographical Numbers.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
