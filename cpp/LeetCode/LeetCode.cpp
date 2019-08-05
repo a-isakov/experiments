@@ -118,25 +118,34 @@
 //	std::cout << "Test 7 " << std::string(sol.serialize(sol.subtreeWithAllDeepest(sol.buildTree(v))) == vc ? "passed" : "FAILED") << "\n";
 //}
 
-#include "Unique Paths.hpp"
-void testUniquePaths()
+//#include "Unique Paths.hpp"
+//void testUniquePaths()
+//{
+//		Solution sol;
+//		std::cout << "Test 1 " << std::string(sol.uniquePaths(7, 1) == 1 ? "passed" : "FAILED") << "\n";
+//		std::cout << "Test 2 " << std::string(sol.uniquePaths(1, 7) == 1 ? "passed" : "FAILED") << "\n";
+//		std::cout << "Test 3 " << std::string(sol.uniquePaths(5, 2) == 5 ? "passed" : "FAILED") << "\n";
+//		std::cout << "Test 4 " << std::string(sol.uniquePaths(2, 5) == 5 ? "passed" : "FAILED") << "\n";
+//		std::cout << "Test 5 " << std::string(sol.uniquePaths(3, 3) == 6 ? "passed" : "FAILED") << "\n";
+//		std::cout << "Test 6 " << std::string(sol.uniquePaths(3, 4) == 10 ? "passed" : "FAILED") << "\n";
+//		std::cout << "Test 7 " << std::string(sol.uniquePaths(4, 3) == 10 ? "passed" : "FAILED") << "\n";
+//		std::cout << "Test 8 " << std::string(sol.uniquePaths(4, 4) == 20 ? "passed" : "FAILED") << "\n";
+//		std::cout << "Test 9 " << std::string(sol.uniquePaths(5, 4) == 35 ? "passed" : "FAILED") << "\n";
+//		std::cout << "Test 10 " << std::string(sol.uniquePaths(4, 5) == 35 ? "passed" : "FAILED") << "\n";
+//		std::cout << "Test 11 " << std::string(sol.uniquePaths(5, 5) == 70 ? "passed" : "FAILED") << "\n";
+//}
+
+#include "386 Lexicographical Numbers.hpp"
+void testLexicographicalNumbers()
 {
-		Solution sol;
-		std::cout << "Test 1 " << std::string(sol.uniquePaths(7, 1) == 1 ? "passed" : "FAILED") << "\n";
-		std::cout << "Test 2 " << std::string(sol.uniquePaths(1, 7) == 1 ? "passed" : "FAILED") << "\n";
-		std::cout << "Test 3 " << std::string(sol.uniquePaths(5, 2) == 5 ? "passed" : "FAILED") << "\n";
-		std::cout << "Test 4 " << std::string(sol.uniquePaths(2, 5) == 5 ? "passed" : "FAILED") << "\n";
-		std::cout << "Test 5 " << std::string(sol.uniquePaths(3, 3) == 6 ? "passed" : "FAILED") << "\n";
-		std::cout << "Test 6 " << std::string(sol.uniquePaths(3, 4) == 10 ? "passed" : "FAILED") << "\n";
-		std::cout << "Test 7 " << std::string(sol.uniquePaths(4, 3) == 10 ? "passed" : "FAILED") << "\n";
-		std::cout << "Test 8 " << std::string(sol.uniquePaths(4, 4) == 20 ? "passed" : "FAILED") << "\n";
-		std::cout << "Test 9 " << std::string(sol.uniquePaths(5, 4) == 35 ? "passed" : "FAILED") << "\n";
-		std::cout << "Test 10 " << std::string(sol.uniquePaths(4, 5) == 35 ? "passed" : "FAILED") << "\n";
-		std::cout << "Test 11 " << std::string(sol.uniquePaths(5, 5) == 70 ? "passed" : "FAILED") << "\n";
+	Solution sol;
+	std::string resultString;
+	std::vector<int> v = { 1,10,11,12,13,2,3,4,5,6,7,8,9 };
+	std::cout << "Test 1 " << std::string(sol.lexicalOrder(13) == v ? "passed" : "FAILED") << "\n";
 }
 
 int main()
 {
-	testUniquePaths();
+	testLexicographicalNumbers();
 	std::cout << "Hello World!\n";
 }
