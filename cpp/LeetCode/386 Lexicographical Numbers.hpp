@@ -15,10 +15,11 @@ class Solution {
 public:
 	vector<int> lexicalOrder(int n) {
 		auto cmp = [](int left, int right) {
+			// Check if right is less
 			int l = left;
 			int r = right;
-			queue<int> lQ;
-			queue<int> rQ;
+			stack<int> lQ;
+			stack<int> rQ;
 			while (l)
 			{
 				int d = l % 10;
@@ -34,19 +35,19 @@ public:
 
 			while (!lQ.empty() && !rQ.empty())
 			{
-				int lD = lQ.front();
+				int lD = lQ.top();
 				lQ.pop();
-				int rD = rQ.front();
+				int rD = rQ.top();
 				rQ.pop();
 				if (lD < rD)
-					return true;
-				else if (lD > rD)
 					return false;
+				else if (lD > rD)
+					return true;
 			}
 			if (lQ.empty())
-				return true;
+				return false;
 
-			return false;
+			return true;
 		};
 		priority_queue<int, vector<int>, decltype(cmp)> pq(cmp);
 		for (int i = 1; i <= n; i++)
