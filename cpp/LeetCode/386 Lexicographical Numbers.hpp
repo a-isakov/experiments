@@ -14,53 +14,46 @@ using namespace std;
 class Solution {
 public:
 	vector<int> lexicalOrder(int n) {
-		auto cmp = [](int left, int right) {
-			// Check if right is less
-			int l = left;
-			int r = right;
-			stack<int> lQ;
-			stack<int> rQ;
-			while (l)
-			{
-				int d = l % 10;
-				lQ.push(d);
-				l /= 10;
-			}
-			while (r)
-			{
-				int d = r % 10;
-				rQ.push(d);
-				r /= 10;
-			}
-
-			while (!lQ.empty() && !rQ.empty())
-			{
-				int lD = lQ.top();
-				lQ.pop();
-				int rD = rQ.top();
-				rQ.pop();
-				if (lD < rD)
-					return false;
-				else if (lD > rD)
-					return true;
-			}
-			if (lQ.empty())
-				return false;
-
-			return true;
-		};
-		priority_queue<int, vector<int>, decltype(cmp)> pq(cmp);
-		for (int i = 1; i <= n; i++)
+		vector<int> v(n);
+		if (n < 10)
 		{
-			pq.push(i);
+			for (int i = 0; i < n; i++)
+				v[i] = i + 1;
 		}
-
-		vector<int> v(pq.size());
-		size_t index = 0;
-		while (!pq.empty())
+		else
 		{
-			v[index++] = pq.top();
-			pq.pop();
+			// pair<int, int>: first - value, second - multiplier
+			auto cmp = [](pair<int, int>& left, pair<int, int>& right) {
+				// Check if right is less
+				if (left.second == right.second)
+					return right.first < left.first;
+				int l = left.second > right.second ? left.first : left.first * (right.second / left.second);
+				int r = left.second < right.second ? right.first : right.first * (left.second / right.second);
+				if (l == r)
+					return right.second < left.second;
+
+				return r < l;
+			};
+
+			priority_queue<pair<int, int>, vector<pair<int, int>>, decltype(cmp)> pq(cmp);
+			for (int i = 1; i <= n; i++)
+			{
+				int multiplier = 1;
+				int ci = i;
+				while (ci)
+				{
+					multiplier *= 10;
+					ci /= 10;
+				}
+				pq.emplace(pair<int, int>(i, multiplier/10));
+			}
+
+			size_t index = 0;
+			while (!pq.empty())
+			{
+				v[index++] = pq.top().first;
+				pq.pop();
+			}
 		}
 
 		return v;
