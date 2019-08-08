@@ -6,53 +6,36 @@ Please optimize your algorithm to use less time and space. The input size may be
 */
 
 #include <vector>
-#include <stack>
-#include <queue>
 
 using namespace std;
 
 class Solution {
+private:
+	void pushMultipliers(vector<int>& v, const int value, const int multiplier, const int n)
+	{
+		const int nextMultiplier = multiplier * 10;
+		for (int i = value * 10; i < (value + 1) * 10 && i <= n; i++)
+		{
+			v.push_back(i);
+			if (nextMultiplier <= n)
+				pushMultipliers(v, i, nextMultiplier, n);
+		}
+	}
 public:
 	vector<int> lexicalOrder(int n) {
-		vector<int> v(n);
+		vector<int> v;
+		v.reserve(n);
 		if (n < 10)
 		{
 			for (int i = 0; i < n; i++)
-				v[i] = i + 1;
+				v.push_back(i + 1);
 		}
 		else
 		{
-			// pair<int, int>: first - value, second - multiplier
-			auto cmp = [](pair<int, int>& left, pair<int, int>& right) {
-				// Check if right is less
-				if (left.second == right.second)
-					return right.first < left.first;
-				int l = left.second > right.second ? left.first : left.first * (right.second / left.second);
-				int r = left.second < right.second ? right.first : right.first * (left.second / right.second);
-				if (l == r)
-					return right.second < left.second;
-
-				return r < l;
-			};
-
-			priority_queue<pair<int, int>, vector<pair<int, int>>, decltype(cmp)> pq(cmp);
-			for (int i = 1; i <= n; i++)
+			for (int i = 1; i < 10; i++)
 			{
-				int multiplier = 1;
-				int ci = i;
-				while (ci)
-				{
-					multiplier *= 10;
-					ci /= 10;
-				}
-				pq.emplace(pair<int, int>(i, multiplier/10));
-			}
-
-			size_t index = 0;
-			while (!pq.empty())
-			{
-				v[index++] = pq.top().first;
-				pq.pop();
+				v.push_back(i);
+				pushMultipliers(v, i, 10, n);
 			}
 		}
 
