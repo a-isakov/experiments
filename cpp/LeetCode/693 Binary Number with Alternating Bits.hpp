@@ -55,3 +55,14 @@ protected:
 	int BIG_INT_1 = 0b1010101010101010101010101010101;
 	int BIG_INT_0 = 0b0101010101010101010101010101010;
 };
+
+void testBits()
+{
+	Solution sol;
+	std::cout << "Test 1 " << std::string(sol.hasAlternatingBits(5) ? "passed" : "FAILED") << "\n";
+	std::cout << "Test 2 " << std::string(!sol.hasAlternatingBits(7) ? "passed" : "FAILED") << "\n";
+	std::cout << "Test 3 " << std::string(!sol.hasAlternatingBits(11) ? "passed" : "FAILED") << "\n";
+	std::cout << "Test 4 " << std::string(sol.hasAlternatingBits(10) ? "passed" : "FAILED") << "\n";
+	std::cout << "Test 5 " << std::string(!sol.hasAlternatingBits(4) ? "passed" : "FAILED") << "\n";
+	std::cout << "Test 6 " << std::string(!sol.hasAlternatingBits(8) ? "passed" : "FAILED") << "\n";
+}

@@ -45,3 +45,23 @@ public:
 		return max;
 	}
 };
+
+void testContainer()
+{
+	Solution sol;
+	std::string resultString;
+	std::vector<int> v = { 1, 8, 6, 2, 5, 4, 8, 3, 7 };
+	std::cout << "Test 1 " << std::string(sol.maxArea(v) == 49 ? "passed" : "FAILED") << "\n";
+
+	v = { 1, 2, 4, 3 };
+	std::cout << "Test 2 " << std::string(sol.maxArea(v) == 4 ? "passed" : "FAILED") << "\n";
+
+	v = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+	std::cout << "Test 3 " << std::string(sol.maxArea(v) == 25 ? "passed" : "FAILED") << "\n";
+
+	v = { 6, 4, 3, 1, 4, 6, 99, 62, 1, 2, 6 };
+	std::cout << "Test 4 " << std::string(sol.maxArea(v) == 62 ? "passed" : "FAILED") << "\n";
+
+	v = { 1, 1 };
+	std::cout << "Test 5 " << std::string(sol.maxArea(v) == 1 ? "passed" : "FAILED") << "\n";
+}

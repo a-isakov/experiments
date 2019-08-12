@@ -57,3 +57,19 @@ public:
 		return result;
 	}
 };
+
+void testUniquePaths()
+{
+		Solution sol;
+		std::cout << "Test 1 " << std::string(sol.uniquePaths(7, 1) == 1 ? "passed" : "FAILED") << "\n";
+		std::cout << "Test 2 " << std::string(sol.uniquePaths(1, 7) == 1 ? "passed" : "FAILED") << "\n";
+		std::cout << "Test 3 " << std::string(sol.uniquePaths(5, 2) == 5 ? "passed" : "FAILED") << "\n";
+		std::cout << "Test 4 " << std::string(sol.uniquePaths(2, 5) == 5 ? "passed" : "FAILED") << "\n";
+		std::cout << "Test 5 " << std::string(sol.uniquePaths(3, 3) == 6 ? "passed" : "FAILED") << "\n";
+		std::cout << "Test 6 " << std::string(sol.uniquePaths(3, 4) == 10 ? "passed" : "FAILED") << "\n";
+		std::cout << "Test 7 " << std::string(sol.uniquePaths(4, 3) == 10 ? "passed" : "FAILED") << "\n";
+		std::cout << "Test 8 " << std::string(sol.uniquePaths(4, 4) == 20 ? "passed" : "FAILED") << "\n";
+		std::cout << "Test 9 " << std::string(sol.uniquePaths(5, 4) == 35 ? "passed" : "FAILED") << "\n";
+		std::cout << "Test 10 " << std::string(sol.uniquePaths(4, 5) == 35 ? "passed" : "FAILED") << "\n";
+		std::cout << "Test 11 " << std::string(sol.uniquePaths(5, 5) == 70 ? "passed" : "FAILED") << "\n";
+}

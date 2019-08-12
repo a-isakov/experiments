@@ -20,7 +20,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="386 Lexicographical Numbers.hpp">
+    <ClInclude Include="12 Integer to Roman.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
