@@ -31,59 +31,40 @@ void CLogReader::Close()
 // установка фильтра строк, false - ошибка
 bool CLogReader::SetFilter(const char* filter)
 {
-	if (!m_rules.Size()) // Already set. Assume should be set once
+	if (m_rules.Size()) // Already set. Assume should be set once
 		return false;
 
 	const size_t filterLen = ::strlen(filter);
 
 	// Parse rules
-	//m_firstRule = new SRule();
-	//if (!m_firstRule->AddChar(filter[0]))
-	//{
-	//	CleanRules();
-	//	return false;
-	//}
-	//SRule* currentRule = m_firstRule;
-	//for (size_t i = 1; i < filterLen; i++)
-	//{
-	//	if (filter[i] == '*')
-	//	{
-	//		if (currentRule->pattern[0] == '*')
-	//			continue; // Compress stars
-	//		else
-	//		{
-	//			if (!currentRule->AddRule(filter[i]))
-	//			{
-	//				CleanRules();
-	//				return false;
-	//			}
-	//		}
-	//	}
-	//	else if (filter[i] == '?')
-	//	{
-	//		if (!currentRule->AddRule(filter[i]))
-	//		{
-	//			CleanRules();
-	//			return false;
-	//		}
-	//	}
-	//	else
-	//	{
-	//		if (currentRule->pattern[0] == '?' || currentRule->pattern[0] == '*')
-	//		{
-	//			if (!currentRule->AddRule(filter[i]))
-	//			{
-	//				CleanRules();
-	//				return false;
-	//			}
-	//			else if (!currentRule->AddChar(filter[i]))
-	//			{
-	//				CleanRules();
-	//				return false;
-	//			}
-	//		}
-	//	}
-	//}
+	for (size_t i = 0; i < filterLen; i++)
+	{
+		switch (filter[i])
+		{
+		case '*':
+			// Collapse stars
+			if (m_rules.Size() && m_rules[m_rules.Size() - 1].m_pattern[0] == '*')
+				break;
+		case '?':
+			{
+				SRule rule(filter[i]);
+				m_rules.Append((SRule&&)rule);
+			}
+			break;
+		default:
+			{
+				// Find where string ends
+				size_t rightIndex = i;
+				while (rightIndex < filterLen && filter[rightIndex] != '?' && filter[rightIndex] != '*')
+				{
+					rightIndex++;
+				}
+				SRule rule(&filter[i], rightIndex - i);
+				m_rules.Append((SRule&&)rule);
+				i = rightIndex - 1;
+			}
+		}
+	}
 
 	return true;
 }
@@ -132,17 +113,32 @@ CLogReader::CArray<T>::CArray(const size_t capacity) :
 		m_capacity = capacity;
 }
 
-//template <class T>
-//CLogReader::CArray<T>::CArray(CArray<T> const&& rhv) noexcept :
-//	m_failed(rhv.m_failed),
-//	m_size(rhv.m_size),
-//	m_capacity(rhv.m_capacity),
-//	m_array(rhv.m_array)
-//{
-//	m_size = 0;
-//	m_capacity = 0;
-//	m_array = nullptr;
-//}
+template <class T>
+CLogReader::CArray<T>::CArray(CArray<T> const&& rhv) noexcept :
+	m_failed(rhv.m_failed),
+	m_size(rhv.m_size),
+	m_capacity(rhv.m_capacity),
+	m_array(rhv.m_array)
+{
+	m_size = 0;
+	m_capacity = 0;
+	m_array = nullptr;
+}
+
+template <class T>
+CLogReader::CArray<T>& CLogReader::CArray<T>::operator=(CArray<T>&& rhv) noexcept
+{
+	m_failed = rhv.m_failed;
+	m_size = rhv.m_size;
+	m_capacity = rhv.m_capacity;
+	m_array = rhv.m_array;
+
+	rhv.m_size = 0;
+	rhv.m_capacity = 0;
+	rhv.m_array = nullptr;
+
+	return *this;
+}
 
 template <class T>
 CLogReader::CArray<T>::~CArray()
@@ -171,7 +167,7 @@ bool CLogReader::CArray<T>::Append(T&& item)
 		return false;
 	}
 
-	m_array[m_size++] = item;
+	m_array[m_size++] = (T&&)item;
 	return true;
 }
 
@@ -264,60 +260,42 @@ void CLogReader::CArray<T>::Clear()
 
 ////////////////////////////////////
 // SRule
+CLogReader::SRule::SRule(const char pattern) :
+	m_positions(0)
+{
+	m_pattern = (char*)::malloc(2);
+	if (m_pattern)
+	{
+		m_pattern[0] = pattern;
+		m_pattern[1] = 0;
+	}
+}
+
+CLogReader::SRule::SRule(const char* pattern, const size_t size) :
+	m_positions(0)
+{
+	m_pattern = (char*)::malloc(size + 1);
+	if (m_pattern)
+	{
+		::memcpy_s(m_pattern, size + 1, pattern, size);
+		m_pattern[size] = 0;
+	}
+}
+
+CLogReader::SRule& CLogReader::SRule::operator=(SRule&& rhv) noexcept
+{
+	this->m_pattern = rhv.m_pattern;
+	this->m_positions = (CArray<size_t>&&)rhv.m_positions;
+
+	rhv.m_pattern = nullptr;
+
+	return *this;
+}
+
 CLogReader::SRule::~SRule()
 {
-	if (pattern)
-		::free(pattern);
-}
-
-bool CLogReader::SRule::AddChar(char c)
-{
-	if (!pattern)
-	{
-		pattern = (char*)::malloc(2);
-		if (!pattern)
-			return false;
-		else
-		{
-			pattern[0] = c;
-			pattern[1] = 0;
-		}
-	}
-	else
-	{
-		const size_t size = sizeof(pattern);
-		char* newPattern = (char*)::malloc(size + 1);
-		if (!newPattern)
-			return false;
-		else
-		{
-			if (::memcpy_s(newPattern, size + 1, pattern, size))
-			{
-				::free(newPattern);
-				return false;
-			}
-			else
-			{
-				newPattern[size - 1] = c;
-				newPattern[size] = 0;
-				::free(pattern);
-				pattern = newPattern;
-			}
-		}
-	}
-	return true;
-}
-
-bool CLogReader::SRule::AddRule(char c)
-{
-	SRule* newRule = new SRule();
-	if (!newRule->AddChar(c))
-	{
-		delete newRule;
-		return false;
-	}
-	next = newRule;
-	return true;
+	if (m_pattern)
+		::free(m_pattern);
 }
 
 ////////////////////////////////////

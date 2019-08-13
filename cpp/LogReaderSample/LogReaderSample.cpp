@@ -30,7 +30,7 @@ int main()
 #ifdef TESTE2E
 	char buf[2048];
 	CLogReader logReader;
-	logReader.SetFilter("*");
+	logReader.SetFilter("a***?tst?a");
 	logReader.Open("D:\\dev\\experiments\\.gitignore");
 	logReader.GetNextLine(buf, 2048);
 	logReader.Close();

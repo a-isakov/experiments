@@ -23,7 +23,8 @@ public:
 	{
 	public:
 		CArray(const size_t capacity);
-		//CArray(CArray<T> const&& rhv) noexcept;
+		CArray(CArray<T> const&& rhv) noexcept;
+		CArray<T>& operator=(CArray<T>&& rhv) noexcept;
 		~CArray();
 		size_t Size();
 		bool Append(T&& item);
@@ -44,12 +45,12 @@ private:
 
 	struct SRule
 	{
-		SRule() : pattern(nullptr), next(nullptr) {}
+		SRule(const char pattern);
+		SRule(const char* pattern, const size_t size);
+		SRule& operator=(SRule&& rhv) noexcept;
 		~SRule();
-		bool AddChar(char c);
-		bool AddRule(char c);
-		char* pattern;
-		SRule* next;
+		char* m_pattern;
+		CArray<size_t> m_positions;
 	}; // struct SRule
 
 #ifdef TESTLOGLINE
