@@ -15,7 +15,7 @@ CLogReader::CLogReader() :
 CLogReader::~CLogReader()
 {
 	//if (m_filter)
-	//	free(m_filter);
+	//	sfree(m_filter);
 
 	CleanRules();
 	m_fileHelper.Close();
@@ -119,6 +119,140 @@ bool CLogReader::GetNextLine(char* buf, const int bufsize)
 }
 
 ////////////////////////////////////
+// CArray
+template <class T>
+CLogReader::CArray<T>::CArray(const size_t capacity) :
+	m_failed(false),
+	m_size(0),
+	m_array(nullptr)
+{
+	if (capacity && !Alloc(capacity))
+		m_failed = true;
+	else
+		m_capacity = capacity;
+}
+
+template <class T>
+CLogReader::CArray<T>::~CArray()
+{
+	Clear();
+}
+
+template <class T>
+size_t CLogReader::CArray<T>::Size()
+{
+	return m_size;
+}
+
+template <class T>
+bool CLogReader::CArray<T>::Append(T&& item)
+{
+	if (m_failed)
+		return false;
+
+	if (!m_capacity && !Alloc())
+		return false;
+
+	if (m_size == m_capacity && !DoubleSize())
+	{
+		m_failed = true;
+		return false;
+	}
+
+	m_array[m_size++] = item;
+	return true;
+}
+
+template <class T>
+bool CLogReader::CArray<T>::Append(T* items, size_t count, bool keepTail)
+{
+	size_t remains = m_capacity - m_size;
+	if (remains < count) // Need to change array capacity
+	{
+		size_t need = count - remains;
+		if (!Alloc(m_capacity + need))
+			return false;
+		remains = m_capacity - m_size;
+	}
+
+	T tail = m_array[m_size - 1];
+	if (!::memcpy_s(&m_array[keepTail ? m_size - 1 : m_size], sizeof(T) * remains, items, sizeof(T) * count))
+		m_size += count;
+	else
+		return false;
+	if (keepTail)
+		m_array[m_size - 1] = tail;
+
+	return true;
+}
+
+template <class T>
+T& CLogReader::CArray<T>::operator[](const size_t i)
+{
+	//if (m_failed || i >= m_size)
+	//	return nullptr;
+	return m_array[i];
+}
+
+template <class T>
+bool CLogReader::CArray<T>::Alloc(const size_t capacity, const bool resize)
+{
+	if (m_failed)
+		return false;
+
+	if (capacity <= m_capacity)
+		return true;
+
+	size_t bytesNeed = sizeof(T) * capacity;
+	T* newArray = (T*)::malloc(bytesNeed);
+	if (!newArray)
+	{
+		m_failed = true;
+		return false;
+	}
+
+	if (m_array)
+	{
+		if (::memcpy_s(newArray, bytesNeed, m_array, sizeof(T) * m_capacity))
+		{
+			m_failed = true;
+			::free(newArray);
+			return false;
+		}
+
+		T* toDelete = m_array;
+		::free(toDelete);
+	}
+	m_array = newArray;
+	m_capacity = capacity;
+
+	if (resize)
+		m_size = m_capacity;
+
+	return true;
+}
+
+template <class T>
+bool CLogReader::CArray<T>::DoubleSize()
+{
+	if (m_failed)
+		return false;
+
+	return Alloc(m_capacity * 2);
+}
+
+template <class T>
+void CLogReader::CArray<T>::Clear()
+{
+	if (!m_array)
+		return;
+	::free(m_array);
+	m_array = nullptr;
+	m_size = 0;
+	m_capacity = 0;
+}
+
+////////////////////////////////////
 // SRule
 CLogReader::SRule::~SRule()
 {
@@ -177,15 +311,32 @@ bool CLogReader::SRule::AddRule(char c)
 }
 
 ////////////////////////////////////
+// CLogLine
+
+CLogReader::CLogLine::CLogLine() :
+	m_str(0)
+{
+	m_str.Append(0);
+}
+
+bool CLogReader::CLogLine::AppendBytes(char* buf, const size_t size)
+{
+	return m_str.Append(buf, size, true);
+}
+
+////////////////////////////////////
 // CFileHelper
 
 CLogReader::CFileHelper::CFileHelper() :
 	m_file(INVALID_HANDLE_VALUE),
 	m_clusterSize(DEFAULT_CLUSTER_SIZE),
-	m_firstChunk(nullptr),
-	m_lastChunk(nullptr),
-	m_currentChunk(nullptr),
-	m_chunkPos(0)
+	m_bytesInBuffer(0),
+	m_bufferIndex(0),
+	m_buffer(0)
+	//m_firstChunk(nullptr),
+	//m_lastChunk(nullptr),
+	//m_currentChunk(nullptr),
+	//m_chunkPos(0),
 {
 }
 
@@ -207,7 +358,7 @@ bool CLogReader::CFileHelper::Open(const char* fileName)
 	if (m_file != INVALID_HANDLE_VALUE)
 	{
 		CalcClusterSize(fileName);
-		return true;
+		return m_buffer.Alloc(m_clusterSize, true);
 	}
 
 	return false;
@@ -218,67 +369,103 @@ void CLogReader::CFileHelper::Close()
 	if (m_file != INVALID_HANDLE_VALUE)
 		::CloseHandle(m_file);
 	m_file = INVALID_HANDLE_VALUE;
+	m_buffer.Clear();
 
-	CleanChunks();
+	//CleanChunks();
 }
 
 bool CLogReader::CFileHelper::GetLine(const char* buf, const int bufsize)
 {
-	if (!m_currentChunk)
-	{
-		if (!AddChunk())
-			return false;
-		m_currentChunk = m_firstChunk;
-	}
+	//if (!m_currentChunk)
+	//{
+	//	if (!AddChunk())
+	//		return false;
+	//	m_currentChunk = m_firstChunk;
+	//}
 
-	if (!m_currentChunk->bytes)
-	{
-		DWORD bytesRead = 0;
-		if (::ReadFile(m_file, m_currentChunk->buffer, m_clusterSize, &bytesRead, NULL))
-			m_currentChunk->bytes = bytesRead;
-		else
-			return false;
-		if (!m_currentChunk->bytes)
-			return false;
-	}
+	//if (!m_currentChunk->bytes)
+	//{
+	//	DWORD bytesRead = 0;
+	//	if (::ReadFile(m_file, m_currentChunk->buffer, m_clusterSize, &bytesRead, NULL))
+	//		m_currentChunk->bytes = bytesRead;
+	//	else
+	//		return false;
+	//	if (!m_currentChunk->bytes)
+	//		return false;
+	//}
 
-	char* pos = (char*)::memchr(m_currentChunk->buffer, '\n', m_currentChunk->bytes);
+	//char* pos = (char*)::memchr(m_currentChunk->buffer, '\n', m_currentChunk->bytes);
 	// TODO:
+
+	CLogLine logLine;
+	while (!m_bytesInBuffer)
+	{
+		if (!m_bytesInBuffer)
+		{
+			if (!::ReadFile(m_file, &m_buffer[0], m_clusterSize, &m_bytesInBuffer, NULL))
+				return false;
+			m_bufferIndex = 0;
+			if (!m_bytesInBuffer)
+				return false;
+		}
+
+		// Look for line tail or end of buffer
+		DWORD pos = m_bufferIndex;
+		while (m_buffer[pos] != '\n' && m_buffer[pos] != '\r' && pos < m_buffer.Size())
+		{
+			pos++;
+		}
+
+		if (pos == m_buffer.Size()) // End of buffer
+		{
+			if (!logLine.AppendBytes(&m_buffer[m_bufferIndex], pos - m_bufferIndex))
+				return false;
+			m_bufferIndex = 0;
+			m_bytesInBuffer = 0; // To read next block
+		}
+		else
+		{
+			if (!logLine.AppendBytes(&m_buffer[m_bufferIndex], pos - m_bufferIndex))
+				return false;
+			m_bufferIndex = pos;
+			// TODO: check for another line breaks
+		}
+	}
 
 	return false;
 }
 
-void CLogReader::CFileHelper::CleanChunks()
-{
-	while (m_firstChunk)
-	{
-		SChunk* p = m_firstChunk->next;
-		delete m_firstChunk;
-		m_firstChunk = p;
-	}
-
-	m_firstChunk = nullptr;
-	m_lastChunk = nullptr;
-}
+//void CLogReader::CFileHelper::CleanChunks()
+//{
+//	while (m_firstChunk)
+//	{
+//		SChunk* p = m_firstChunk->next;
+//		delete m_firstChunk;
+//		m_firstChunk = p;
+//	}
+//
+//	m_firstChunk = nullptr;
+//	m_lastChunk = nullptr;
+//}
 
 // True if succeeded, false in error case
-bool CLogReader::CFileHelper::AddChunk()
-{
-	if (!m_lastChunk)
-	{
-		// Initialization
-		m_firstChunk = new CLogReader::CFileHelper::SChunk(m_clusterSize, 0); // Struct is pretty small, operator new is safe
-		m_lastChunk = m_firstChunk;
-	}
-	else
-	{
-		SChunk* newChunk = new CLogReader::CFileHelper::SChunk(m_clusterSize, m_lastChunk->i + 1); // Struct is pretty small, operator new is safe
-		m_lastChunk->next = newChunk;
-		m_lastChunk = newChunk;
-	}
-
-	return m_lastChunk->buffer;
-}
+//bool CLogReader::CFileHelper::AddChunk()
+//{
+//	if (!m_lastChunk)
+//	{
+//		// Initialization
+//		m_firstChunk = new CLogReader::CFileHelper::SChunk(m_clusterSize, 0); // Struct is pretty small, operator new is safe
+//		m_lastChunk = m_firstChunk;
+//	}
+//	else
+//	{
+//		SChunk* newChunk = new CLogReader::CFileHelper::SChunk(m_clusterSize, m_lastChunk->i + 1); // Struct is pretty small, operator new is safe
+//		m_lastChunk->next = newChunk;
+//		m_lastChunk = newChunk;
+//	}
+//
+//	return m_lastChunk->buffer;
+//}
 
 // Returns root path value for cluster size calculation
 // Returns nullptr if cannot recognize
@@ -293,7 +480,7 @@ char* CLogReader::CFileHelper::GetRootPath(const char* fileName)
 		return nullptr;
 
 	char* rootPath = nullptr;
-	int trailPos = 0;
+	size_t trailPos = 0;
 	if (fileName[1] == ':' && fileName[2] == '\\') // Drive in the path
 		trailPos = 2;
 	else if (fileName[0] == '\\' && fileName[1] == '\\' && fileName[2] != '\\') // Check if it's UNC
@@ -311,7 +498,7 @@ char* CLogReader::CFileHelper::GetRootPath(const char* fileName)
 	if (trailPos)
 	{
 		trailPos++;
-		rootPath = (char*)malloc(trailPos + 1); // Operator new works faster but I have no-exceptions requirement
+		rootPath = (char*)::malloc(trailPos + 1); // Operator new works faster but I have no-exceptions requirement
 		if (rootPath)
 		{
 			// Try to copy substring of the path
@@ -319,7 +506,7 @@ char* CLogReader::CFileHelper::GetRootPath(const char* fileName)
 				rootPath[trailPos] = 0;
 			else
 			{
-				free(rootPath);
+				::free(rootPath);
 				rootPath = nullptr;
 			}
 		}
@@ -343,5 +530,5 @@ void CLogReader::CFileHelper::CalcClusterSize(const char* fileName)
 		m_clusterSize = DEFAULT_CLUSTER_SIZE;
 
 	if (rootPath)
-		free(rootPath);
+		::free(rootPath);
 }
