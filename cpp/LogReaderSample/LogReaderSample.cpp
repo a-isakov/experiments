@@ -18,12 +18,6 @@ void testLogString();
 
 int main()
 {
-	//char buf[2048];
-	//CLogReader logReader;
-	//logReader.SetFilter("*");
-	//logReader.Open("C:\\Intel\\Logs\\IntelGFXCoin.log");
-	//logReader.GetNextLine(buf, 2048);
-	//logReader.Close();
 #ifdef TESTROOTPATH
 	testRootPath();
 #endif
@@ -32,6 +26,14 @@ int main()
 #endif
 #ifdef TESTLOGLINE
 	testLogString();
+#endif
+#ifdef TESTE2E
+	char buf[2048];
+	CLogReader logReader;
+	logReader.SetFilter("*");
+	logReader.Open("C:\\dev\\experiments\\.gitignore");
+	logReader.GetNextLine(buf, 2048);
+	logReader.Close();
 #endif
 }
 

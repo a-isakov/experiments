@@ -7,8 +7,9 @@ constexpr DWORD DEFAULT_CLUSTER_SIZE = 64 * 1024;
 // Main class
 
 CLogReader::CLogReader() :
+	m_rules(0)
 	//m_filter(nullptr),
-	m_firstRule(nullptr)
+	//m_firstRule(nullptr)
 {
 }
 
@@ -36,71 +37,71 @@ void CLogReader::Close()
 // установка фильтра строк, false - ошибка
 bool CLogReader::SetFilter(const char* filter)
 {
-	if (!m_firstRule) // Already set. Assume should be set once
-		return false;
+	//if (!m_firstRule) // Already set. Assume should be set once
+	//	return false;
 
 	const size_t filterLen = ::strlen(filter);
 
 	// Parse rules
-	m_firstRule = new SRule();
-	if (!m_firstRule->AddChar(filter[0]))
-	{
-		CleanRules();
-		return false;
-	}
-	SRule* currentRule = m_firstRule;
-	for (size_t i = 1; i < filterLen; i++)
-	{
-		if (filter[i] == '*')
-		{
-			if (currentRule->pattern[0] == '*')
-				continue; // Compress stars
-			else
-			{
-				if (!currentRule->AddRule(filter[i]))
-				{
-					CleanRules();
-					return false;
-				}
-			}
-		}
-		else if (filter[i] == '?')
-		{
-			if (!currentRule->AddRule(filter[i]))
-			{
-				CleanRules();
-				return false;
-			}
-		}
-		else
-		{
-			if (currentRule->pattern[0] == '?' || currentRule->pattern[0] == '*')
-			{
-				if (!currentRule->AddRule(filter[i]))
-				{
-					CleanRules();
-					return false;
-				}
-				else if (!currentRule->AddChar(filter[i]))
-				{
-					CleanRules();
-					return false;
-				}
-			}
-		}
-	}
+	//m_firstRule = new SRule();
+	//if (!m_firstRule->AddChar(filter[0]))
+	//{
+	//	CleanRules();
+	//	return false;
+	//}
+	//SRule* currentRule = m_firstRule;
+	//for (size_t i = 1; i < filterLen; i++)
+	//{
+	//	if (filter[i] == '*')
+	//	{
+	//		if (currentRule->pattern[0] == '*')
+	//			continue; // Compress stars
+	//		else
+	//		{
+	//			if (!currentRule->AddRule(filter[i]))
+	//			{
+	//				CleanRules();
+	//				return false;
+	//			}
+	//		}
+	//	}
+	//	else if (filter[i] == '?')
+	//	{
+	//		if (!currentRule->AddRule(filter[i]))
+	//		{
+	//			CleanRules();
+	//			return false;
+	//		}
+	//	}
+	//	else
+	//	{
+	//		if (currentRule->pattern[0] == '?' || currentRule->pattern[0] == '*')
+	//		{
+	//			if (!currentRule->AddRule(filter[i]))
+	//			{
+	//				CleanRules();
+	//				return false;
+	//			}
+	//			else if (!currentRule->AddChar(filter[i]))
+	//			{
+	//				CleanRules();
+	//				return false;
+	//			}
+	//		}
+	//	}
+	//}
 
 	return true;
 }
 
 void CLogReader::CleanRules()
 {
-	while (m_firstRule)
-	{
-		SRule* p = m_firstRule->next;
-		delete m_firstRule;
-		m_firstRule = p;
-	}
+	//while (m_firstRule)
+	//{
+	//	SRule* p = m_firstRule->next;
+	//	delete m_firstRule;
+	//	m_firstRule = p;
+	//}
 }
 
 // запрос очередной найденной строки,
@@ -109,10 +110,12 @@ void CLogReader::CleanRules()
 bool CLogReader::GetNextLine(char* buf, const int bufsize)
 {
 	// Filter not yet set
-	if (!m_firstRule)
-		return false;
+	//if (!m_firstRule)
+	//	return false;
 
 	char buff[2048];
+	m_fileHelper.GetLine(buff, 2048);
+	m_fileHelper.GetLine(buff, 2048);
 	m_fileHelper.GetLine(buff, 2048);
 
 	return false;
@@ -428,8 +431,18 @@ bool CLogReader::CFileHelper::GetLine(const char* buf, const int bufsize)
 			if (!logLine.AppendBytes(&m_buffer[m_bufferIndex], pos - m_bufferIndex))
 				return false;
 			m_bufferIndex = pos;
-			// TODO: check for another line breaks
 		}
+	}
+
+	// Check for another line breaks
+	while ((m_buffer[m_bufferIndex] == '\n' || m_buffer[m_bufferIndex] == '\r') && m_bufferIndex < m_buffer.Size())
+	{
+		m_bufferIndex++;
+	}
+	if (m_bufferIndex == m_buffer.Size())
+	{
+		m_bufferIndex = 0;
+		m_bytesInBuffer = 0; // To read next block
 	}
 
 	return false;

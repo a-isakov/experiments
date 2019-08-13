@@ -133,7 +133,8 @@ private:
 private:
 	CFileHelper m_fileHelper;
 	//char* m_filter;
-	SRule* m_firstRule;
+	//SRule* m_firstRule;
+	CArray<SRule> m_rules;
 
 #ifdef TESTROOTPATH
 public:
