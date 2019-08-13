@@ -35,9 +35,9 @@ public:
 		void Clear();
 	private:
 		bool m_failed;
-		size_t m_size;
-		size_t m_capacity;
-		T* m_array;
+		size_t m_size; // Number of elements in the array
+		size_t m_capacity; // Number of elements available to store
+		T* m_array; // Storage itself
 	}; // CArray
 #ifdef TESTARRAY
 private:
@@ -63,7 +63,7 @@ public:
 #ifdef TESTLOGLINE
 	public:
 #endif
-		CArray<char> m_str;
+		CArray<char> m_str; // Buffer of the string. Used custom array to simplify few operations
 	}; // class CLogLine
 #ifdef TESTLOGLINE
 private:
@@ -90,10 +90,10 @@ private:
 	private:
 
 		HANDLE m_file;
-		DWORD m_clusterSize;
-		DWORD m_bytesInBuffer;
-		DWORD m_bufferIndex;
-		CArray<char> m_buffer;
+		DWORD m_clusterSize; // Size of the disk cluster to optimize disk read
+		DWORD m_bytesInBuffer; // Number of bytes written to the buffer
+		DWORD m_bufferIndex; // Index of the current position in buffer. Used to read next line
+		CArray<char> m_buffer; // Storage itself. Memory reserved equal to cluster size
 
 #ifdef TESTROOTPATH
 	public:
@@ -107,8 +107,8 @@ private:
 	}; // class CFileHelper
 
 private:
-	CFileHelper m_fileHelper;
-	CLogLine m_filter;
+	CFileHelper m_fileHelper; // For operations with log file
+	CLogLine m_filter; // Filter mask
 
 #ifdef TESTROOTPATH
 public:

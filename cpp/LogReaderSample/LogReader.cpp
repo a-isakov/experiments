@@ -3,7 +3,7 @@
 // 64Kb supposed to be a max cluster size on NTFS
 constexpr DWORD DEFAULT_CLUSTER_SIZE = 64 * 1024;
 
-////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////
 // Main class
 
 CLogReader::CLogReader()
@@ -30,11 +30,11 @@ void CLogReader::Close()
 // установка фильтра строк, false - ошибка
 bool CLogReader::SetFilter(const char* filter)
 {
-	if (m_filter.Size()) // Already set. Assume should be set once
+	if (m_filter.Size()) // Already set. Assume should be set once however it is pretty easy to implement reset
 		return false;
 
 	const size_t filterLen = ::strlen(filter);
-	m_filter.AppendBytes(filter, filterLen);
+	m_filter.AppendBytes(filter, filterLen); // Copy filter
 
 	// Collapse stars
 	size_t ind = 0;
@@ -43,17 +43,17 @@ bool CLogReader::SetFilter(const char* filter)
 		switch (filter[i])
 		{
 		case '*':
-			// Collapse stars
+			// Collapse stars. It makes match a bit faster
 			if (i && filter[i - 1] == '*')
 				break;
 		default:
 			if (ind == i)
 				ind++;
 			else
-				m_filter[ind++] = filter[i];
+				m_filter[ind++] = filter[i]; // Change only if multiple stars found
 		}
 	}
-	m_filter[ind] = 0;
+	m_filter[ind] = 0; // Finalize updated filter
 
 	return true;
 }
@@ -68,13 +68,13 @@ bool CLogReader::GetNextLine(char* buf, const int bufsize)
 		return false;
 
 	CLogLine logLine;
-	while (m_fileHelper.GetLine(logLine))
+	while (m_fileHelper.GetLine(logLine)) // Read lines from the file
 	{
-		if (logLine.Matches(&m_filter[0]))
+		if (logLine.Matches(&m_filter[0])) // Check line against the filter
 		{
 			if (logLine.Size() < (size_t)bufsize) // Buffer is enough
 				return !::memcpy_s(buf, bufsize, &logLine[0], logLine.Size() + 1);
-			else // Cut the line
+			else // Cut the line with trailing "..." if buffer is small
 			{
 				logLine[bufsize - 1] = 0;
 				logLine[bufsize - 2] = '.';
@@ -88,15 +88,16 @@ bool CLogReader::GetNextLine(char* buf, const int bufsize)
 	return false;
 }
 
-////////////////////////////////////
-// CArray
+///////////////////////////////////////////////////////////////////////////////////////////
+// CArray. Hand made dynamic array. Cannot reduce size because no need in this task
+
 template <class T>
-CLogReader::CArray<T>::CArray(const size_t capacity) :
+CLogReader::CArray<T>::CArray(const size_t capacity) : // capacity is a number of elements not bytes
 	m_failed(false),
 	m_size(0),
 	m_array(nullptr)
 {
-	if (capacity && !Alloc(capacity))
+	if (capacity && !Alloc(capacity)) // Reserve memory
 		m_failed = true;
 	else
 		m_capacity = capacity;
@@ -135,12 +136,14 @@ CLogReader::CArray<T>::~CArray()
 	Clear();
 }
 
+// Return number of elements in the array
 template <class T>
 size_t CLogReader::CArray<T>::Size()
 {
 	return m_size;
 }
 
+// Add element to array
 template <class T>
 bool CLogReader::CArray<T>::Append(T&& item)
 {
@@ -160,6 +163,7 @@ bool CLogReader::CArray<T>::Append(T&& item)
 	return true;
 }
 
+// Add array of elements
 template <class T>
 bool CLogReader::CArray<T>::Append(const T* items, size_t count, bool keepTail)
 {
@@ -172,32 +176,35 @@ bool CLogReader::CArray<T>::Append(const T* items, size_t count, bool keepTail)
 		remains = m_capacity - m_size;
 	}
 
-	T tail = m_array[m_size - 1];
+	T tail = m_array[m_size - 1]; // Remember last element
 	if (!::memcpy_s(&m_array[keepTail ? m_size - 1 : m_size], sizeof(T) * remains, items, sizeof(T) * count))
 		m_size += count;
 	else
 		return false;
-	if (keepTail)
+	if (keepTail) // Need to move last element for string operations where 0 should be at the end
 		m_array[m_size - 1] = tail;
 
 	return true;
 }
 
+// Random access operator. Unsafe
 template <class T>
 T& CLogReader::CArray<T>::operator[](const size_t i)
 {
 	return m_array[i];
 }
 
+// Allocate space for specified number of elements. Possible to change size when used as a buffer
 template <class T>
 bool CLogReader::CArray<T>::Alloc(const size_t capacity, const bool resize)
 {
 	if (m_failed)
 		return false;
 
-	if (capacity <= m_capacity)
+	if (capacity <= m_capacity) // Requests capacity is less than existing
 		return true;
 
+	// Create new bigger array and copy old one over
 	size_t bytesNeed = sizeof(T) * capacity;
 	T* newArray = (T*)::malloc(bytesNeed);
 	if (!newArray)
@@ -227,6 +234,7 @@ bool CLogReader::CArray<T>::Alloc(const size_t capacity, const bool resize)
 	return true;
 }
 
+// Increase reserved size twice
 template <class T>
 bool CLogReader::CArray<T>::DoubleSize()
 {
@@ -236,6 +244,7 @@ bool CLogReader::CArray<T>::DoubleSize()
 	return Alloc(m_capacity * 2);
 }
 
+// Cleanup array
 template <class T>
 void CLogReader::CArray<T>::Clear()
 {
@@ -247,13 +256,13 @@ void CLogReader::CArray<T>::Clear()
 	m_capacity = 0;
 }
 
-////////////////////////////////////
-// CLogLine
+///////////////////////////////////////////////////////////////////////////////////////////
+// CLogLine. Originally designed for log lines only but used in multiple places
 
 CLogReader::CLogLine::CLogLine() :
 	m_str(0)
 {
-	m_str.Append(0);
+	m_str.Append(0); // Always store 0 as end of the line
 }
 
 //CLogReader::CLogLine::CLogLine(CLogLine const&& rhv) noexcept :
@@ -261,28 +270,33 @@ CLogReader::CLogLine::CLogLine() :
 //{
 //}
 
+// Copy string to the tail of this one
 bool CLogReader::CLogLine::AppendBytes(const char* buf, const size_t size)
 {
 	return m_str.Append(buf, size, true);
 }
 
+// Length of the string without 0
 size_t CLogReader::CLogLine::Size()
 {
 	// Buffer minus trailing zero
 	return m_str.Size() - 1;
 }
 
+// Random access operator. Unsafe
 char& CLogReader::CLogLine::operator[](const size_t i)
 {
 	return m_str[i];
 }
 
+// Cleanup the string
 void CLogReader::CLogLine::Clear()
 {
 	m_str.Clear();
-	m_str.Append(0);
+	m_str.Append(0); // Always store 0 as end of the line
 }
 
+// Verify if string matches filter criteria
 bool CLogReader::CLogLine::Matches(const char* filter)
 {
 	if (!filter || !filter[0])
@@ -296,7 +310,7 @@ bool CLogReader::CLogLine::Matches(const char* filter)
 	{
 		if (filter[fIndex] == '*')
 		{
-			// Save reverse position but move filter on
+			// Save reverse position but move filter position on
 			fRevIndex = fIndex++;
 			lRevIndex = lIndex;
 		}
@@ -304,12 +318,7 @@ bool CLogReader::CLogLine::Matches(const char* filter)
 		{
 			return !filter[fIndex]; // Matches if filter also ends
 		}
-		else if (filter[fIndex] == '?')
-		{
-			fIndex++;
-			lIndex++;
-		}
-		else if (m_str[lIndex] == filter[fIndex])
+		else if (filter[fIndex] == '?' || m_str[lIndex] == filter[fIndex]) // Characted matches, move forward
 		{
 			fIndex++;
 			lIndex++;
@@ -334,11 +343,11 @@ bool CLogReader::CLogLine::Matches(const char* filter)
 	return false;
 }
 
-////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////
 // CFileHelper
 
 CLogReader::CFileHelper::CFileHelper() :
-	m_file(INVALID_HANDLE_VALUE),
+	m_file(INVALID_HANDLE_VALUE), // This is a flag of opened/non-opened
 	m_clusterSize(DEFAULT_CLUSTER_SIZE),
 	m_bytesInBuffer(0),
 	m_bufferIndex(0),
@@ -363,13 +372,14 @@ bool CLogReader::CFileHelper::Open(const char* fileName)
 	m_file = ::CreateFileA(fileName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (m_file != INVALID_HANDLE_VALUE)
 	{
-		CalcClusterSize(fileName);
+		CalcClusterSize(fileName); // Try to check size of the cluster of the disk where file saved
 		return m_buffer.Alloc(m_clusterSize, true);
 	}
 
 	return false;
 }
 
+// Close file if it has been opened. Optional because invoked from destructor
 void CLogReader::CFileHelper::Close()
 {
 	if (m_file != INVALID_HANDLE_VALUE)
@@ -378,6 +388,7 @@ void CLogReader::CFileHelper::Close()
 	m_buffer.Clear();
 }
 
+// Read line
 bool CLogReader::CFileHelper::GetLine(CLogLine& logLine)
 {
 	logLine.Clear();
@@ -385,13 +396,14 @@ bool CLogReader::CFileHelper::GetLine(CLogLine& logLine)
 	{
 		if (!m_bytesInBuffer) // Buffer is empty
 		{
+			// Need to read data from file to buffer
 			if (!ReadBlock())
 				return false;
 			if (!m_bytesInBuffer) // No more data in file
 				break;
 		}
 
-		// Look for line tail or end of buffer
+		// Look for line break or end of buffer
 		DWORD pos = m_bufferIndex;
 		while (m_buffer[pos] != '\n' && m_buffer[pos] != '\r' && pos < m_bytesInBuffer)
 		{
@@ -410,6 +422,7 @@ bool CLogReader::CFileHelper::GetLine(CLogLine& logLine)
 			if (!logLine.AppendBytes(&m_buffer[m_bufferIndex], pos - m_bufferIndex))
 				return false;
 
+			// Reset these values to enforce read one more portion from file to buffer
 			m_bytesInBuffer = 0;
 			m_bufferIndex = 0;
 		}
@@ -417,13 +430,13 @@ bool CLogReader::CFileHelper::GetLine(CLogLine& logLine)
 
 	if (m_bytesInBuffer)
 	{
-		// Track index to the beginning of the new line
+		// Move index to the beginning of the new line
 		while ((m_buffer[m_bufferIndex] == '\n' || m_buffer[m_bufferIndex] == '\r') && m_bufferIndex < m_bytesInBuffer)
 		{
 			m_bufferIndex++;
 		}
 		if (m_bufferIndex == m_bytesInBuffer) // End of buffer
-			ReadBlock();
+			ReadBlock(); // Need to read new block into buffer
 	}
 
 	if (!logLine.Size() && !m_bytesInBuffer) // Line is empty and no more data in file
@@ -434,19 +447,19 @@ bool CLogReader::CFileHelper::GetLine(CLogLine& logLine)
 
 // Returns root path value for cluster size calculation
 // Returns nullptr if cannot recognize
-// Returned value should be disposed by free function
+// NOTE: Returned value should always be disposed by free function to prevent memory leak
 char* CLogReader::CFileHelper::GetRootPath(const char* fileName)
 {
 	if (!fileName)
 		return nullptr;
 
 	const size_t fileNameLen = ::strlen(fileName);
-	if (fileNameLen <= 3)
+	if (fileNameLen <= 3) // Cannot recognize disk from such a small path
 		return nullptr;
 
 	char* rootPath = nullptr;
 	size_t trailPos = 0;
-	if (fileName[1] == ':' && fileName[2] == '\\') // Drive in the path
+	if (fileName[1] == ':' && fileName[2] == '\\') // Drive is in the path
 		trailPos = 2;
 	else if (fileName[0] == '\\' && fileName[1] == '\\' && fileName[2] != '\\') // Check if it's UNC
 	{
@@ -463,7 +476,7 @@ char* CLogReader::CFileHelper::GetRootPath(const char* fileName)
 	if (trailPos)
 	{
 		trailPos++;
-		rootPath = (char*)::malloc(trailPos + 1); // Operator new works faster but I have no-exceptions requirement
+		rootPath = (char*)::malloc(trailPos + 1);
 		if (rootPath)
 		{
 			// Try to copy substring of the path
@@ -477,10 +490,10 @@ char* CLogReader::CFileHelper::GetRootPath(const char* fileName)
 		}
 	}
 
-	return rootPath;
+	return rootPath; // <- This value should be freed by invoker
 }
 
-// Take disk cluster size in advance of read performance
+// Take disk cluster size in advance of read performance. Current disk used if cannot recognize drive from the path
 void CLogReader::CFileHelper::CalcClusterSize(const char* fileName)
 {
 	char* rootPath = GetRootPath(fileName);
@@ -498,6 +511,7 @@ void CLogReader::CFileHelper::CalcClusterSize(const char* fileName)
 		::free(rootPath);
 }
 
+// Read block from file into buffer
 bool CLogReader::CFileHelper::ReadBlock()
 {
 	if (!::ReadFile(m_file, &m_buffer[0], m_clusterSize, &m_bytesInBuffer, NULL))
