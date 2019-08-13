@@ -8,17 +8,11 @@ constexpr DWORD DEFAULT_CLUSTER_SIZE = 64 * 1024;
 
 CLogReader::CLogReader() :
 	m_rules(0)
-	//m_filter(nullptr),
-	//m_firstRule(nullptr)
 {
 }
 
 CLogReader::~CLogReader()
 {
-	//if (m_filter)
-	//	sfree(m_filter);
-
-	CleanRules();
 	m_fileHelper.Close();
 }
 
@@ -37,8 +31,8 @@ void CLogReader::Close()
 // установка фильтра строк, false - ошибка
 bool CLogReader::SetFilter(const char* filter)
 {
-	//if (!m_firstRule) // Already set. Assume should be set once
-	//	return false;
+	if (!m_rules.Size()) // Already set. Assume should be set once
+		return false;
 
 	const size_t filterLen = ::strlen(filter);
 
@@ -94,42 +88,32 @@ bool CLogReader::SetFilter(const char* filter)
 	return true;
 }
 
-void CLogReader::CleanRules()
-{
-	//while (m_firstRule)
-	//{
-	//	SRule* p = m_firstRule->next;
-	//	delete m_firstRule;
-	//	m_firstRule = p;
-	//}
-}
-
 // запрос очередной найденной строки,
 // buf - буфер, bufsize - максимальная длина
 // false - конец файла или ошибка
 bool CLogReader::GetNextLine(char* buf, const int bufsize)
 {
 	// Filter not yet set
-	//if (!m_firstRule)
-	//	return false;
+	if (!m_rules.Size())
+		return false;
 
 	CLogLine logLine;
-	bool b = m_fileHelper.GetLine(logLine);
-	b = m_fileHelper.GetLine(logLine);
-	b = m_fileHelper.GetLine(logLine);
-	b = m_fileHelper.GetLine(logLine);
-	b = m_fileHelper.GetLine(logLine);
-
-	//if (logLine.Size() < (size_t)bufsize) // Buffer is enough
-	//	return !::memcpy_s(buf, bufsize, &logLine[0], logLine.Size() + 1);
-	//else // Cut the line
-	//{
-	//	logLine[bufsize - 1] = 0;
-	//	logLine[bufsize - 2] = '.';
-	//	logLine[bufsize - 3] = '.';
-	//	logLine[bufsize - 4] = '.';
-	//	return !::memcpy_s(buf, bufsize, &logLine[0], bufsize);
-	//}
+	while (m_fileHelper.GetLine(logLine))
+	{
+		if (logLine.Matches(m_rules))
+		{
+			if (logLine.Size() < (size_t)bufsize) // Buffer is enough
+				return !::memcpy_s(buf, bufsize, &logLine[0], logLine.Size() + 1);
+			else // Cut the line
+			{
+				logLine[bufsize - 1] = 0;
+				logLine[bufsize - 2] = '.';
+				logLine[bufsize - 3] = '.';
+				logLine[bufsize - 4] = '.';
+				return !::memcpy_s(buf, bufsize, &logLine[0], bufsize);
+			}
+		}
+	}
 
 	return false;
 }
@@ -148,17 +132,17 @@ CLogReader::CArray<T>::CArray(const size_t capacity) :
 		m_capacity = capacity;
 }
 
-template <class T>
-CLogReader::CArray<T>::CArray(CArray<T> const&& rhv) noexcept :
-	m_failed(rhv.m_failed),
-	m_size(rhv.m_size),
-	m_capacity(rhv.m_capacity),
-	m_array(rhv.m_array)
-{
-	m_size = 0;
-	m_capacity = 0;
-	m_array = nullptr;
-}
+//template <class T>
+//CLogReader::CArray<T>::CArray(CArray<T> const&& rhv) noexcept :
+//	m_failed(rhv.m_failed),
+//	m_size(rhv.m_size),
+//	m_capacity(rhv.m_capacity),
+//	m_array(rhv.m_array)
+//{
+//	m_size = 0;
+//	m_capacity = 0;
+//	m_array = nullptr;
+//}
 
 template <class T>
 CLogReader::CArray<T>::~CArray()
@@ -217,8 +201,6 @@ bool CLogReader::CArray<T>::Append(T* items, size_t count, bool keepTail)
 template <class T>
 T& CLogReader::CArray<T>::operator[](const size_t i)
 {
-	//if (m_failed || i >= m_size)
-	//	return nullptr;
 	return m_array[i];
 }
 
@@ -347,10 +329,10 @@ CLogReader::CLogLine::CLogLine() :
 	m_str.Append(0);
 }
 
-CLogReader::CLogLine::CLogLine(CLogLine const&& rhv) noexcept :
-	m_str((CArray<char> const&&)rhv.m_str)
-{
-}
+//CLogReader::CLogLine::CLogLine(CLogLine const&& rhv) noexcept :
+//	m_str((CArray<char> const&&)rhv.m_str)
+//{
+//}
 
 bool CLogReader::CLogLine::AppendBytes(char* buf, const size_t size)
 {
@@ -371,6 +353,12 @@ char& CLogReader::CLogLine::operator[](const size_t i)
 void CLogReader::CLogLine::Clear()
 {
 	m_str.Clear();
+}
+
+bool CLogReader::CLogLine::Matches(CArray<SRule>& rules)
+{
+	// TODO:
+	return false;
 }
 
 ////////////////////////////////////

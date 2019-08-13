@@ -14,7 +14,6 @@ public:
 	bool GetNextLine(char* buf, const int bufsize); // запрос очередной найденной строки, buf - буфер, bufsize - максимальная длина, false - конец файла или ошибка
 
 private:
-	void CleanRules();
 
 #ifdef TESTARRAY
 public:
@@ -24,7 +23,7 @@ public:
 	{
 	public:
 		CArray(const size_t capacity);
-		CArray(CArray<T> const&& rhv) noexcept;
+		//CArray(CArray<T> const&& rhv) noexcept;
 		~CArray();
 		size_t Size();
 		bool Append(T&& item);
@@ -60,11 +59,12 @@ public:
 	{
 	public:
 		CLogLine();
-		CLogLine(CLogLine const&& rhv)  noexcept;
+		//CLogLine(CLogLine const&& rhv)  noexcept;
 		bool AppendBytes(char* buf, const size_t size);
 		size_t Size();
 		char& operator[](const size_t i);
 		void Clear();
+		bool Matches(CArray<SRule>& rules);
 	private:
 #ifdef TESTLOGLINE
 	public:
@@ -111,8 +111,6 @@ private:
 
 private:
 	CFileHelper m_fileHelper;
-	//char* m_filter;
-	//SRule* m_firstRule;
 	CArray<SRule> m_rules;
 
 #ifdef TESTROOTPATH
