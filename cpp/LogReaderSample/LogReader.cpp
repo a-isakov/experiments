@@ -6,14 +6,13 @@ constexpr DWORD DEFAULT_CLUSTER_SIZE = 64 * 1024;
 ////////////////////////////////////
 // Main class
 
-CLogReader::CLogReader() :
-	m_rules(0)
+CLogReader::CLogReader()
 {
 }
 
 CLogReader::~CLogReader()
 {
-	m_fileHelper.Close();
+	Close();
 }
 
 // открытие файла, false - ошибка
@@ -31,40 +30,30 @@ void CLogReader::Close()
 // установка фильтра строк, false - ошибка
 bool CLogReader::SetFilter(const char* filter)
 {
-	if (m_rules.Size()) // Already set. Assume should be set once
+	if (m_filter.Size()) // Already set. Assume should be set once
 		return false;
 
 	const size_t filterLen = ::strlen(filter);
+	m_filter.AppendBytes(filter, filterLen);
 
-	// Parse rules
+	// Collapse stars
+	size_t ind = 0;
 	for (size_t i = 0; i < filterLen; i++)
 	{
 		switch (filter[i])
 		{
 		case '*':
 			// Collapse stars
-			if (m_rules.Size() && m_rules[m_rules.Size() - 1].m_pattern[0] == '*')
+			if (i && filter[i - 1] == '*')
 				break;
-		case '?':
-			{
-				SRule rule(filter[i]);
-				m_rules.Append((SRule&&)rule);
-			}
-			break;
 		default:
-			{
-				// Find where string ends
-				size_t rightIndex = i;
-				while (rightIndex < filterLen && filter[rightIndex] != '?' && filter[rightIndex] != '*')
-				{
-					rightIndex++;
-				}
-				SRule rule(&filter[i], rightIndex - i);
-				m_rules.Append((SRule&&)rule);
-				i = rightIndex - 1;
-			}
+			if (ind == i)
+				ind++;
+			else
+				m_filter[ind++] = filter[i];
 		}
 	}
+	m_filter[ind] = 0;
 
 	return true;
 }
@@ -75,13 +64,13 @@ bool CLogReader::SetFilter(const char* filter)
 bool CLogReader::GetNextLine(char* buf, const int bufsize)
 {
 	// Filter not yet set
-	if (!m_rules.Size())
+	if (!m_filter.Size())
 		return false;
 
 	CLogLine logLine;
 	while (m_fileHelper.GetLine(logLine))
 	{
-		if (logLine.Matches(m_rules))
+		if (logLine.Matches(&m_filter[0]))
 		{
 			if (logLine.Size() < (size_t)bufsize) // Buffer is enough
 				return !::memcpy_s(buf, bufsize, &logLine[0], logLine.Size() + 1);
@@ -172,7 +161,7 @@ bool CLogReader::CArray<T>::Append(T&& item)
 }
 
 template <class T>
-bool CLogReader::CArray<T>::Append(T* items, size_t count, bool keepTail)
+bool CLogReader::CArray<T>::Append(const T* items, size_t count, bool keepTail)
 {
 	size_t remains = m_capacity - m_size;
 	if (remains < count) // Need to change array capacity
@@ -259,46 +248,6 @@ void CLogReader::CArray<T>::Clear()
 }
 
 ////////////////////////////////////
-// SRule
-CLogReader::SRule::SRule(const char pattern) :
-	m_positions(0)
-{
-	m_pattern = (char*)::malloc(2);
-	if (m_pattern)
-	{
-		m_pattern[0] = pattern;
-		m_pattern[1] = 0;
-	}
-}
-
-CLogReader::SRule::SRule(const char* pattern, const size_t size) :
-	m_positions(0)
-{
-	m_pattern = (char*)::malloc(size + 1);
-	if (m_pattern)
-	{
-		::memcpy_s(m_pattern, size + 1, pattern, size);
-		m_pattern[size] = 0;
-	}
-}
-
-CLogReader::SRule& CLogReader::SRule::operator=(SRule&& rhv) noexcept
-{
-	this->m_pattern = rhv.m_pattern;
-	this->m_positions = (CArray<size_t>&&)rhv.m_positions;
-
-	rhv.m_pattern = nullptr;
-
-	return *this;
-}
-
-CLogReader::SRule::~SRule()
-{
-	if (m_pattern)
-		::free(m_pattern);
-}
-
-////////////////////////////////////
 // CLogLine
 
 CLogReader::CLogLine::CLogLine() :
@@ -312,7 +261,7 @@ CLogReader::CLogLine::CLogLine() :
 //{
 //}
 
-bool CLogReader::CLogLine::AppendBytes(char* buf, const size_t size)
+bool CLogReader::CLogLine::AppendBytes(const char* buf, const size_t size)
 {
 	return m_str.Append(buf, size, true);
 }
@@ -331,11 +280,57 @@ char& CLogReader::CLogLine::operator[](const size_t i)
 void CLogReader::CLogLine::Clear()
 {
 	m_str.Clear();
+	m_str.Append(0);
 }
 
-bool CLogReader::CLogLine::Matches(CArray<SRule>& rules)
+bool CLogReader::CLogLine::Matches(const char* filter)
 {
-	// TODO:
+	if (!filter || !filter[0])
+		return false;
+
+	size_t fIndex = 0;
+	size_t fRevIndex = -1;
+	size_t lIndex = 0;
+	size_t lRevIndex = -1;
+	while (true)
+	{
+		if (filter[fIndex] == '*')
+		{
+			// Save reverse position but move filter on
+			fRevIndex = fIndex++;
+			lRevIndex = lIndex;
+		}
+		else if (!m_str[lIndex]) // End of the line
+		{
+			return !filter[fIndex]; // Matches if filter also ends
+		}
+		else if (filter[fIndex] == '?')
+		{
+			fIndex++;
+			lIndex++;
+		}
+		else if (m_str[lIndex] == filter[fIndex])
+		{
+			fIndex++;
+			lIndex++;
+		}
+		else if (!filter[fIndex]) // End of filter
+		{
+			// Try to revert position
+			if (fRevIndex == -1)
+				return false;
+			fIndex = fRevIndex;
+			lIndex++;
+		}
+		else if (lRevIndex == -1) // No reverse position for line
+			return false;
+		else
+		{
+			// Revert positions and move line position on
+			lIndex = ++lRevIndex;
+			fIndex = fRevIndex;
+		}
+	}
 	return false;
 }
 

@@ -28,7 +28,7 @@ public:
 		~CArray();
 		size_t Size();
 		bool Append(T&& item);
-		bool Append(T* items, size_t count, bool keepTail = false);
+		bool Append(const T* items, size_t count, bool keepTail = false);
 		T& operator[](const size_t i);
 		bool Alloc(const size_t capacity = 1, const bool resize = false);
 		bool DoubleSize();
@@ -43,17 +43,10 @@ public:
 private:
 #endif
 
-	struct SRule
-	{
-		SRule(const char pattern);
-		SRule(const char* pattern, const size_t size);
-		SRule& operator=(SRule&& rhv) noexcept;
-		~SRule();
-		char* m_pattern;
-		CArray<size_t> m_positions;
-	}; // struct SRule
-
 #ifdef TESTLOGLINE
+public:
+#endif
+#ifdef TESTMATCH
 public:
 #endif
 	class CLogLine
@@ -61,11 +54,11 @@ public:
 	public:
 		CLogLine();
 		//CLogLine(CLogLine const&& rhv)  noexcept;
-		bool AppendBytes(char* buf, const size_t size);
+		bool AppendBytes(const char* buf, const size_t size);
 		size_t Size();
 		char& operator[](const size_t i);
 		void Clear();
-		bool Matches(CArray<SRule>& rules);
+		bool Matches(const char* filter);
 	private:
 #ifdef TESTLOGLINE
 	public:
@@ -73,6 +66,9 @@ public:
 		CArray<char> m_str;
 	}; // class CLogLine
 #ifdef TESTLOGLINE
+private:
+#endif
+#ifdef TESTMATCH
 private:
 #endif
 
@@ -112,7 +108,7 @@ private:
 
 private:
 	CFileHelper m_fileHelper;
-	CArray<SRule> m_rules;
+	CLogLine m_filter;
 
 #ifdef TESTROOTPATH
 public:

@@ -14,10 +14,46 @@ void testArray();
 #ifdef TESTLOGLINE
 void testLogString();
 #endif
+#ifdef TESTMATCH
+void testMatch();
+#endif
 
 
-int main()
+int main(int argc, char* argv[])
 {
+	if (argc != 3)
+	{
+		::printf("Two params expected: LogReaderSample.exe <log-file-name> <mask>\n");
+		return 0;
+	}
+
+	constexpr size_t size = 60;
+	char buffer[size];
+	CLogReader logReader;
+	if (!logReader.SetFilter(argv[2]))
+	{
+		::printf("Failed to set specified mask: %s\n", argv[2]);
+		return 0;
+	}
+	if (!logReader.Open(argv[1]))
+	{
+		::printf("Failed to open specified file: %s\n", argv[1]);
+		return 0;
+	}
+
+	bool foundOnce = false;
+	while (logReader.GetNextLine(buffer, size))
+	{
+		if (!foundOnce)
+		{
+			::printf("--- Matches found:\n\n");
+			foundOnce = true;
+		}
+		::printf("%s\n", buffer);
+	}
+	::printf(foundOnce ? "\n--- Search completed\n" : "Nothing found\n");
+
+	logReader.Close();
 #ifdef TESTROOTPATH
 	testRootPath();
 #endif
@@ -26,6 +62,9 @@ int main()
 #endif
 #ifdef TESTLOGLINE
 	testLogString();
+#endif
+#ifdef TESTMATCH
+	testMatch();
 #endif
 #ifdef TESTE2E
 	char buf[2048];
@@ -191,5 +230,82 @@ void testLogString()
 		::printf("Test 21 failed equality\n");
 	else
 		::printf("Test 21 passed\n");
+}
+#endif
+
+#ifdef TESTMATCH
+void testMatch()
+{
+	CLogReader::CLogLine logLine;
+	logLine.AppendBytes("one will be", 11);
+	if (!logLine.Matches(""))
+		::printf("Test 22 passed\n");
+	else
+		::printf("Test 22 failed\n");
+
+	if (logLine.Matches("*"))
+		::printf("Test 23 passed\n");
+	else
+		::printf("Test 23 failed\n");
+
+	if (logLine.Matches("*?will*?"))
+		::printf("Test 24 passed\n");
+	else
+		::printf("Test 24 failed\n");
+
+	if (logLine.Matches("*be"))
+		::printf("Test 25 passed\n");
+	else
+		::printf("Test 25 failed\n");
+
+	if (!logLine.Matches("be"))
+		::printf("Test 26 passed\n");
+	else
+		::printf("Test 26 failed\n");
+
+	if (logLine.Matches("on*"))
+		::printf("Test 27 passed\n");
+	else
+		::printf("Test 27 failed\n");
+
+	if (logLine.Matches("?n*"))
+		::printf("Test 28 passed\n");
+	else
+		::printf("Test 28 failed\n");
+
+	if (logLine.Matches("???????????"))
+		::printf("Test 29 passed\n");
+	else
+		::printf("Test 29 failed\n");
+
+	if (!logLine.Matches("??????????"))
+		::printf("Test 30 passed\n");
+	else
+		::printf("Test 30 failed\n");
+
+	if (!logLine.Matches("????????????"))
+		::printf("Test 31 passed\n");
+	else
+		::printf("Test 31 failed\n");
+
+	if (!logLine.Matches("?"))
+		::printf("Test 32 passed\n");
+	else
+		::printf("Test 32 failed\n");
+
+	if (!logLine.Matches("*1*"))
+		::printf("Test 33 passed\n");
+	else
+		::printf("Test 33 failed\n");
+
+	if (!logLine.Matches("one"))
+		::printf("Test 34 passed\n");
+	else
+		::printf("Test 34 failed\n");
+
+	if (logLine.Matches("one*********************be"))
+		::printf("Test 35 passed\n");
+	else
+		::printf("Test 35 failed\n");
 }
 #endif
