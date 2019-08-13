@@ -31,7 +31,7 @@ int main()
 	char buf[2048];
 	CLogReader logReader;
 	logReader.SetFilter("*");
-	logReader.Open("C:\\dev\\experiments\\.gitignore");
+	logReader.Open("D:\\dev\\experiments\\.gitignore");
 	logReader.GetNextLine(buf, 2048);
 	logReader.Close();
 #endif

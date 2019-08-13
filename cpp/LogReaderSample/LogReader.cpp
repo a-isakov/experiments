@@ -113,10 +113,23 @@ bool CLogReader::GetNextLine(char* buf, const int bufsize)
 	//if (!m_firstRule)
 	//	return false;
 
-	char buff[2048];
-	m_fileHelper.GetLine(buff, 2048);
-	m_fileHelper.GetLine(buff, 2048);
-	m_fileHelper.GetLine(buff, 2048);
+	CLogLine logLine;
+	bool b = m_fileHelper.GetLine(logLine);
+	b = m_fileHelper.GetLine(logLine);
+	b = m_fileHelper.GetLine(logLine);
+	b = m_fileHelper.GetLine(logLine);
+	b = m_fileHelper.GetLine(logLine);
+
+	//if (logLine.Size() < (size_t)bufsize) // Buffer is enough
+	//	return !::memcpy_s(buf, bufsize, &logLine[0], logLine.Size() + 1);
+	//else // Cut the line
+	//{
+	//	logLine[bufsize - 1] = 0;
+	//	logLine[bufsize - 2] = '.';
+	//	logLine[bufsize - 3] = '.';
+	//	logLine[bufsize - 4] = '.';
+	//	return !::memcpy_s(buf, bufsize, &logLine[0], bufsize);
+	//}
 
 	return false;
 }
@@ -133,6 +146,18 @@ CLogReader::CArray<T>::CArray(const size_t capacity) :
 		m_failed = true;
 	else
 		m_capacity = capacity;
+}
+
+template <class T>
+CLogReader::CArray<T>::CArray(CArray<T> const&& rhv) noexcept :
+	m_failed(rhv.m_failed),
+	m_size(rhv.m_size),
+	m_capacity(rhv.m_capacity),
+	m_array(rhv.m_array)
+{
+	m_size = 0;
+	m_capacity = 0;
+	m_array = nullptr;
 }
 
 template <class T>
@@ -322,9 +347,30 @@ CLogReader::CLogLine::CLogLine() :
 	m_str.Append(0);
 }
 
+CLogReader::CLogLine::CLogLine(CLogLine const&& rhv) noexcept :
+	m_str((CArray<char> const&&)rhv.m_str)
+{
+}
+
 bool CLogReader::CLogLine::AppendBytes(char* buf, const size_t size)
 {
 	return m_str.Append(buf, size, true);
+}
+
+size_t CLogReader::CLogLine::Size()
+{
+	// Buffer minus trailing zero
+	return m_str.Size() - 1;
+}
+
+char& CLogReader::CLogLine::operator[](const size_t i)
+{
+	return m_str[i];
+}
+
+void CLogReader::CLogLine::Clear()
+{
+	m_str.Clear();
 }
 
 ////////////////////////////////////
@@ -336,10 +382,6 @@ CLogReader::CFileHelper::CFileHelper() :
 	m_bytesInBuffer(0),
 	m_bufferIndex(0),
 	m_buffer(0)
-	//m_firstChunk(nullptr),
-	//m_lastChunk(nullptr),
-	//m_currentChunk(nullptr),
-	//m_chunkPos(0),
 {
 }
 
@@ -373,112 +415,61 @@ void CLogReader::CFileHelper::Close()
 		::CloseHandle(m_file);
 	m_file = INVALID_HANDLE_VALUE;
 	m_buffer.Clear();
-
-	//CleanChunks();
 }
 
-bool CLogReader::CFileHelper::GetLine(const char* buf, const int bufsize)
+bool CLogReader::CFileHelper::GetLine(CLogLine& logLine)
 {
-	//if (!m_currentChunk)
-	//{
-	//	if (!AddChunk())
-	//		return false;
-	//	m_currentChunk = m_firstChunk;
-	//}
-
-	//if (!m_currentChunk->bytes)
-	//{
-	//	DWORD bytesRead = 0;
-	//	if (::ReadFile(m_file, m_currentChunk->buffer, m_clusterSize, &bytesRead, NULL))
-	//		m_currentChunk->bytes = bytesRead;
-	//	else
-	//		return false;
-	//	if (!m_currentChunk->bytes)
-	//		return false;
-	//}
-
-	//char* pos = (char*)::memchr(m_currentChunk->buffer, '\n', m_currentChunk->bytes);
-	// TODO:
-
-	CLogLine logLine;
-	while (!m_bytesInBuffer)
+	logLine.Clear();
+	while (!m_bytesInBuffer || (m_buffer[m_bufferIndex] != '\n' && m_buffer[m_bufferIndex] != '\r'))
 	{
-		if (!m_bytesInBuffer)
+		if (!m_bytesInBuffer) // Buffer is empty
 		{
-			if (!::ReadFile(m_file, &m_buffer[0], m_clusterSize, &m_bytesInBuffer, NULL))
+			if (!ReadBlock())
 				return false;
-			m_bufferIndex = 0;
-			if (!m_bytesInBuffer)
-				return false;
+			if (!m_bytesInBuffer) // No more data in file
+				break;
 		}
 
 		// Look for line tail or end of buffer
 		DWORD pos = m_bufferIndex;
-		while (m_buffer[pos] != '\n' && m_buffer[pos] != '\r' && pos < m_buffer.Size())
+		while (m_buffer[pos] != '\n' && m_buffer[pos] != '\r' && pos < m_bytesInBuffer)
 		{
 			pos++;
 		}
 
-		if (pos == m_buffer.Size()) // End of buffer
+		if (pos != m_bytesInBuffer) // End of line
 		{
 			if (!logLine.AppendBytes(&m_buffer[m_bufferIndex], pos - m_bufferIndex))
 				return false;
-			m_bufferIndex = 0;
-			m_bytesInBuffer = 0; // To read next block
-		}
-		else
-		{
-			if (!logLine.AppendBytes(&m_buffer[m_bufferIndex], pos - m_bufferIndex))
-				return false;
+
 			m_bufferIndex = pos;
 		}
+		else // End of buffer
+		{
+			if (!logLine.AppendBytes(&m_buffer[m_bufferIndex], pos - m_bufferIndex))
+				return false;
+
+			m_bytesInBuffer = 0;
+			m_bufferIndex = 0;
+		}
 	}
 
-	// Check for another line breaks
-	while ((m_buffer[m_bufferIndex] == '\n' || m_buffer[m_bufferIndex] == '\r') && m_bufferIndex < m_buffer.Size())
+	if (m_bytesInBuffer)
 	{
-		m_bufferIndex++;
-	}
-	if (m_bufferIndex == m_buffer.Size())
-	{
-		m_bufferIndex = 0;
-		m_bytesInBuffer = 0; // To read next block
+		// Track index to the beginning of the new line
+		while ((m_buffer[m_bufferIndex] == '\n' || m_buffer[m_bufferIndex] == '\r') && m_bufferIndex < m_bytesInBuffer)
+		{
+			m_bufferIndex++;
+		}
+		if (m_bufferIndex == m_bytesInBuffer) // End of buffer
+			ReadBlock();
 	}
 
-	return false;
+	if (!logLine.Size() && !m_bytesInBuffer) // Line is empty and no more data in file
+		return false;
+
+	return true;
 }
-
-//void CLogReader::CFileHelper::CleanChunks()
-//{
-//	while (m_firstChunk)
-//	{
-//		SChunk* p = m_firstChunk->next;
-//		delete m_firstChunk;
-//		m_firstChunk = p;
-//	}
-//
-//	m_firstChunk = nullptr;
-//	m_lastChunk = nullptr;
-//}
-
-// True if succeeded, false in error case
-//bool CLogReader::CFileHelper::AddChunk()
-//{
-//	if (!m_lastChunk)
-//	{
-//		// Initialization
-//		m_firstChunk = new CLogReader::CFileHelper::SChunk(m_clusterSize, 0); // Struct is pretty small, operator new is safe
-//		m_lastChunk = m_firstChunk;
-//	}
-//	else
-//	{
-//		SChunk* newChunk = new CLogReader::CFileHelper::SChunk(m_clusterSize, m_lastChunk->i + 1); // Struct is pretty small, operator new is safe
-//		m_lastChunk->next = newChunk;
-//		m_lastChunk = newChunk;
-//	}
-//
-//	return m_lastChunk->buffer;
-//}
 
 // Returns root path value for cluster size calculation
 // Returns nullptr if cannot recognize
@@ -544,4 +535,12 @@ void CLogReader::CFileHelper::CalcClusterSize(const char* fileName)
 
 	if (rootPath)
 		::free(rootPath);
+}
+
+bool CLogReader::CFileHelper::ReadBlock()
+{
+	if (!::ReadFile(m_file, &m_buffer[0], m_clusterSize, &m_bytesInBuffer, NULL))
+		return false;
+	m_bufferIndex = 0;
+	return true;
 }

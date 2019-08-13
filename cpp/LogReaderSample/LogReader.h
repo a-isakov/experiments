@@ -24,6 +24,7 @@ public:
 	{
 	public:
 		CArray(const size_t capacity);
+		CArray(CArray<T> const&& rhv) noexcept;
 		~CArray();
 		size_t Size();
 		bool Append(T&& item);
@@ -59,7 +60,11 @@ public:
 	{
 	public:
 		CLogLine();
+		CLogLine(CLogLine const&& rhv)  noexcept;
 		bool AppendBytes(char* buf, const size_t size);
+		size_t Size();
+		char& operator[](const size_t i);
+		void Clear();
 	private:
 #ifdef TESTLOGLINE
 	public:
@@ -78,43 +83,17 @@ private:
 
 		bool Open(const char* fileName);
 		void Close();
-
-		bool GetLine(const char* buf, const int bufsize);
+		bool GetLine(CLogLine& logLine);
 
 	private:
-		//void CleanChunks();
-		//bool AddChunk();
 		char* GetRootPath(const char* fileName);
 		void CalcClusterSize(const char* fileName);
+		bool ReadBlock();
 
 	private:
-		//struct SChunk
-		//{
-		//	SChunk(const size_t bytes, const BYTE index) :
-		//		buffer(nullptr),
-		//		next(nullptr),
-		//		i(index),
-		//		bytes(0)
-		//	{
-		//		buffer = (BYTE*)::malloc(bytes + 1);
-		//	}
-		//	~SChunk()
-		//	{
-		//		if (buffer)
-		//			sfree(buffer);
-		//	}
-		//	BYTE* buffer;
-		//	SChunk* next;
-		//	BYTE i; // Index of the chunk
-		//	DWORD bytes; // Bytes loaded into the buffer
-		//};
 
 		HANDLE m_file;
 		DWORD m_clusterSize;
-		//SChunk* m_firstChunk;
-		//SChunk* m_lastChunk;
-		//SChunk* m_currentChunk;
-		//int m_chunkPos;
 		DWORD m_bytesInBuffer;
 		DWORD m_bufferIndex;
 		CArray<char> m_buffer;
