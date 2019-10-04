@@ -35,12 +35,38 @@ Explanation: M = 1000, CM = 900, XC = 90 and IV = 4.
 */
 
 #include <string>
+#include <vector>
 
 using namespace std;
 
 class Solution {
 public:
 	string intToRoman(int num) {
+		vector<vector<string>> converter = { { "", "", "", "" }, // 0
+											{ "I", "X", "C", "M" }, // 1
+											{ "II", "XX", "CC", "MM" }, // 2
+											{ "III", "XXX", "CCC", "MMM" }, // 3
+											{ "IV", "XL", "CD", "-" }, // 4
+											{ "V", "L", "D", "-" }, // 5
+											{ "VI", "LX", "DC", "-" }, // 6
+											{ "VII", "LXX", "DCC", "-" }, // 7
+											{ "VIII", "LXXX", "DCCC", "-" }, // 8
+											{ "IX", "XC", "CM", "-" } // 9
+		};
+		int level = 0;
+		string result;
+		while (num)
+		{
+			int n = num % 10;
+			if (n)
+				result.insert(0, converter[n][level]);
+				//result = converter[n][level] + result;
 
+			//result.insert
+
+			level++;
+			num /= 10;
+		}
+		return result;
 	}
 };
