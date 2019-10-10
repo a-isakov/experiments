@@ -40,19 +40,42 @@ Explanation: M = 1000, CM = 900, XC = 90 and IV = 4.
 using namespace std;
 
 class Solution {
+private:
+	vector<vector<string>> converter = { { "", "", "", "" }, // 0
+										{ "I", "X", "C", "M" }, // 1
+										{ "II", "XX", "CC", "MM" }, // 2
+										{ "III", "XXX", "CCC", "MMM" }, // 3
+										{ "IV", "XL", "CD", "-" }, // 4
+										{ "V", "L", "D", "-" }, // 5
+										{ "VI", "LX", "DC", "-" }, // 6
+										{ "VII", "LXX", "DCC", "-" }, // 7
+										{ "VIII", "LXXX", "DCCC", "-" }, // 8
+										{ "IX", "XC", "CM", "-" } // 9
+	};
+	int levels[4] = {1, 10, 100, 1000};
+	char roman[10];
+
 public:
 	string intToRoman(int num) {
-		vector<vector<string>> converter = { { "", "", "", "" }, // 0
-											{ "I", "X", "C", "M" }, // 1
-											{ "II", "XX", "CC", "MM" }, // 2
-											{ "III", "XXX", "CCC", "MMM" }, // 3
-											{ "IV", "XL", "CD", "-" }, // 4
-											{ "V", "L", "D", "-" }, // 5
-											{ "VI", "LX", "DC", "-" }, // 6
-											{ "VII", "LXX", "DCC", "-" }, // 7
-											{ "VIII", "LXXX", "DCCC", "-" }, // 8
-											{ "IX", "XC", "CM", "-" } // 9
-		};
+		size_t index = 0;
+		roman[0] = 0;
+		for (int level = 3; level >= 0; level--)
+		{
+			int right = num % levels[level];
+			int n = (num - right) / levels[level];
+			num = right;
+			if (n)
+			{
+				size_t length = converter[n][level].length();
+				::memcpy(&roman[index], converter[n][level].c_str(), length);
+				index += length;
+			}
+		}
+		roman[index] = 0;
+		return roman;
+	}
+
+	string intToRomanSlow(int num) {
 		int level = 0;
 		string result;
 		while (num)
