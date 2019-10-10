@@ -122,9 +122,6 @@ public:
 			int n = num % 10;
 			if (n)
 				result.insert(0, converter[n][level]);
-				//result = converter[n][level] + result;
-
-			//result.insert
 
 			level++;
 			num /= 10;
