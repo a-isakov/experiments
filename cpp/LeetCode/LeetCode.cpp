@@ -15,6 +15,7 @@ void testIntToRoman()
 	std::cout << "Test 5 " << std::string(sol.intToRoman(1994) == "MCMXCIV" ? "passed" : "FAILED") << "\n";
 	std::cout << "Test 6 " << std::string(sol.intToRoman(3900) == "MMMCM" ? "passed" : "FAILED") << "\n";
 	std::cout << "Test 7 " << std::string(sol.intToRoman(800) == "DCCC" ? "passed" : "FAILED") << "\n";
+	std::cout << "Test 8 " << std::string(sol.intToRoman(888) == "DCCCLXXXVIII" ? "passed" : "FAILED") << "\n";
 }
 
 int main()

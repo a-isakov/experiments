@@ -45,18 +45,57 @@ private:
 										{ "I", "X", "C", "M" }, // 1
 										{ "II", "XX", "CC", "MM" }, // 2
 										{ "III", "XXX", "CCC", "MMM" }, // 3
-										{ "IV", "XL", "CD", "-" }, // 4
-										{ "V", "L", "D", "-" }, // 5
-										{ "VI", "LX", "DC", "-" }, // 6
-										{ "VII", "LXX", "DCC", "-" }, // 7
-										{ "VIII", "LXXX", "DCCC", "-" }, // 8
-										{ "IX", "XC", "CM", "-" } // 9
+										{ "IV", "XL", "CD", "" }, // 4
+										{ "V", "L", "D", "" }, // 5
+										{ "VI", "LX", "DC", "" }, // 6
+										{ "VII", "LXX", "DCC", "" }, // 7
+										{ "VIII", "LXXX", "DCCC", "" }, // 8
+										{ "IX", "XC", "CM", "" } // 9
 	};
+	char rDigits[7] = {'I', 'V', 'X', 'L', 'C', 'D', 'M'};
 	int levels[4] = {1, 10, 100, 1000};
-	char roman[10];
+	char roman[15];
 
 public:
 	string intToRoman(int num) {
+		size_t index = 0;
+		size_t digitIndex = 6;
+		for (int level = 3; level >= 0; level--)
+		{
+			int right = num % levels[level];
+			int n = (num - right) / levels[level];
+			num = right;
+			switch (n)
+			{
+			case 1:
+			case 2:
+			case 3:
+				for (int i = 0; i < n; i++)
+					roman[index++] = rDigits[digitIndex];
+				break;
+			case 4:
+				roman[index++] = rDigits[digitIndex];
+			case 5:
+				roman[index++] = rDigits[digitIndex + 1];
+				break;
+			case 6:
+			case 7:
+			case 8:
+				roman[index++] = rDigits[digitIndex + 1];
+				for (int i = 0; i < n - 5; i++)
+					roman[index++] = rDigits[digitIndex];
+				break;
+			case 9:
+				roman[index++] = rDigits[digitIndex];
+				roman[index++] = rDigits[digitIndex + 2];
+			}
+			digitIndex -= 2;
+		}
+		roman[index] = 0;
+		return roman;
+	}
+
+	string intToRomanSlow2(int num) {
 		size_t index = 0;
 		roman[0] = 0;
 		for (int level = 3; level >= 0; level--)
