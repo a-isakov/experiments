@@ -154,8 +154,7 @@
     <ClCompile Include="LeetCode.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="12 Integer to Roman.hpp" />
-    <ClInclude Include="13 Roman to Integer.hpp" />
+    <ClInclude Include="14 Longest Common Prefix.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
