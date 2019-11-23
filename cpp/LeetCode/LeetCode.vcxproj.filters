@@ -23,5 +23,8 @@
     <ClInclude Include="12 Integer to Roman.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="13 Roman to Integer.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
