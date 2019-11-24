@@ -12,14 +12,44 @@ A solution set is:
 ]
 */
 
-#include <string>
 #include <vector>
+#include <algorithm>
 
 using namespace std;
 
 class Solution {
 public:
 	vector<vector<int>> threeSum(vector<int>& nums) {
-
+		vector<vector<int>> result;
+		if (nums.size() < 3)
+			return result;
+		sort(nums.begin(), nums.end());
+		std::vector<int>::iterator left = nums.begin();
+		std::vector<int>::iterator right = nums.end() - 1;
+		while (right - left > 1)
+		{
+			int delta = 0 - *left - *right;
+			if (delta < *left)
+				left++;
+			else if (delta > *right)
+				right--;
+			else
+			{
+				if (binary_search(left + 1, right, delta))
+				{
+					result.push_back({ *left, delta, *right });
+					left++;
+					right--;
+				}
+				else
+				{
+					if (delta > 0)
+						left++;
+					else
+						right--;
+				}
+			}
+		}
+		return result;
 	}
 };
