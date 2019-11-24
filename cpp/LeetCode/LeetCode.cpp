@@ -6,14 +6,14 @@
 void testLongestCommonPrefix()
 {
 	Solution sol;
-	//std::cout << "Test 1 " << std::string(sol.romanToInt("III") == 3 ? "passed" : "FAILED") << "\n";
-	//std::cout << "Test 2 " << std::string(sol.romanToInt("IV") == 4 ? "passed" : "FAILED") << "\n";
-	//std::cout << "Test 3 " << std::string(sol.romanToInt("IX") == 9 ? "passed" : "FAILED") << "\n";
-	//std::cout << "Test 4 " << std::string(sol.romanToInt("LVIII") == 58 ? "passed" : "FAILED") << "\n";
-	//std::cout << "Test 5 " << std::string(sol.romanToInt("MCMXCIV") == 1994 ? "passed" : "FAILED") << "\n";
-	//std::cout << "Test 6 " << std::string(sol.romanToInt("MMMCM") == 3900 ? "passed" : "FAILED") << "\n";
-	//std::cout << "Test 7 " << std::string(sol.romanToInt("DCCC") == 800 ? "passed" : "FAILED") << "\n";
-	//std::cout << "Test 8 " << std::string(sol.romanToInt("DCCCLXXXVIII") == 888 ? "passed" : "FAILED") << "\n";
+	vector<string> strs = { "flower","flow","flight" };
+	std::cout << "Test 1 " << std::string(sol.longestCommonPrefix(strs) == "fl" ? "passed" : "FAILED") << "\n";
+	strs = { "dog","racecar","car" };
+	std::cout << "Test 2 " << std::string(sol.longestCommonPrefix(strs) == "" ? "passed" : "FAILED") << "\n";
+	strs = { "" };
+	std::cout << "Test 3 " << std::string(sol.longestCommonPrefix(strs) == "" ? "passed" : "FAILED") << "\n";
+	strs = { "b", "cb", "cab" };
+	std::cout << "Test 4 " << std::string(sol.longestCommonPrefix(strs) == "" ? "passed" : "FAILED") << "\n";
 }
 
 int main()
