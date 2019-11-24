@@ -23,5 +23,8 @@
     <ClInclude Include="14 Longest Common Prefix.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="15 3Sum.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
