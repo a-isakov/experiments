@@ -24,22 +24,36 @@ public:
 		if (nums.size() < 3)
 			return result;
 		sort(nums.begin(), nums.end());
-		std::vector<int>::iterator left = nums.begin();
-		std::vector<int>::iterator right = nums.end() - 1;
+		size_t left = 0;
+		size_t right = nums.size() - 1;
+
+		//  vec = { -4, -1, -1, 0, 1, 2 };
+		// 	vec = { -2, 0, 1, 1, 2 };
 		while (right - left > 1)
 		{
-			int delta = 0 - *left - *right;
-			if (delta < *left)
+			int delta = 0 - nums[left] - nums[right];
+			if (delta < nums[left])
 				left++;
-			else if (delta > *right)
+			else if (delta > nums[right])
 				right--;
 			else
 			{
-				if (binary_search(left + 1, right, delta))
+				int *fnd = (int *)bsearch(&delta, &nums[left + 1], right - left - 1, sizeof(int), compareints);
+				if(fnd)
 				{
-					result.push_back({ *left, delta, *right });
-					left++;
-					right--;
+					result.push_back({ nums[left], delta, nums[right] });
+					if (fnd - &nums[left] > & nums[right] - fnd)
+					{
+						left++;
+						while (nums[left] == nums[left - 1] && right > left)
+							left++;
+					}
+					else
+					{
+						right--;
+						while (nums[right] == nums[right + 1] && right > left)
+							right--;
+					}
 				}
 				else
 				{
@@ -51,5 +65,10 @@ public:
 			}
 		}
 		return result;
+	}
+private:
+	static int compareints(const void* a, const void* b)
+	{
+		return (*(int*)a - *(int*)b);
 	}
 };
