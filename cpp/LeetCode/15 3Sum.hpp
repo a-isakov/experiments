@@ -28,23 +28,29 @@ public:
 		size_t right = nums.size() - 1;
 		while (left < nums.size() - 2 && nums[left] <= 0)
 		{
-			size_t mid = left + 1;
-			while (mid < nums.size() - 1)
+			int delta = 0 - nums[left] - nums[right];
+			if (delta <= nums[right])
 			{
-				int delta = 0 - nums[left] - nums[mid];
-				// if right element less than delta, move middle element
-				if (nums[right] < delta)
+				size_t mid = left + 1;
+				while (nums[mid] < delta)
+					mid++;
+				while (mid < nums.size() - 1)
 				{
+					delta = 0 - nums[left] - nums[mid];
+					// if right element less than delta, move middle element
+					if (nums[right] < delta)
+					{
+						mid++;
+						continue;
+					}
+					int* fnd = (int*)bsearch(&delta, &nums[mid + 1], right - mid, sizeof(int), compareInts);
+					if(fnd)
+						result.push_back({ nums[left], nums[mid], delta });
 					mid++;
-					continue;
+					// while middle element stays the same, move it
+					while (nums[mid] == nums[mid - 1] && mid < nums.size() - 1)
+						mid++;
 				}
-				int* fnd = (int*)bsearch(&delta, &nums[mid + 1], right - mid, sizeof(int), compareInts);
-				if(fnd)
-					result.push_back({ nums[left], nums[mid], delta });
-				mid++;
-				// while middle element stays the same, move it
-				while (nums[mid] == nums[mid - 1] && mid < nums.size() - 1)
-					mid++;
 			}
 			left++;
 			// while left element stays the same, move it
