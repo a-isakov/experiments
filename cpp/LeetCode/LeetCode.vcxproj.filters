@@ -26,5 +26,8 @@
     <ClInclude Include="15 3Sum.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="17 Letter Combinations of a Phone Number.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

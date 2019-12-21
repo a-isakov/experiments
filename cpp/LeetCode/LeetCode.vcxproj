@@ -156,6 +156,7 @@
   <ItemGroup>
     <ClInclude Include="14 Longest Common Prefix.hpp" />
     <ClInclude Include="15 3Sum.hpp" />
+    <ClInclude Include="17 Letter Combinations of a Phone Number.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
