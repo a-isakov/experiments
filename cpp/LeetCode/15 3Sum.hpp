@@ -31,12 +31,13 @@ public:
 			int delta = 0 - nums[left] - nums[right];
 			if (delta <= nums[right])
 			{
-				size_t mid = left + 1;
-				while (nums[mid] < delta)
-					mid++;
+				size_t mid = getLeftMidPosition(nums, left + 1, right, delta);
 				while (mid < nums.size() - 1)
 				{
 					delta = 0 - nums[left] - nums[mid];
+					// need to break if delta less that middle element because it doesn't make sense to continue search
+					if (delta < nums[mid])
+						break;
 					// if right element less than delta, move middle element
 					if (nums[right] < delta)
 					{
@@ -63,5 +64,14 @@ private:
 	static int compareInts(const void* a, const void* b)
 	{
 		return (*(int*)a - *(int*)b);
+	}
+	size_t getLeftMidPosition(vector<int>& nums, const size_t left, const size_t right, const int delta)
+	{
+		if (right - left < 2)
+			return left;
+		size_t mid = (left + right) / 2;
+		if (nums[mid] > delta)
+			return getLeftMidPosition(nums, left, mid, delta);
+		return getLeftMidPosition(nums, mid, right, delta);
 	}
 };
