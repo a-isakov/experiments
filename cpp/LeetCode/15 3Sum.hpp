@@ -25,38 +25,41 @@ public:
 			return result;
 		sort(nums.begin(), nums.end());
 		size_t left = 0;
-		size_t right = nums.size() - 1;
-		while (left < nums.size() - 2 && nums[left] <= 0)
+		for (size_t left = 0; left < nums.size() - 2; left++)
 		{
-			int delta = 0 - nums[left] - nums[right];
-			if (delta <= nums[right])
+			if (nums[left] > 0)
+				break;
+			if (left > 0 && nums[left - 1] == nums[left])
+				continue;
+			int delta = 0 - nums[left]; // the sum of the rest two numbers
+			size_t mid = left + 1;
+			size_t right = nums.size() - 1;
+			while (mid < right)
 			{
-				size_t mid = getLeftMidPosition(nums, left + 1, right, delta);
-				while (mid < nums.size() - 1)
+				int restSum = nums[mid] + nums[right];
+				if (restSum == delta)
 				{
-					delta = 0 - nums[left] - nums[mid];
-					// need to break if delta less that middle element because it doesn't make sense to continue search
-					if (delta < nums[mid])
-						break;
-					// if right element less than delta, move middle element
-					if (nums[right] < delta)
+					result.push_back({ nums[left], nums[mid], nums[right] });
+					// shift left iterator skipping duplicates
+					do
 					{
 						mid++;
-						continue;
-					}
-					int* fnd = (int*)bsearch(&delta, &nums[mid + 1], right - mid, sizeof(int), compareInts);
-					if(fnd)
-						result.push_back({ nums[left], nums[mid], delta });
+					} while (mid < right && nums[mid] == nums[mid - 1]);
+					// shift right iterator skipping duplicates
+					do
+					{
+						right--;
+					} while (mid < right && nums[right] == nums[right + 1]);
+				}
+				else if (restSum < delta)
+				{
 					mid++;
-					// while middle element stays the same, move it
-					while (nums[mid] == nums[mid - 1] && mid < nums.size() - 1)
-						mid++;
+				}
+				else
+				{
+					right--;
 				}
 			}
-			left++;
-			// while left element stays the same, move it
-			while (nums[left] == nums[left - 1] && left < nums.size() - 1)
-				left++;
 		}
 		return result;
 	}
