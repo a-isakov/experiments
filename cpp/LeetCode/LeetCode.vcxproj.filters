@@ -35,5 +35,8 @@
     <ClInclude Include="20 Valid Parentheses.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="21 Merge Two Sorted Lists.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

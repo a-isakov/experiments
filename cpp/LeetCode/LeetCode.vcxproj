@@ -159,6 +159,7 @@
     <ClInclude Include="17 Letter Combinations of a Phone Number.hpp" />
     <ClInclude Include="19 Remove Nth Node From End of List.hpp" />
     <ClInclude Include="20 Valid Parentheses.hpp" />
+    <ClInclude Include="21 Merge Two Sorted Lists.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

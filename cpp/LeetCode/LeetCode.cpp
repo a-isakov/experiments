@@ -1,24 +1,28 @@
 #include <iostream>
 #include <vector>
 
-#include "20 Valid Parentheses.hpp"
+#include "21 Merge Two Sorted Lists.hpp"
 
-void testRemoveNth()
+void testMerge2()
 {
+	Solution::ListNode node11(1);
+	Solution::ListNode node12(2);
+	node11.next = &node12;
+	Solution::ListNode node14(4);
+	node12.next = &node14;
+	Solution::ListNode node21(1);
+	Solution::ListNode node23(3);
+	node21.next = &node23;
+	Solution::ListNode node24(4);
+	node23.next = &node24;
 	Solution sol;
-	std::cout << "Test 1 " << std::string(sol.isValid("()") ? "passed" : "FAILED") << "\n";
-	std::cout << "Test 2 " << std::string(sol.isValid("()[]{}") ? "passed" : "FAILED") << "\n";
-	std::cout << "Test 3 " << std::string(!sol.isValid("(]") ? "passed" : "FAILED") << "\n";
-	std::cout << "Test 4 " << std::string(!sol.isValid("([)]") ? "passed" : "FAILED") << "\n";
-	std::cout << "Test 5 " << std::string(sol.isValid("{[]}") ? "passed" : "FAILED") << "\n";
-	std::cout << "Test 6 " << std::string(!sol.isValid("[") ? "passed" : "FAILED") << "\n";
-	std::cout << "Test 7 " << std::string(!sol.isValid("]") ? "passed" : "FAILED") << "\n";
+	sol.mergeTwoLists(&node11, &node21);
 }
 
 int main()
 {
 	int i = INT_MIN;
 	i = INT_MAX;
-	testRemoveNth();
+	testMerge2();
 	std::cout << "Hello World!\n";
 }
