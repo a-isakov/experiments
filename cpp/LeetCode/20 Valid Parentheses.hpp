@@ -23,15 +23,49 @@ Example 5:
 */
 
 #include <string>
+#include <stack>
 
 using namespace std;
 
 class Solution {
 public:
 	bool isValid(string s) {
+		if (s.empty())
+			return true;
+		stack<char> checker;
 		for (size_t i = 0; i < s.length(); i++)
 		{
-
+			char c = s[i];
+			switch (c)
+			{
+			case '(':
+			case '[':
+			case '{':
+				checker.push(c);
+				break;
+			case ')':
+			{
+				if (checker.empty() || checker.top() != '(')
+					return false;
+				checker.pop();
+				break;
+			}
+			case ']':
+			{
+				if (checker.empty() || checker.top() != '[')
+					return false;
+				checker.pop();
+				break;
+			}
+			case '}':
+			{
+				if (checker.empty() || checker.top() != '{')
+					return false;
+				checker.pop();
+				break;
+			}
+			}
 		}
+		return checker.empty();
 	}
 };

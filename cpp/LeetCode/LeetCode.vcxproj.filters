@@ -32,5 +32,8 @@
     <ClInclude Include="19 Remove Nth Node From End of List.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="20 Valid Parentheses.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

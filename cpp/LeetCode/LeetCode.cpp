@@ -11,6 +11,8 @@ void testRemoveNth()
 	std::cout << "Test 3 " << std::string(!sol.isValid("(]") ? "passed" : "FAILED") << "\n";
 	std::cout << "Test 4 " << std::string(!sol.isValid("([)]") ? "passed" : "FAILED") << "\n";
 	std::cout << "Test 5 " << std::string(sol.isValid("{[]}") ? "passed" : "FAILED") << "\n";
+	std::cout << "Test 6 " << std::string(!sol.isValid("[") ? "passed" : "FAILED") << "\n";
+	std::cout << "Test 7 " << std::string(!sol.isValid("]") ? "passed" : "FAILED") << "\n";
 }
 
 int main()
