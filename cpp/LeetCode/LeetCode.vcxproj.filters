@@ -29,5 +29,8 @@
     <ClInclude Include="17 Letter Combinations of a Phone Number.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="19 Remove Nth Node From End of List.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
