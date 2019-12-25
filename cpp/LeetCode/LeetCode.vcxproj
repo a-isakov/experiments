@@ -160,6 +160,7 @@
     <ClInclude Include="19 Remove Nth Node From End of List.hpp" />
     <ClInclude Include="20 Valid Parentheses.hpp" />
     <ClInclude Include="21 Merge Two Sorted Lists.hpp" />
+    <ClInclude Include="22 Generate Parentheses.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
