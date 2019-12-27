@@ -22,17 +22,16 @@ public:
 		vector<string> result;
 		if (!n)
 			return result;
-		char* res = new char[n * 2 + 1];
-		res[n * 2] = 0;
-		//for (int l = 0; l < n; l++)
-		//{ }
+		int max = n << 1;
+		char* res = new char[max + 1];
+		res[max] = 0;
 		res[0] = '(';
 		addRest(n - 1, n, res, 1, result);
 		delete[] res;
 		return result;
 	}
 private:
-	void addRest(int l, int r, char* res, int index, vector<string> &result)
+	inline void addRest(int l, int r, char* res, int index, vector<string> &result)
 	{
 		if (!l && !r)
 			result.push_back(res);
@@ -43,7 +42,7 @@ private:
 				res[index] = '(';
 				addRest(l - 1, r, res, index + 1, result);
 			}
-			if (r)
+			if (r && r > l)
 			{
 				res[index] = ')';
 				addRest(l, r - 1, res, index + 1, result);
