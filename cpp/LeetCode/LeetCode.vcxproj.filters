@@ -41,5 +41,8 @@
     <ClInclude Include="22 Generate Parentheses.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="23 Merge k Sorted Lists.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
