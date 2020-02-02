@@ -4,6 +4,13 @@ out/
 *.iml
 *.class
 
+*.o
+*.exe
+*.txt
+*.csv
+*.data
+*.names
+
 *__pycache__/
 
 ## Ignore Visual Studio temporary files, build results, and
