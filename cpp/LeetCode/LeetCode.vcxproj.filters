@@ -47,5 +47,8 @@
     <ClInclude Include="24 Swap Nodes in Pairs.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="26 Remove Duplicates from Sorted Array.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
