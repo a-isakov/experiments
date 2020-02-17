@@ -1,4 +1,4 @@
-package main
+package tests
 
 import "fmt"
 
@@ -16,7 +16,8 @@ func removeDuplicates(nums []int) int {
 	return counter
 }
 
-func main() {
+// TestRemoveDuplicates solves https://leetcode.com/problems/remove-duplicates-from-sorted-array/
+func TestRemoveDuplicates() {
 	var arr = []int{1, 1, 2}
 	fmt.Printf("%d %v\n", removeDuplicates(arr), arr)
 	arr = []int{0, 0, 1, 1, 1, 2, 2, 3, 3, 4}

@@ -50,5 +50,11 @@
     <ClInclude Include="26 Remove Duplicates from Sorted Array.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="27 Remove Element.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="28 Implement strStr.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -164,6 +164,8 @@
     <ClInclude Include="23 Merge k Sorted Lists.hpp" />
     <ClInclude Include="24 Swap Nodes in Pairs.hpp" />
     <ClInclude Include="26 Remove Duplicates from Sorted Array.hpp" />
+    <ClInclude Include="27 Remove Element.hpp" />
+    <ClInclude Include="28 Implement strStr.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
