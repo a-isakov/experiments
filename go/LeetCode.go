@@ -5,5 +5,6 @@ import "./tests"
 func main() {
 	// tests.TestRemoveDuplicates()
 	// tests.TestRemoveElement()
-	tests.TestStrStr()
+	// tests.TestStrStr()
+	tests.TestSearchInsert()
 }

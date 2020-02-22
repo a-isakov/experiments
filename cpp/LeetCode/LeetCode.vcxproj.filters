@@ -56,5 +56,8 @@
     <ClInclude Include="28 Implement strStr.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="35 Search Insert Position.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
