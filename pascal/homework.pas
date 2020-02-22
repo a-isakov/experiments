@@ -14,15 +14,15 @@ begin
         number_copy := number_copy DIV 10;
         reverse := reverse * 10 + digit;
     end;
-    Write('Число ');
+    Write('Number ');
     Write(number);
     if number = reverse then
     begin
-        Writeln(' палиндром');
+        Writeln(' is a palindrom');
     end
     else
     begin
-        Writeln(' не палиндром');
+        Writeln(' is not a palindrom');
     end;
 end;
 
@@ -46,13 +46,13 @@ begin
         end;
         number := number DIV 10;
     end;
-    Write('Число ');
+    Write('Number ');
     Write(number_copy);
-    Write(' имеет ');
+    Write(' has ');
     Write(count2);
-    Write(' двоек и ');
+    Write(' twos and ');
     Write(count5);
-    Writeln(' пятёрок');
+    Writeln(' fives');
 end;
 
 procedure Task10(number: Integer);
@@ -78,11 +78,11 @@ begin
 end;
 
 begin
-    // Task8(123);
-    // Task8(12321);
-    // Task9(12525);
-    // Task9(123);
-    // Task9(1346);
+    Task8(123);
+    Task8(12321);
+    Task9(12525);
+    Task9(123);
+    Task9(1346);
     Task10(123);
     Task10(1346);
 end.
