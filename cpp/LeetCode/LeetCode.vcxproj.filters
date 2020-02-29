@@ -59,5 +59,11 @@
     <ClInclude Include="35 Search Insert Position.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="29 Divide Two Integers.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="30 Substring with Concatenation of All Words.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
