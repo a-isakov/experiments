@@ -26,37 +26,42 @@ using namespace std;
 
 class Solution {
 public:
+    string* str;
+    size_t word_len;
+
     vector<int> findSubstring(string s, vector<string>& words) {
         vector<int> result;
         if (!words.size())
             return result;
-        size_t len = words[0].length();
+        word_len = words[0].length();
+        size_t max_pos = s.length() - word_len * words.size();
+        str = &s;
         unordered_map<string, size_t> availables;
-        unordered_set<string> distinct_words;
-        for (string word : words)
-        {
+        for (string& word : words)
             availables[word]++;
-            distinct_words.insert(word);
-        }
-        for (string word : distinct_words)
+        for (auto& word_item : availables)
         {
-            availables[word]--;
-            size_t pos = s.find(word);
+            if (!word_item.second)
+                continue;
+            word_item.second--;
+            size_t pos = s.find(word_item.first.c_str(), 0);
             while (pos != string::npos)
             {
-                if (CheckDeeper(s, pos, len, availables, result))
+                if (pos > max_pos)
+                    break;
+                if (CheckDeeper(pos, availables))
                     result.push_back((int)pos);
-                pos = s.find(word, pos + 1);
+                pos = s.find(word_item.first.c_str(), pos + 1);
             }
-            availables[word]++;
+            word_item.second++;
         }
         return result;
     }
 
-    inline bool CheckDeeper(string& s, size_t pos, size_t len, unordered_map<string, size_t>& availables, vector<int>& result)
+    inline bool CheckDeeper(size_t pos, unordered_map<string, size_t>& availables)
     {
         bool empty = true;
-        for(auto it : availables)
+        for(auto& it : availables)
         {
             if (it.second)
             {
@@ -66,12 +71,13 @@ public:
         }
         if (empty)
             return true;
-        string sub = s.substr(pos + len, len);
-        if (availables[sub])
+        string sub = str->substr(pos + word_len, word_len);
+        size_t& count = availables[sub];
+        if (count)
         {
-            availables[sub]--;
-            bool res = CheckDeeper(s, pos + len, len, availables, result);
-            availables[sub]++;
+            count--;
+            bool res = CheckDeeper(pos + word_len, availables);
+            count++;
             return res;
         }
         return false;

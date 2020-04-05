@@ -36,28 +36,24 @@ public:
         int result = 0;
         if (dividend < divisor)
         {
+            result = 1;
             while (!(dividend & 1) && !(divisor & 1))
             {
                 dividend = dividend >> 1;
                 divisor = divisor >> 1;
-                if (result == 0)
-                    result = 1;
                 result = result << 1;
             }
             if (divisor == -1)
                 return positive ? -dividend : dividend;
             int multiplier = divisor;
-            while (dividend <= multiplier)
+            while (dividend <= multiplier && multiplier > (int)0xc0000000)
             {
                 multiplier = (multiplier & 0xffffffff) << 1;
                 if (multiplier > dividend)
-                {
-                    if (result == 0)
-                        result = 1;
                     result = result << 1;
-                }
             }
-            multiplier = multiplier >> 1;
+            if (multiplier > (int)0xc0000000 || multiplier <= dividend)
+                multiplier = multiplier >> 1;
             dividend -= multiplier;
             while (dividend <= divisor)
             {
@@ -70,6 +66,7 @@ public:
 
     void test()
     {
+        std::cout << "Test 0 " << std::string(divide(214, 3) == 71 ? "passed" : "FAILED") << "\n";
         std::cout << "Test 1 " << std::string(divide(1, 4) == 0 ? "passed" : "FAILED") << "\n";
         std::cout << "Test 2 " << std::string(divide(10, 3) == 3 ? "passed" : "FAILED") << "\n";
         std::cout << "Test 3 " << std::string(divide(7, -3) == -2 ? "passed" : "FAILED") << "\n";
@@ -80,6 +77,9 @@ public:
         std::cout << "Test 8 " << std::string(divide(-1010369383, -2147483648) == 0 ? "passed" : "FAILED") << "\n";
         std::cout << "Test 9 " << std::string(divide(-2147483648, 2) == -1073741824 ? "passed" : "FAILED") << "\n";
         std::cout << "Test 10 " << std::string(divide(2147483647, 3) == 715827882 ? "passed" : "FAILED") << "\n";
+        std::cout << "Test 11 " << std::string(divide(-1021989372, -82778243) == 12 ? "passed" : "FAILED") << "\n";
+        std::cout << "Test 12 " << std::string(divide(1026117192, -874002063) == -1 ? "passed" : "FAILED") << "\n";
+        std::cout << "Test 13 " << std::string(divide(-1046638222, 564425312) == -1 ? "passed" : "FAILED") << "\n";
         std::cout << "Completed\n";
     }
 };
