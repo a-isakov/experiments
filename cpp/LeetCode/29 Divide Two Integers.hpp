@@ -41,7 +41,6 @@ public:
             {
                 dividend = dividend >> 1;
                 divisor = divisor >> 1;
-                result = result << 1;
             }
             if (divisor == -1)
                 return positive ? -dividend : dividend;
