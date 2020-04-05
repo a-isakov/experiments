@@ -97,6 +97,9 @@ public:
         vec = { "word","good","best","good" };
         res = { 8 };
         std::cout << "Test 4 " << std::string(findSubstring("wordgoodgoodgoodbestword", vec) == res ? "passed" : "FAILED") << "\n";
+        vec = { "foo","bar" };
+        res = { 0, 9 };
+        std::cout << "Test 5 " << std::string(findSubstring("barfoothefoobarman", vec) == res ? "passed" : "FAILED") << "\n";
         std::cout << "Completed\n";
     }
 };
