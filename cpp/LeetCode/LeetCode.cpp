@@ -1,9 +1,8 @@
-#include "30 Substring with Concatenation of All Words.hpp"
+#include "38 Count and Say.hpp"
 
 int main()
 {
 	Solution sol;
-	//for (size_t i = 0; i < 1000; i++)
-		sol.test();
+	sol.test();
 	std::cout << "Completed\n";
 }

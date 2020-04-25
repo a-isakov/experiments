@@ -18,6 +18,9 @@
     <ClCompile Include="LeetCode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="38 Count and Say.hpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="14 Longest Common Prefix.hpp">
