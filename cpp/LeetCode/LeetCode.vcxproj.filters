@@ -68,5 +68,11 @@
     <ClInclude Include="30 Substring with Concatenation of All Words.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="53 Maximum Subarray.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="69 Sqrt(x).hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
