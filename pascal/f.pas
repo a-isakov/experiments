@@ -1,23 +1,25 @@
 Program f;
 const nmax=10000;
-var a: array [1..nmax] of longint;
- n, i, j, x: longint;
+var ar: array [1..nmax] of longint;
+ n, a, b, i, c, x: longint;
 begin
+  read (a);
+  read (b);
   read (n);
-  for j := 1 to n do
-  begin
-    write ('a[', j, ']=', a[j], ' ');
-  end;
-  writeln ('');
-
-  x := n;
-
+  randomize;
   for i := 1 to n do
   begin
-    write ('x=', x, ': ');
-    a[i] := x;
-    x := x - 1;
-    write ('i=', i, ': ');
-    for j := 1 to n do write ('a[', j, ']=', a[j], ' '); writeln ('');
+    ar[i] := Random (b - a) + a;
+    write (ar[i], ' ');
   end;
+
+  c := 0;
+  for i := 1 to n do
+  begin
+    x := ar[i] div 10;
+    x := x mod 10;
+    if x mod 2 = 0 then c := c + 1;
+  end;
+  writeln ('');
+  write (c);
 end.

@@ -169,6 +169,7 @@
     <ClInclude Include="28 Implement strStr.hpp" />
     <ClInclude Include="29 Divide Two Integers.hpp" />
     <ClInclude Include="30 Substring with Concatenation of All Words.hpp" />
+    <ClInclude Include="31 Next Permutation.hpp" />
     <ClInclude Include="35 Search Insert Position.hpp" />
     <ClInclude Include="53 Maximum Subarray.hpp" />
     <ClInclude Include="69 Sqrt(x).hpp" />

@@ -8,6 +8,7 @@ Explanation: [4,-1,2,1] has the largest sum = 6.
 */
 
 #include <vector>
+#include <iostream>
 
 using namespace std;
 
@@ -16,4 +17,7 @@ public:
     int maxSubArray(vector<int>& nums) {
 
     }
+
+    void test()
+    {}
 };
