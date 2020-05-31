@@ -1,3 +1,4 @@
+#include <iostream>
 #include "31 Next Permutation.hpp"
 
 int main()
