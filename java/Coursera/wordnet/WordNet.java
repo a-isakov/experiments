@@ -1,6 +1,7 @@
 import edu.princeton.cs.algs4.Digraph;
 import edu.princeton.cs.algs4.In;
 
+import java.util.HashMap;
 import java.util.HashSet;
 
 public class WordNet {
@@ -8,6 +9,8 @@ public class WordNet {
     private SAP sap;
     // private ArrayList<String> synsetArray;
     private HashSet<String> nouns;
+    private HashMap<String, Integer> nounsMap;
+    private HashMap<Integer, String> nounsMapR;
 
     // constructor takes the name of the two input files
     public WordNet(String synsets, String hypernyms) {
@@ -16,10 +19,15 @@ public class WordNet {
 
         // synsetArray = new ArrayList<String>();
         nouns = new HashSet<String>();
+        nounsMap = new HashMap<String, Integer>();
+        nounsMapR = new HashMap<Integer, String>();
         while (!synsetsInput.isEmpty()) {
             String line = synsetsInput.readString();
             String[] values = line.split(",");
             nouns.add(values[1]);
+            Integer n = Integer.valueOf(values[0]);
+            nounsMap.put(values[1], n);
+            nounsMapR.put(n, values[1]);
         }
 
         digraph = new Digraph(nouns.size());
@@ -46,22 +54,27 @@ public class WordNet {
     public boolean isNoun(String word) {
         if (word == null)
             throw new NullPointerException("word parameter is null");
-        // for (String s: synsetArray) {
-        //     if (s.equals(word))
-        //         return true;
-        // }
         return nouns.contains(word);
     }
 
     // distance between nounA and nounB (defined below)
     public int distance(String nounA, String nounB) {
-        return 0;
+        if (!isNoun(nounA) || !isNoun(nounB))
+            throw new IllegalArgumentException("Invalid noun");
+        int a = nounsMap.get(nounA);
+        int b = nounsMap.get(nounB);
+        return sap.length(a, b);
     }
 
     // a synset (second field of synsets.txt) that is the common ancestor of nounA and nounB
     // in a shortest ancestral path (defined below)
     public String sap(String nounA, String nounB) {
-        return "";
+        if (!isNoun(nounA) || !isNoun(nounB))
+            throw new IllegalArgumentException("Invalid noun");
+        int a = nounsMap.get(nounA);
+        int b = nounsMap.get(nounB);
+        int ancestor = sap.ancestor(a, b);
+        return nounsMapR.get(ancestor);
     }
 
     // do unit testing of this class
