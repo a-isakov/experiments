@@ -6,5 +6,6 @@ func main() {
 	// tests.TestRemoveDuplicates()
 	// tests.TestRemoveElement()
 	// tests.TestStrStr()
-	tests.TestSearchInsert()
+	// tests.TestSearchInsert()
+	tests.TestHasCycle()
 }
