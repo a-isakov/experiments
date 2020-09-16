@@ -77,5 +77,8 @@
     <ClInclude Include="31 Next Permutation.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="141 Linked List Cycle.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
