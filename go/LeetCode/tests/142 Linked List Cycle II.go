@@ -9,42 +9,18 @@ import "fmt"
 // }
 
 // solves https://leetcode.com/problems/linked-list-cycle-ii/
-func detectCycle0(head *ListNode) *ListNode {
-	// if head != nil {
-	// 	var addrs map[*ListNode]bool = make(map[*ListNode]bool)
-	// 	var node *ListNode = head
-	// 	for node != nil {
-	// 		addrs[node] = true
-	// 		if node.Next != nil && addrs[node.Next] {
-	// 			return true
-	// 		}
-	// 		node = node.Next
-	// 	}
-	// }
-	// return false
-	return nil
-}
-
-// solves https://leetcode.com/problems/linked-list-cycle-ii/
 func detectCycle(head *ListNode) *ListNode {
-	// if head != nil {
-	// 	var slowNode *ListNode = head
-	// 	var fastNode *ListNode = head
-
-	// 	for slowNode != nil && fastNode != nil {
-	// 		if slowNode.Next == nil || fastNode.Next == nil {
-	// 			return false
-	// 		}
-
-	// 		slowNode = slowNode.Next
-	// 		fastNode = fastNode.Next.Next
-
-	// 		if slowNode == fastNode {
-	// 			return true
-	// 		}
-	// 	}
-	// }
-	// return false
+	if head != nil {
+		var addrs map[*ListNode]bool = make(map[*ListNode]bool)
+		var node *ListNode = head
+		for node != nil {
+			addrs[node] = true
+			if node.Next != nil && addrs[node.Next] {
+				return node.Next
+			}
+			node = node.Next
+		}
+	}
 	return nil
 }
 

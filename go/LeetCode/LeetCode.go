@@ -7,5 +7,5 @@ func main() {
 	// tests.TestRemoveElement()
 	// tests.TestStrStr()
 	// tests.TestSearchInsert()
-	tests.TestHasCycle()
+	tests.TestHasCycle2()
 }
