@@ -7,9 +7,12 @@
 import edu.princeton.cs.algs4.Digraph;
 
 public class SAP {
+    private Digraph digraph;
+    private 
+
     // constructor takes a digraph (not necessarily a DAG)
     public SAP(Digraph G) {
-
+        digraph = G;
     }
 
     // length of shortest ancestral path between v and w; -1 if no such path
@@ -32,7 +35,7 @@ public class SAP {
         return 0;
     }
 
-    public static void main(String[] args) {
-
-    }
+    // public static void main(String[] args) {
+    //
+    // }
 }

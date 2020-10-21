@@ -7,7 +7,6 @@ import java.util.HashSet;
 public class WordNet {
     private Digraph digraph;
     private SAP sap;
-    // private ArrayList<String> synsetArray;
     private HashSet<String> nouns;
     private HashMap<String, Integer> nounsMap;
     private HashMap<Integer, String> nounsMapR;
@@ -17,7 +16,6 @@ public class WordNet {
         In synsetsInput = new In(synsets);
         In hypernymsInput = new In(hypernyms);
 
-        // synsetArray = new ArrayList<String>();
         nouns = new HashSet<String>();
         nounsMap = new HashMap<String, Integer>();
         nounsMapR = new HashMap<Integer, String>();
