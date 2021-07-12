@@ -12,25 +12,28 @@
 (function() {
     'use strict';
 
-    const elements = document.getElementsByClassName('aui-toolbar2-primary');
-    if (elements.length > 0) {
-        const jiraKey = document.getElementById('key-val').textContent;
-
-        let completeButton = document.createElement('div');
-        completeButton.className = 'aui-buttons pluggable-ops';
-        completeButton.innerHTML = '<span class="aui-button toolbar-trigger issueaction-workflow-transition trigger-label">Complete</span>';
-        completeButton.addEventListener('click', function() {
-            customCloserListener(jiraKey, true)
-        }, false);
-        elements[0].appendChild(completeButton);
-
-        let rejectButton = document.createElement('div');
-        rejectButton.className = 'aui-buttons pluggable-ops';
-        rejectButton.innerHTML = '<span class="aui-button toolbar-trigger issueaction-workflow-transition trigger-label">Reject</span>';
-        rejectButton.addEventListener('click', function() {
-            customCloserListener(jiraKey, false)
-        }, false);
-        elements[0].appendChild(rejectButton);
+    const jiraStatus = document.getElementById('status-val').textContent.trim().toLowerCase();
+    if (jiraStatus != 'closed') {
+        const elements = document.getElementsByClassName('aui-toolbar2-primary');
+        if (elements.length > 0) {
+            const jiraKey = document.getElementById('key-val').textContent;
+    
+            let completeButton = document.createElement('div');
+            completeButton.className = 'aui-buttons pluggable-ops';
+            completeButton.innerHTML = '<span class="aui-button toolbar-trigger issueaction-workflow-transition trigger-label">Complete</span>';
+            completeButton.addEventListener('click', function() {
+                customCloserListener(jiraKey, true)
+            }, false);
+            elements[0].appendChild(completeButton);
+    
+            let rejectButton = document.createElement('div');
+            rejectButton.className = 'aui-buttons pluggable-ops';
+            rejectButton.innerHTML = '<span class="aui-button toolbar-trigger issueaction-workflow-transition trigger-label">Reject</span>';
+            rejectButton.addEventListener('click', function() {
+                customCloserListener(jiraKey, false)
+            }, false);
+            elements[0].appendChild(rejectButton);
+        }
     }
 
     function customCloserListener(jiraKey, complete) {
