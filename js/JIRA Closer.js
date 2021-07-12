@@ -62,7 +62,7 @@
                 const status = jiraIssue['fields']['status']['name'];
                 const type = jiraIssue['fields']['issuetype']['name'];
                 
-                if (status != 'Closed') {
+                if (status.toLowerCase() != 'closed') {
                     closeByWorkflow(jiraKey, type, status, complete);
                 }
             }
@@ -76,6 +76,7 @@
         console.log('STATUS: ' + status);
 
         const nextStatus = defineNextStatus(type, status);
+        console.log('NEXT STATUS: ' + nextStatus);
         if (nextStatus == '') {
             return;
         }
@@ -87,7 +88,7 @@
                 const transitionsReponse = JSON.parse(transitionsRequest.responseText);
                 // console.log(transitionsReponse);
                 transitionsReponse['transitions'].forEach(transition => {
-                    if (transition['to']['name'] == nextStatus) {
+                    if (transition['to']['name'].toLowerCase() == nextStatus.toLowerCase()) {
                         transitionId = transition['id'];
                         // console.log(transitionId);
                     }
@@ -105,7 +106,7 @@
                     moveRequest.open('POST', '/rest/api/2/issue/' + jiraKey + '/transitions?expand=transitions.fields', true);
                     moveRequest.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
     
-                    if (nextStatus == 'Closed') {
+                    if (nextStatus.toLowerCase() == 'closed') {
                         moveRequest.send(JSON.stringify({'fields': {'resolution': {'name': resolution}}, 'transition': {'id': transitionId}}));
                     } else {
                         moveRequest.send(JSON.stringify({'transition': {'id': transitionId}}));
@@ -130,55 +131,75 @@
             case 'Technical Task':
                 nextStatus = defineNextTechnialTaskStatus(status);
                 break;
+            case 'Epic':
+                nextStatus = defineNextEpicStatus(status);
+                break;
         }
         return nextStatus;
     }
 
     function defineNextSubTaskStatus(status) {
-        switch (status) {
-            case 'Open':
-                return 'In progress';
-            case 'Waiting for rework':
-            case 'Ready for publish':
-                return 'Closed';
-            case 'In progress':
-                return 'Ready for test';
-            case 'Ready for test':
-                return 'In Testing';
-            case 'In Testing':
-                return 'Ready for publish';
+        switch (status.toLowerCase()) {
+            case 'open':
+                return 'in progress';
+            case 'waiting for rework':
+            case 'ready for publish':
+                return 'closed';
+            case 'in progress':
+                return 'ready for test';
+            case 'ready for test':
+                return 'in testing';
+            case 'in testing':
+                return 'ready for publish';
         }
         return '';
     }
 
     function defineNextUserStoryStatus(status) {
-        switch (status) {
-            case 'Open':
-            case 'Ready for publish':
-                return 'Closed';
-            case 'Waiting for Rework':
-                return 'In progress';
-            case 'In progress':
-                return 'Ready for test';
-            case 'Ready for test':
-                return 'In Testing';
-            case 'In Testing':
-                return 'Ready for publish';
+        switch (status.toLowerCase()) {
+            case 'open':
+            case 'ready for publish':
+                return 'closed';
+            case 'waiting for Rework':
+                return 'in progress';
+            case 'in progress':
+                return 'ready for test';
+            case 'ready for test':
+                return 'in testing';
+            case 'in testing':
+                return 'ready for publish';
         }
         return '';
     }
 
     function defineNextTechnialTaskStatus(status) {
-        switch (status) {
-            case 'Open':
-            case 'Acceptance':
-                return 'Closed';
-            case 'Waiting for Rework':
-                return 'In progress';
-            case 'In progress':
-                return 'Ready for acceptance';
-            case 'Ready for acceptance':
-                return 'Acceptance';
+        switch (status.toLowerCase()) {
+            case 'open':
+            case 'acceptance':
+                return 'closed';
+            case 'waiting for rework':
+                return 'in progress';
+            case 'in progress':
+                return 'ready for acceptance';
+            case 'ready for acceptance':
+                return 'acceptance';
+        }
+        return '';
+    }
+
+    function defineNextEpicStatus(status) {
+        switch (status.toLowerCase()) {
+            case 'open':
+            case 'on hold':
+                return 'analysed';
+            case 'analysed':
+                return 'ready to impl';
+            case 'ready to impl':
+                return 'in progress';
+            case 'in progress':
+                return 'hypothesis verification';
+            case 'hypothesis verification':
+                return 'closed';
         }
         return '';
     }
