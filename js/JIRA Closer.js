@@ -76,6 +76,9 @@
         console.log('STATUS: ' + status);
 
         const nextStatus = defineNextStatus(type, status);
+        if (nextStatus == '') {
+            return;
+        }
 
         let transitionsRequest = new XMLHttpRequest();
         transitionsRequest.onreadystatechange = function() {
@@ -120,6 +123,10 @@
             case 'Sub-task':
                 nextStatus = defineNextSubTaskStatus(status);
                 break;
+            case 'User Story':
+            case 'Team Enabler':
+                nextStatus = defineNextTeamEnablerStatus(status);
+                break;
         }
         return nextStatus;
     }
@@ -131,6 +138,23 @@
             case 'Waiting for rework':
             case 'Ready for publish':
                 return 'Closed';
+            case 'In progress':
+                return 'Ready for test';
+            case 'Ready for test':
+                return 'In Testing';
+            case 'In Testing':
+                return 'Ready for publish';
+        }
+        return '';
+    }
+
+    function defineNextTeamEnablerStatus(status) {
+        switch (status) {
+            case 'Open':
+            case 'Ready for publish':
+                return 'Closed';
+            case 'Waiting for Rework':
+                return 'In progress';
             case 'In progress':
                 return 'Ready for test';
             case 'Ready for test':
