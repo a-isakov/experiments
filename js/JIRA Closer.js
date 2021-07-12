@@ -53,7 +53,7 @@
             }
         };
         request.open('GET', '/rest/api/2/issue/' + jiraKey + '/subtask', true);
-        request.send();
+        request.send(); // retrieve list of subtasks
     }
 
     function closeJira(jiraKey, complete) {
@@ -71,9 +71,10 @@
             }
         };
         request.open('GET', '/rest/api/2/issue/' + jiraKey + '?fields=issuetype,status', true);
-        request.send();
+        request.send(); // retrieve issue details to close
     }
     
+    // closes isses following the JIRA workflow
     function closeByWorkflow(jiraKey, type, status, complete) {
         console.log('TYPE: ' + type);
         console.log('STATUS: ' + status);
@@ -91,6 +92,7 @@
                 const transitionsReponse = JSON.parse(transitionsRequest.responseText);
                 // console.log(transitionsReponse);
                 transitionsReponse['transitions'].forEach(transition => {
+                    // looking for transition with target status
                     if (transition['to']['name'].toLowerCase() == nextStatus.toLowerCase()) {
                         transitionId = transition['id'];
                         // console.log(transitionId);
@@ -98,18 +100,19 @@
                 });
     
                 if (transitionId != -1) {
-                    const resolution = (complete == true ? 'Done' : 'Won\'t Do');
                     let moveRequest = new XMLHttpRequest();
                     moveRequest.onreadystatechange = function() {
                         if (this.readyState == 4 && this.status == 204) {
                             console.log(jiraKey + ' moved to ' + nextStatus);
-                            closeByWorkflow(jiraKey, type, nextStatus, complete);
+                            closeByWorkflow(jiraKey, type, nextStatus, complete); // follow the workflow until get closed
                         }
                     };
                     moveRequest.open('POST', '/rest/api/2/issue/' + jiraKey + '/transitions?expand=transitions.fields', true);
                     moveRequest.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
     
+                    // do the status change
                     if (nextStatus.toLowerCase() == 'closed') {
+                        const resolution = (complete == true ? 'Done' : 'Won\'t Do');
                         moveRequest.send(JSON.stringify({'fields': {'resolution': {'name': resolution}}, 'transition': {'id': transitionId}}));
                     } else {
                         moveRequest.send(JSON.stringify({'transition': {'id': transitionId}}));
@@ -118,7 +121,7 @@
             }
         };
         transitionsRequest.open('GET', '/rest/api/2/issue/' + jiraKey + '/transitions', true);
-        transitionsRequest.send();
+        transitionsRequest.send(); // check available transitions
     }
 
     function defineNextStatus(type, status) {
