@@ -125,7 +125,10 @@
                 break;
             case 'User Story':
             case 'Team Enabler':
-                nextStatus = defineNextTeamEnablerStatus(status);
+                nextStatus = defineNextUserStoryStatus(status);
+                break;
+            case 'Technical Task':
+                nextStatus = defineNextTechnialTaskStatus(status);
                 break;
         }
         return nextStatus;
@@ -148,7 +151,7 @@
         return '';
     }
 
-    function defineNextTeamEnablerStatus(status) {
+    function defineNextUserStoryStatus(status) {
         switch (status) {
             case 'Open':
             case 'Ready for publish':
@@ -161,6 +164,21 @@
                 return 'In Testing';
             case 'In Testing':
                 return 'Ready for publish';
+        }
+        return '';
+    }
+
+    function defineNextTechnialTaskStatus(status) {
+        switch (status) {
+            case 'Open':
+            case 'Acceptance':
+                return 'Closed';
+            case 'Waiting for Rework':
+                return 'In progress';
+            case 'In progress':
+                return 'Ready for acceptance';
+            case 'Ready for acceptance':
+                return 'Acceptance';
         }
         return '';
     }
