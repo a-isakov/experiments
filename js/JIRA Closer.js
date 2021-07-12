@@ -91,7 +91,7 @@
                 });
     
                 if (transitionId != -1) {
-                    const resolution = (complete == true ? 'Done' : 'Unresolved');
+                    const resolution = (complete == true ? 'Done' : 'Won\'t Do');
                     let moveRequest = new XMLHttpRequest();
                     moveRequest.onreadystatechange = function() {
                         if (this.readyState == 4 && this.status == 204) {
