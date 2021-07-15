@@ -96,7 +96,7 @@
             "name": "Python: All debug Options",
             "type": "python",
             "request": "launch",
-            "pythonPath": "${omnipascal.freePascalSourcePath}",
+            "python": "${omnipascal.freePascalSourcePath}",
             "program": "${file}",
             "module": "module.name",
             "env": {
