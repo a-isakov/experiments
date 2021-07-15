@@ -49,11 +49,13 @@
     }
 
     function customCloserListener(jiraKey, complete) {
-        Promise.all([
-            closeSubtasks(jiraKey, complete),
-            closeJira(jiraKey, complete)
-        ]).then(() => console.log('===================done'))
-        // window.location.reload();
+        if (confirm('Are you sure you want to close the issue with all subtasks?')) {
+            Promise.all([
+                closeSubtasks(jiraKey, complete),
+                closeJira(jiraKey, complete)
+            ]).then(() => console.log('done'))
+            // window.location.reload();
+        }
     }
 
     function closeSubtasks(jiraKey, complete) {
