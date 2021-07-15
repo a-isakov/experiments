@@ -13,6 +13,26 @@
 (function() {
     'use strict';
 
+    const TYPE_SUBTASK = 10102;
+    const TYPE_USER_STORY = 12400;
+    const TYPE_TEAM_ENABLER = 12401;
+    const TYPE_TECHNICAL_TASK = 12700;
+    const TYPE_EPIC = 10000;
+
+    const STATUS_OPEN = 10500;
+    const STATUS_WAITING_FOR_REWORK = 12703;
+    const STATUS_IN_PROGRESS = 10600;
+    const STATUS_READY_FOR_TEST = 10106;
+    const STATUS_IN_TESTING = 11120;
+    const STATUS_READY_FOR_ACCEPTANCE = 12708;
+    const STATUS_ACCEPTANCE = 12709;
+    const STATUS_ANALYSED = 12704;
+    const STATUS_READY_TO_IMPL = 12705;
+    const STATUS_HYPOTHESIS_VERIFICATION = 12700;
+    const STATUS_ON_HOLD = 12706;
+    const STATUS_READY_FOR_PUBLISH = 12707;
+    const STATUS_CLOSED = 6;
+
     waitForKeyElements (
         '<div class="aui-toolbar2-primary">', 
         appendButtons
@@ -23,7 +43,7 @@
         const element = document.getElementById('custom-complete-button');
         if (element == null) {
             const jiraStatus = document.getElementById('status-val').textContent.trim().toLowerCase();
-            if (jiraStatus != 'closed') {
+            if (jiraStatus != 'closed' && jiraStatus != 'закрыт') {
                 const elements = document.getElementsByClassName('aui-toolbar2-primary');
                 if (elements.length > 0) {
                     const jiraKey = document.getElementById('key-val').textContent;
@@ -78,10 +98,11 @@
         request.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
                 const jiraIssue = JSON.parse(request.responseText);
-                const status = jiraIssue['fields']['status']['name'];
-                const type = jiraIssue['fields']['issuetype']['name'];
+                const status = jiraIssue['fields']['status']['id'];
+                const type = jiraIssue['fields']['issuetype']['id'];
                 
-                if (status.toLowerCase() != 'closed') {
+                // console.log(jiraIssue);
+                if (status != STATUS_CLOSED) {
                     closeByWorkflow(jiraKey, type, status, complete);
                 }
             }
@@ -97,7 +118,7 @@
 
         const nextStatus = defineNextStatus(type, status);
         console.log('NEXT STATUS: ' + nextStatus);
-        if (nextStatus == '') {
+        if (nextStatus == 0) {
             return;
         }
 
@@ -109,7 +130,7 @@
                 // console.log(transitionsReponse);
                 transitionsReponse['transitions'].forEach(transition => {
                     // looking for transition with target status
-                    if (transition['to']['name'].toLowerCase() == nextStatus.toLowerCase()) {
+                    if (transition['to']['id'] == nextStatus) {
                         transitionId = transition['id'];
                         // console.log(transitionId);
                     }
@@ -127,7 +148,7 @@
                     moveRequest.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
     
                     // do the status change
-                    if (nextStatus.toLowerCase() == 'closed') {
+                    if (nextStatus == STATUS_CLOSED) {
                         const resolution = (complete == true ? 'Done' : 'Won\'t Do');
                         moveRequest.send(JSON.stringify({'fields': {'resolution': {'name': resolution}}, 'transition': {'id': transitionId}}));
                     } else {
@@ -141,19 +162,19 @@
     }
 
     function defineNextStatus(type, status) {
-        let nextStatus = '';
-        switch (type) {
-            case 'Sub-task':
+        let nextStatus = 0;
+        switch (Number(type)) {
+            case TYPE_SUBTASK:
                 nextStatus = defineNextSubTaskStatus(status);
                 break;
-            case 'User Story':
-            case 'Team Enabler':
+            case TYPE_USER_STORY:
+            case TYPE_TEAM_ENABLER:
                 nextStatus = defineNextUserStoryStatus(status);
                 break;
-            case 'Technical Task':
+            case TYPE_TECHNICAL_TASK:
                 nextStatus = defineNextTechnialTaskStatus(status);
                 break;
-            case 'Epic':
+            case TYPE_EPIC:
                 nextStatus = defineNextEpicStatus(status);
                 break;
         }
@@ -161,68 +182,68 @@
     }
 
     function defineNextSubTaskStatus(status) {
-        switch (status.toLowerCase()) {
-            case 'open':
-                return 'in progress';
-            case 'waiting for rework':
-            case 'ready for publish':
-                return 'closed';
-            case 'in progress':
-                return 'ready for test';
-            case 'ready for test':
-                return 'in testing';
-            case 'in testing':
-                return 'ready for publish';
+        switch (Number(status)) {
+            case STATUS_OPEN:
+                return STATUS_IN_PROGRESS;
+            case STATUS_WAITING_FOR_REWORK:
+            case STATUS_READY_FOR_PUBLISH:
+                return STATUS_CLOSED;
+            case STATUS_IN_PROGRESS:
+                return STATUS_READY_FOR_TEST;
+            case STATUS_READY_FOR_TEST:
+                return STATUS_IN_TESTING;
+            case STATUS_IN_TESTING:
+                return STATUS_READY_FOR_PUBLISH;
         }
-        return '';
+        return 0;
     }
 
     function defineNextUserStoryStatus(status) {
-        switch (status.toLowerCase()) {
-            case 'open':
-            case 'ready for publish':
-                return 'closed';
-            case 'waiting for Rework':
-                return 'in progress';
-            case 'in progress':
-                return 'ready for test';
-            case 'ready for test':
-                return 'in testing';
-            case 'in testing':
-                return 'ready for publish';
+        switch (Number(status)) {
+            case STATUS_OPEN:
+            case STATUS_READY_FOR_PUBLISH:
+                return STATUS_CLOSED;
+            case STATUS_WAITING_FOR_REWORK:
+                return STATUS_IN_PROGRESS;
+            case STATUS_IN_PROGRESS:
+                return STATUS_READY_FOR_TEST;
+            case STATUS_READY_FOR_TEST:
+                return STATUS_IN_TESTING;
+            case STATUS_IN_TESTING:
+                return STATUS_READY_FOR_PUBLISH;
         }
-        return '';
+        return 0;
     }
 
     function defineNextTechnialTaskStatus(status) {
-        switch (status.toLowerCase()) {
-            case 'open':
-            case 'acceptance':
-                return 'closed';
-            case 'waiting for rework':
-                return 'in progress';
-            case 'in progress':
-                return 'ready for acceptance';
-            case 'ready for acceptance':
-                return 'acceptance';
+        switch (Number(status)) {
+            case STATUS_OPEN:
+            case STATUS_ACCEPTANCE:
+                return STATUS_CLOSED;
+            case STATUS_WAITING_FOR_REWORK:
+                return STATUS_IN_PROGRESS;
+            case STATUS_IN_PROGRESS:
+                return STATUS_READY_FOR_ACCEPTANCE;
+            case STATUS_READY_FOR_ACCEPTANCE:
+                return STATUS_ACCEPTANCE;
         }
-        return '';
+        return 0;
     }
 
     function defineNextEpicStatus(status) {
-        switch (status.toLowerCase()) {
-            case 'open':
-            case 'on hold':
-                return 'analysed';
-            case 'analysed':
-                return 'ready to impl';
-            case 'ready to impl':
-                return 'in progress';
-            case 'in progress':
-                return 'hypothesis verification';
-            case 'hypothesis verification':
-                return 'closed';
+        switch (Number(status)) {
+            case STATUS_OPEN:
+            case STATUS_ON_HOLD:
+                return STATUS_ANALYSED;
+            case STATUS_ANALYSED:
+                return STATUS_READY_TO_IMPL;
+            case STATUS_READY_TO_IMPL:
+                return STATUS_IN_PROGRESS;
+            case STATUS_IN_PROGRESS:
+                return STATUS_HYPOTHESIS_VERIFICATION;
+            case STATUS_HYPOTHESIS_VERIFICATION:
+                return STATUS_CLOSED;
         }
-        return '';
+        return 0;
     }
 })();
