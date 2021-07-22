@@ -71,25 +71,23 @@
     function customCloserListener(jiraKey, complete) {
         if (confirm('Are you sure you want to close the issue with all subtasks?')) {
             Promise.all([
-                // closeSubtasks(jiraKey, complete),
+                closeSubtasks(jiraKey, complete),
                 closeJira(jiraKey, complete)
-            ]).then(() => console.log('done'))
-            // window.location.reload();
+            ]).then(() => {
+                console.log('done');
+                window.location.reload();
+            })
         }
     }
 
-    function closeSubtasks(jiraKey, complete) {
-        let request = new XMLHttpRequest();
-        request.onreadystatechange = function() {
-            if (this.readyState == 4 && this.status == 200) {
-                const subtasks = JSON.parse(request.responseText);
-                subtasks.forEach(element => {
-                    closeJira(element['key'], complete);
-                });
+    async function closeSubtasks(jiraKey, complete) {
+        const response = await fetch('/rest/api/2/issue/' + jiraKey + '/subtask'); // retrieve list of subtasks
+        if (response.status == 200) {
+            const subtasks = await response.json();
+            for (const subtask of subtasks) {
+                await closeJira(subtask['key'], complete);
             }
-        };
-        request.open('GET', '/rest/api/2/issue/' + jiraKey + '/subtask', true);
-        request.send(); // retrieve list of subtasks
+        }
     }
 
     async function closeJira(jiraKey, complete) {
@@ -121,8 +119,8 @@
         if (transitionsReponse.status == 200) {
             const transitions = await transitionsReponse.json();
             // console.log(transitions);
-            transitions['transitions'].forEach(transition => {
-                // looking for transition with target status
+            // looking for transition with target status
+            for (const transition of transitions['transitions']) {
                 if (transition['to']['id'] == nextStatus) {
                     const transitionId = transition['id'];
                     // console.log(transitionId);
@@ -141,12 +139,12 @@
                         },
                         body: data
                     });
-                    // if (moveResponse.status == 204) {
-                    //     console.log(jiraKey + ' moved to ' + nextStatus);
-                    //     await closeByWorkflow(jiraKey, type, nextStatus, complete); // follow the workflow until get closed
-                    // }
+                    if (moveResponse.status == 204) {
+                        console.log(jiraKey + ' moved to ' + nextStatus);
+                        await closeByWorkflow(jiraKey, type, nextStatus, complete); // follow the workflow until get closed
+                    }
                 }
-            });
+            }
         }
     }
 
