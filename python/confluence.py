@@ -44,7 +44,7 @@ def searchGoogleDocs(sessionID, headers):
         pageIds = set()
         docIds = set()
         spaces = response.json()['results']
-        # spaces = [{'key': 'ABDTDIT'}]
+        # spaces = [{'key': 'ABDTDIT'}] #####################
         for space in spaces:
             spaceKey = space['key']
             if spaceKey != '':
@@ -56,7 +56,10 @@ def searchGoogleDocs(sessionID, headers):
                     for page in pages:
                         parsePage(docIds, pageIds, page['id'], headers)
 
-sessionID = 'C1DF17EBA2BF20F7CF6FE62D841EF7E9'
+sessionID = '3BEC2DFB7D2AA360F86CEB21D67D5CE0'
 headers = {'Accept': 'application/json', 'Cookie': 'JSESSIONID=' + sessionID}
 
-searchGoogleDocs(sessionID, headers)
+# searchGoogleDocs(sessionID, headers)
+response = requests.get('https://docs.google.com/spreadsheets/d/1bZexXxJb61u0t4JdT6c1Cs8ggRrJGcHnR-DIYX0bdGI')
+response = requests.get('https://docs.google.com/spreadsheets/d/1U5gclDtGBa2mFKPUiyWZTyLC1w80eeN6-VLu3XMfeV0')
+respose = 0
