@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow
 
 
 class MyWidget(QMainWindow):
+    calc_works = True
     old_num = 0
     current_num = '0'
     current_dot = False
@@ -39,72 +40,83 @@ class MyWidget(QMainWindow):
         self.btn_clear.clicked.connect(self.c_click)
 
     def num_click(self):
-        if self.current_num == '0':
-            self.current_num = self.sender().text()
-        else:
-            self.current_num += self.sender().text()
-        self.table.display(self.current_num)
+        if self.calc_works:
+            if self.current_num == '0':
+                self.current_num = self.sender().text()
+            else:
+                self.current_num += self.sender().text()
+            self.table.display(self.current_num)
         
     def operator_click(self):
-        if self.table.value() != 'Error':
-            self.operator = self.sender().text()
-            self.old_num = float(self.current_num)
-            self.current_num = '0'
-            self.current_dot = False
-        
-    def sqrt_click(self):
-        if self.table.value() != 'Error':
-            if float(self.current_num) < 0:
-                self.table.display('Error')
-            else:
-                self.current_num = str(math.sqrt(float(self.current_num)))
-                self.table.display(self.current_num)
-        
-    def fact_click(self):
-        if self.table.value() != 'Error':
-            self.current_num = str(math.factorial(float(self.current_num)))
-            self.table.display(self.current_num)
-        
-    def c_click(self):
-        self.old_num = 0
-        self.operator = ''
-        self.current_num = '0'
-        self.current_dot = False
-        self.table.display('0')
-        
-    def dot_click(self):
-        if self.current_dot is False:
-            self.current_dot = True
-            self.current_num += '.'
-            self.table.display(self.current_num)
-        
-    def result_click(self):
-        if self.operator != '':
-            result = 0
-            if self.operator == '+':
-                result = self.old_num + float(self.current_num)
-            elif self.operator == '-':
-                result = self.old_num - float(self.current_num)
-            elif self.operator == '*':
-                result = self.old_num * float(self.current_num)
-            elif self.operator == '^':
-                result = math.pow(self.old_num, float(self.current_num))
-            elif self.operator == '/' and self.current_num != '0':
-                result = self.old_num / float(self.current_num)
-            else:
-                result = 'Error'
-            self.table.display(str(result))
-            self.old_num = 0
-            self.operator = ''
-            if result != 'Error':
-                self.current_num = str(result)
-                if self.current_num.find('.') == -1:
-                    self.current_dot = False
-                else:
-                    self.current_dot = True
-            else:
+        if self.calc_works:
+            if self.table.value() != 'Error':
+                self.operator = self.sender().text()
+                self.old_num = float(self.current_num)
                 self.current_num = '0'
                 self.current_dot = False
+        
+    def sqrt_click(self):
+        if self.calc_works:
+            if self.table.value() != 'Error':
+                if float(self.current_num) < 0:
+                    self.table.display('Error')
+                else:
+                    self.current_num = str(math.sqrt(float(self.current_num)))
+                    self.table.display(self.current_num)
+        
+    def fact_click(self):
+        if self.calc_works:
+            if self.table.value() != 'Error':
+                self.current_num = str(math.factorial(float(self.current_num)))
+                self.table.display(self.current_num)
+        
+    def c_click(self):
+        if self.calc_works:
+            self.table.display('')
+            self.calc_works = False
+        else:
+            self.old_num = 0
+            self.operator = ''
+            self.current_num = '0'
+            self.current_dot = False
+            self.table.display('0')
+            self.calc_works = True
+        
+    def dot_click(self):
+        if self.calc_works:
+            if self.current_dot is False:
+                self.current_dot = True
+                self.current_num += '.'
+                self.table.display(self.current_num)
+        
+    def result_click(self):
+        if self.calc_works:
+            if self.operator != '':
+                result = 0
+                if self.operator == '+':
+                    result = self.old_num + float(self.current_num)
+                elif self.operator == '-':
+                    result = self.old_num - float(self.current_num)
+                elif self.operator == '*':
+                    result = self.old_num * float(self.current_num)
+                elif self.operator == '^':
+                    result = math.pow(self.old_num, float(self.current_num))
+                elif self.operator == '/' and self.current_num != '0':
+                    result = self.old_num / float(self.current_num)
+                else:
+                    result = 'Error'
+                self.table.display(str(result))
+                self.old_num = 0
+                self.operator = ''
+                if result != 'Error':
+                    self.current_num = str(result)
+                    if self.current_num.find('.') == -1:
+                        self.current_dot = False
+                    else:
+                        self.current_dot = True
+                else:
+                    self.current_num = '0'
+                    self.current_dot = False
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
