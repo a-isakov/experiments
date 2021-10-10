@@ -23,22 +23,6 @@
 # Еpert
 # error
 
-class LengthError(ValueError):
-    pass
-
-
-class LetterError(ValueError):
-    pass
-
-
-class DigitError(ValueError):
-    pass
-
-
-class SequenceError(ValueError):
-    pass
-
-
 def convert_c(c):
     if c == 'Q':
         return 'Й'
@@ -97,7 +81,7 @@ def convert_c(c):
 
 def check_password(password):
     if len(password) <= 8:
-        raise LengthError
+         raise ValueError('error')
 
     has_small = False
     has_big = False
@@ -116,80 +100,70 @@ def check_password(password):
             c = convert_c(c)
         password_copy += c
     
-    if not (has_small and has_big):
-        raise LetterError
-
-    if not has_digit:
-        raise DigitError
+    if not (has_small and has_big and has_digit):
+        raise ValueError('error')
 
     if password_copy.find('ЙЦУ') != -1:
-        raise SequenceError
+        raise ValueError('error')
     if password_copy.find('ЦУК') != -1:
-        raise SequenceError
+        raise ValueError('error')
     if password_copy.find('УКЕ') != -1:
-        raise SequenceError
+        raise ValueError('error')
     if password_copy.find('КЕН') != -1:
-        raise SequenceError
+        raise ValueError('error')
     if password_copy.find('ЕНГ') != -1:
-        raise SequenceError
+        raise ValueError('error')
     if password_copy.find('НГШ') != -1:
-        raise SequenceError
+        raise ValueError('error')
     if password_copy.find('ГШЩ') != -1:
-        raise SequenceError
+        raise ValueError('error')
     if password_copy.find('ШЩЗ') != -1:
-        raise SequenceError
+        raise ValueError('error')
     if password_copy.find('ЩЗХ') != -1:
-        raise SequenceError
+        raise ValueError('error')
     if password_copy.find('ЗХЪ') != -1:
-        raise SequenceError
+        raise ValueError('error')
     if password_copy.find('ФЫВ') != -1:
-        raise SequenceError
+        raise ValueError('error')
     if password_copy.find('ЫВА') != -1:
-        raise SequenceError
+        raise ValueError('error')
     if password_copy.find('ВАП') != -1:
-        raise SequenceError
+        raise ValueError('error')
     if password_copy.find('АПР') != -1:
-        raise SequenceError
+        raise ValueError('error')
     if password_copy.find('ПРО') != -1:
-        raise SequenceError
+        raise ValueError('error')
     if password_copy.find('РОЛ') != -1:
-        raise SequenceError
+        raise ValueError('error')
     if password_copy.find('ОЛД') != -1:
-        raise SequenceError
+        raise ValueError('error')
     if password_copy.find('ЛДЖ') != -1:
-        raise SequenceError
+        raise ValueError('error')
     if password_copy.find('ДЖЭ') != -1:
-        raise SequenceError
+        raise ValueError('error')
     if password_copy.find('ЖЭЁ') != -1:
-        raise SequenceError
+        raise ValueError('error')
     if password_copy.find('ЯЧС') != -1:
-        raise SequenceError
+        raise ValueError('error')
     if password_copy.find('ЧСМ') != -1:
-        raise SequenceError
+        raise ValueError('error')
     if password_copy.find('СМИ') != -1:
-        raise SequenceError
+        raise ValueError('error')
     if password_copy.find('МИТ') != -1:
-        raise SequenceError
+        raise ValueError('error')
     if password_copy.find('ИТЬ') != -1:
-        raise SequenceError
+        raise ValueError('error')
     if password_copy.find('ТЬБ') != -1:
-        raise SequenceError
+        raise ValueError('error')
     if password_copy.find('ЬБЮ') != -1:
-        raise SequenceError
+        raise ValueError('error')
 
     return 'ok'
 
-try:
-    print(check_password("U3UшHЪnDЧ5yш.yмЯpH"))
-except Exception as error:
-    print(error.__class__.__name__)
 
 try:
-    print(check_password("еПQSНгиfУЙ70qE"))
-except Exception as error:
-    print(error.__class__.__name__)
-
-try:
-    print(check_password("G7FgTU0bwТuio"))
-except Exception as error:
-    print(error.__class__.__name__)
+    password = input()
+    check_password(password)
+    print('ok')
+except ValueError as e:
+    print(e)
