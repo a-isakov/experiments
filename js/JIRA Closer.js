@@ -4,7 +4,7 @@
 // @version      1
 // @description  try to take over the world!
 // @author       You
-// @match        https://team.akbars.ru/browse/*
+// @match        https://jira.path/browse/*
 // @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
 // @grant        none
 // @require      https://gist.github.com/raw/2625891/waitForKeyElements.js
