@@ -14,7 +14,7 @@ def get_result(db_name):
 
     # Выполнение запроса
     cur.execute("""UPDATE films SET duration = 42
-        WHERE duration is NULL""").fetchall()
+        WHERE duration is NULL OR duration = ''""").fetchall()
     
     con.commit()
     con.close()
