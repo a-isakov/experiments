@@ -1,5 +1,5 @@
 # Напишите функцию get_result(name), которая принимает на вход имя файла базы данных, по структуре идентичной «films.db»,
-# и удаляет все фильмы в жанре комедии из БД.
+# и выполняет запрос, обновляющий таблицу с фильмами таким образом, чтобы длина мюзиклов, превышающая 100 минут, стала равна 100.
 
 # Импорт библиотеки
 import sqlite3
@@ -14,12 +14,12 @@ def get_result(db_name):
     # Выполнение запроса и получение всех результатов
     result = cur.execute("""SELECT id
         FROM genres
-        WHERE title = 'комедия'""").fetchall()
-    comedy_id = result[0][0]
+        WHERE title = 'мюзикл'""").fetchall()
+    genre_id = result[0][0]
     
     # Выполнение запроса
-    cur.execute("""DELETE FROM films
-        WHERE genre = ?""", (comedy_id,)).fetchall()
+    cur.execute("""UPDATE films SET duration = 100
+        WHERE genre = ? AND duration > 100""", (genre_id,)).fetchall()
     
     con.commit()
     con.close()

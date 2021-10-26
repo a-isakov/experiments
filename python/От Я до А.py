@@ -1,5 +1,5 @@
 # Напишите функцию get_result(name), которая принимает на вход имя файла базы данных, по структуре идентичной «films.db»,
-# и удаляет все фильмы в жанре комедии из БД.
+# и удаляет все фильмы, название которых начинается на букву „Я“ и заканчивается на букву „а“.
 
 # Импорт библиотеки
 import sqlite3
@@ -11,15 +11,9 @@ def get_result(db_name):
     # Создание курсора
     cur = con.cursor()
 
-    # Выполнение запроса и получение всех результатов
-    result = cur.execute("""SELECT id
-        FROM genres
-        WHERE title = 'комедия'""").fetchall()
-    comedy_id = result[0][0]
-    
     # Выполнение запроса
     cur.execute("""DELETE FROM films
-        WHERE genre = ?""", (comedy_id,)).fetchall()
+        WHERE title LIKE 'Я%а'""").fetchall()
     
     con.commit()
     con.close()
