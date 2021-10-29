@@ -7,26 +7,23 @@
 // @match        https://tinypass.atlassian.net/jira/*
 // @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
 // @grant        GM_registerMenuCommand
-// require       https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js
-// require       https://gist.github.com/raw/2625891/waitForKeyElements.js
+// @grant        GM_addStyle
+// @require      https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js
+// @require      https://gist.github.com/raw/2625891/waitForKeyElements.js
 // ==/UserScript==
 
 (function() {
     'use strict';
 
-    /*waitForKeyElements (
+    waitForKeyElements (
         '<div id="content" class="z-index-content">',
-        nothing
-    );*/
-    // waitForKeyElements (
-    //     '<div id="content" class="z-index-content">',
-    //     appendButtons
-    // );
-    GM_registerMenuCommand('Expand content', customExpandListener, 'E');
+        appendButtons
+    );
+    // GM_registerMenuCommand('Expand content', customExpandListener, 'E');
 
-    function nothing() {
-        console.log('++++++');
-    }
+    // function nothing() {
+    //     console.log('++++++');
+    // }
 
     function appendButtons(element) {
         const content = document.getElementById('custom_expand_button');
@@ -111,7 +108,7 @@
                 }
             }
         }
-        // remove insight button
+    // remove insight button
         navDiv = document.getElementById('ghx-controls-buttons');
         if (navDiv != null) {
             let navParent = navDiv.parentNode
