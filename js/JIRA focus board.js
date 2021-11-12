@@ -119,6 +119,7 @@
         }
         // expand content
         document.documentElement.style.setProperty('--leftSidebarWidth', '0px');
+        document.getElementById('ghx-work').style.height = `${window.innerHeight - 60}px`;
         // console.log('------------------------');
     }
 })();
