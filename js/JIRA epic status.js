@@ -38,6 +38,7 @@
                 const response = await fetch('/rest/api/2/issue/' + jiraKey + '?fields=issuetype,customfield_10105'); // retrieve issue details to close
                 if (response.status == 200) {
                     const jiraIssue = await response.json();
+                    console.log(jiraIssue);
                     const status = jiraIssue['fields']['customfield_10105']['value'];
                     const type = jiraIssue['fields']['issuetype']['id'];
                     if (type == TYPE_EPIC && status != 'Done') {
@@ -54,8 +55,29 @@
     }
 
     function customButtonListener(jiraKey) {
-        console.log('++++++');
-        console.log(jiraKey);
+        if (confirm('Are you sure you want to close the Epic?')) {
+            Promise.all([
+                closeEpic(jiraKey)
+            ]).then(() => {
+                console.log('done');
+                window.location.reload();
+            })
+        }
+    }
+    
+    async function closeEpic(jiraKey) {
+        const data = '{"issueIdOrKey":"' + jiraKey + '","fieldId":"customfield_10105","newValue":10102}';
+        const URL = '/rest/greenhopper/1.0/xboard/issue/update-field.json';
+        console.log('This will close ' + jiraKey);
+        // do the status change
+        const moveResponse = await fetch(URL, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: data
+        });
+        // console.log(moveResponse);
     }
 
     function findByText(tag, text) {
