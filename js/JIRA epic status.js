@@ -6,6 +6,7 @@
 // @author       You
 // @match        https://tinypass.atlassian.net/browse/*
 // @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
+// @grant        GM_registerMenuCommand
 // @grant        GM_addStyle
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js
 // @require      https://gist.github.com/raw/2625891/waitForKeyElements.js
@@ -20,6 +21,7 @@
         '<div class="sc-1njt3iw-0 klZhqF">',
         appendButtons
     );
+    GM_registerMenuCommand('Close Epic', closeEpicFromMenu, 'C');
 
     async function appendButtons() {
         const customButton = document.getElementById('custom_status_label');
@@ -54,8 +56,14 @@
         }
     }
 
+    function closeEpicFromMenu() {
+        const url = document.URL.split('/');
+        let jiraKey = url[url.length - 1];
+        customButtonListener(jiraKey);
+    }
+
     function customButtonListener(jiraKey) {
-        if (confirm('Are you sure you want to close the Epic?')) {
+        if (confirm('Are you sure you want to close the Epic ' + jiraKey + '?')) {
             Promise.all([
                 closeEpic(jiraKey)
             ]).then(() => {
