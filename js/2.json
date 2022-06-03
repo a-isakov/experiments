@@ -1,0 +1,278 @@
+{
+  "url": "https://noticias.uol.com.br/internacional/ultimas-noticias/2021/10/17/mulher-descobre-apos-2-meses-que-vizinho-estava-morto-dentro-de-apartamento.htm", 
+  "id": "0a033e74e228960c220ee62fab77d193c4ebeb6c", 
+  "siteId": "1137479910722123061", 
+  "canonicalUrl": "https://noticias.uol.com.br/internacional/ultimas-noticias/2021/10/17/mulher-descobre-apos-2-meses-que-vizinho-estava-morto-dentro-de-apartamento.htm", 
+  "title": "Mulher descobre ap\u00f3s 2 meses que vizinho estava morto dentro de apartamento [17/10/2021]", 
+  "httpStatus": 200, 
+  "lastFetched": "2022-04-26T10:59:15Z", 
+  "firstFetched": "2021-10-17T14:18:17Z", 
+  "crawledUrl": "https://noticias.uol.com.br/internacional/ultimas-noticias/2021/10/17/mulher-descobre-apos-2-meses-que-vizinho-estava-morto-dentro-de-apartamento.htm", 
+  "articleId": "", 
+  "duplicateUrls": [
+    "noticias.uol.com.br/internacional/ultimas-noticias/2021/10/17/mulher-descobre-apos-2-meses-que-vizinho-estava-morto-dentro-de-apartamento.htm", 
+    "noticias.uol.com.br/internacional/ultimas-noticias/2021/10/17/mulher-descobre-apos-2-meses-que-vizinho-estava-morto-dentro-de-apartamento.amp.htm"
+  ], 
+  "profile": [
+    {
+      "item": "2021-10-17", 
+      "groups": [
+        {
+          "group": "publishdate", 
+          "weight": 0.1015625, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "apartamento", 
+      "groups": [
+        {
+          "group": "concept", 
+          "weight": 0.77734375, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "article", 
+      "groups": [
+        {
+          "group": "og-type", 
+          "weight": 1.0, 
+          "count": 1
+        }, 
+        {
+          "group": "pageclass", 
+          "weight": 1.0, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "corpo decomposto", 
+      "groups": [
+        {
+          "group": "concept", 
+          "weight": 0.76953125, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "demorou cerca", 
+      "groups": [
+        {
+          "group": "concept", 
+          "weight": 0.76953125, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "disse", 
+      "groups": [
+        {
+          "group": "concept", 
+          "weight": 0.58203125, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "estados unidos", 
+      "groups": [
+        {
+          "group": "location", 
+          "weight": 0.17578125, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "george floyd", 
+      "groups": [
+        {
+          "group": "person", 
+          "weight": 0.6328125, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "internacional", 
+      "groups": [
+        {
+          "group": "category", 
+          "weight": 0.5390625, 
+          "count": 1
+        }, 
+        {
+          "group": "taxonomy", 
+          "weight": 0.5390625, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "internacional/ultimas-noticias", 
+      "groups": [
+        {
+          "group": "taxonomy", 
+          "weight": 0.5390625, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "los angeles", 
+      "groups": [
+        {
+          "group": "location", 
+          "weight": 0.59765625, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "morto", 
+      "groups": [
+        {
+          "group": "concept", 
+          "weight": 0.77734375, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "mulher descobre", 
+      "groups": [
+        {
+          "group": "concept", 
+          "weight": 0.76953125, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "news-and-politics", 
+      "groups": [
+        {
+          "group": "classification", 
+          "weight": 0.94140625, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "noticias.uol.com.br", 
+      "groups": [
+        {
+          "group": "site", 
+          "weight": 1.0, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "pt", 
+      "groups": [
+        {
+          "group": "language", 
+          "weight": 1.0, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "reagan baylee", 
+      "groups": [
+        {
+          "group": "entity", 
+          "weight": 1.0, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "tiktok", 
+      "groups": [
+        {
+          "group": "entity", 
+          "weight": 0.57421875, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "ultimas-noticias", 
+      "groups": [
+        {
+          "group": "category", 
+          "weight": 0.0859375, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "uol", 
+      "groups": [
+        {
+          "group": "author", 
+          "weight": 1.0, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "vizinho", 
+      "groups": [
+        {
+          "group": "concept", 
+          "weight": 0.82421875, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "v\u00eddeos publicados", 
+      "groups": [
+        {
+          "group": "concept", 
+          "weight": 0.76953125, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": 1634428800, 
+      "groups": [
+        {
+          "group": "publishtime:time", 
+          "weight": 1.0, 
+          "count": 1
+        }
+      ]
+    }
+  ], 
+  "thumbnails": [
+    {
+      "type": "screenshot", 
+      "width": 200, 
+      "height": 150, 
+      "url": "https://content-thumbnail.cxpublic.com/content/thumbnail200x150/0a033e74e228960c220ee62fab77d193c4ebeb6c.jpg?6267d083"
+    }, 
+    {
+      "type": "dominant", 
+      "width": 300, 
+      "height": 157, 
+      "url": "https://content-thumbnail.cxpublic.com/content/dominantthumbnail/0a033e74e228960c220ee62fab77d193c4ebeb6c.jpg?6267d083"
+    }, 
+    {
+      "type": "screenshot_full_height", 
+      "width": 200, 
+      "height": 2500, 
+      "url": "https://content-thumbnail.cxpublic.com/content/thumbnailfullheight/0a033e74e228960c220ee62fab77d193c4ebeb6c.jpg?6267d083"
+    }
+  ]
+}

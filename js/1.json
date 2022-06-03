@@ -1,0 +1,1212 @@
+{
+  "url": "https://www.businessinsider.com/companies-making-fast-home-coronavirus-tests-sherlock-mammoth-e25-2020-10", 
+  "id": "4ef4b4a551cdfe3b2dfaea9ccdffa71d146b89fd", 
+  "siteId": "1138555623353467747", 
+  "canonicalUrl": "https://www.businessinsider.com/companies-making-fast-home-coronavirus-tests-sherlock-mammoth-e25-2020-10", 
+  "title": "Meet the 11 companies racing to make coronavirus tests that cost as little as $5 and deliver results in under 15 minutes", 
+  "httpStatus": 200, 
+  "lastFetched": "2022-05-14T02:54:22Z", 
+  "firstFetched": "2021-10-21T18:27:16Z", 
+  "crawledUrl": "https://www.businessinsider.com/companies-making-fast-home-coronavirus-tests-sherlock-mammoth-e25-2020-10", 
+  "articleId": "", 
+  "duplicateUrls": [
+    "businessinsider.com/companies-making-fast-home-coronavirus-tests-sherlock-mammoth-e25-2020-10"
+  ], 
+  "profile": [
+    {
+      "item": "2020-11-02", 
+      "groups": [
+        {
+          "group": "publishdate", 
+          "weight": 0.05859375, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "abbott", 
+      "groups": [
+        {
+          "group": "keyword", 
+          "weight": 0.08984375, 
+          "count": 1
+        }, 
+        {
+          "group": "pn-tags", 
+          "weight": 1.0, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "amazon", 
+      "groups": [
+        {
+          "group": "company", 
+          "weight": 0.04296875, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "approval process", 
+      "groups": [
+        {
+          "group": "concept", 
+          "weight": 0.08984375, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "article", 
+      "groups": [
+        {
+          "group": "og-type", 
+          "weight": 1.0, 
+          "count": 1
+        }, 
+        {
+          "group": "pageclass", 
+          "weight": 1.0, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "asia", 
+      "groups": [
+        {
+          "group": "location", 
+          "weight": 0.06640625, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "at-home test", 
+      "groups": [
+        {
+          "group": "concept", 
+          "weight": 0.171875, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "australia", 
+      "groups": [
+        {
+          "group": "location", 
+          "weight": 0.05859375, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "bi prime", 
+      "groups": [
+        {
+          "group": "keyword", 
+          "weight": 0.01953125, 
+          "count": 1
+        }, 
+        {
+          "group": "pn-tags", 
+          "weight": 1.0, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "binx health", 
+      "groups": [
+        {
+          "group": "entity", 
+          "weight": 0.171875, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "bio", 
+      "groups": [
+        {
+          "group": "entity", 
+          "weight": 0.171875, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "biotech", 
+      "groups": [
+        {
+          "group": "entity", 
+          "weight": 0.171875, 
+          "count": 1
+        }, 
+        {
+          "group": "keyword", 
+          "weight": 0.08984375, 
+          "count": 1
+        }, 
+        {
+          "group": "pn-tags", 
+          "weight": 1.0, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "biotech startup", 
+      "groups": [
+        {
+          "group": "concept", 
+          "weight": 0.08984375, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "blake dodge", 
+      "groups": [
+        {
+          "group": "author", 
+          "weight": 1.0, 
+          "count": 1
+        }, 
+        {
+          "group": "keyword", 
+          "weight": 0.08984375, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "bluetooth", 
+      "groups": [
+        {
+          "group": "entity", 
+          "weight": 0.6171875, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "boston", 
+      "groups": [
+        {
+          "group": "location", 
+          "weight": 0.0625, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "business insider", 
+      "groups": [
+        {
+          "group": "entity", 
+          "weight": 0.5234375, 
+          "count": 1
+        }, 
+        {
+          "group": "og-site-name", 
+          "weight": 1.0, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "businessinsider.com", 
+      "groups": [
+        {
+          "group": "site", 
+          "weight": 1.0, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "cambridge", 
+      "groups": [
+        {
+          "group": "location", 
+          "weight": 0.0859375, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "care facilities", 
+      "groups": [
+        {
+          "group": "concept", 
+          "weight": 0.08984375, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "caveney", 
+      "groups": [
+        {
+          "group": "entity", 
+          "weight": 0.171875, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "chief medical officer", 
+      "groups": [
+        {
+          "group": "concept", 
+          "weight": 0.546875, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "company estimates", 
+      "groups": [
+        {
+          "group": "concept", 
+          "weight": 0.08984375, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "coronavirus", 
+      "groups": [
+        {
+          "group": "concept", 
+          "weight": 0.9375, 
+          "count": 1
+        }, 
+        {
+          "group": "keyword", 
+          "weight": 0.03125, 
+          "count": 1
+        }, 
+        {
+          "group": "pn-tags", 
+          "weight": 1.0, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "coronavirus equivalent", 
+      "groups": [
+        {
+          "group": "concept", 
+          "weight": 0.08984375, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "coronavirus genome", 
+      "groups": [
+        {
+          "group": "concept", 
+          "weight": 0.08984375, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "coronavirus kits", 
+      "groups": [
+        {
+          "group": "concept", 
+          "weight": 0.08984375, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "coronavirus symptoms", 
+      "groups": [
+        {
+          "group": "concept", 
+          "weight": 0.08984375, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "coronavirus test", 
+      "groups": [
+        {
+          "group": "concept", 
+          "weight": 0.92578125, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "coronavirus work", 
+      "groups": [
+        {
+          "group": "concept", 
+          "weight": 0.08984375, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "credit card", 
+      "groups": [
+        {
+          "group": "concept", 
+          "weight": 0.0625, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "cruise lines", 
+      "groups": [
+        {
+          "group": "concept", 
+          "weight": 0.0546875, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "designer antibodies", 
+      "groups": [
+        {
+          "group": "concept", 
+          "weight": 0.08984375, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "device maker", 
+      "groups": [
+        {
+          "group": "concept", 
+          "weight": 0.08984375, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "diagnostics industry", 
+      "groups": [
+        {
+          "group": "concept", 
+          "weight": 0.08984375, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "dispensed", 
+      "groups": [
+        {
+          "group": "keyword", 
+          "weight": 0.08984375, 
+          "count": 1
+        }, 
+        {
+          "group": "pn-tags", 
+          "weight": 1.0, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "donald trump", 
+      "groups": [
+        {
+          "group": "person", 
+          "weight": 0.05078125, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "dr. jay wohlgemuth", 
+      "groups": [
+        {
+          "group": "entity", 
+          "weight": 0.8515625, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "dr. sean parsons", 
+      "groups": [
+        {
+          "group": "entity", 
+          "weight": 0.171875, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "drive thru systems", 
+      "groups": [
+        {
+          "group": "concept", 
+          "weight": 0.08984375, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "drug administration", 
+      "groups": [
+        {
+          "group": "entity", 
+          "weight": 0.171875, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "ellume", 
+      "groups": [
+        {
+          "group": "entity", 
+          "weight": 0.171875, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "emergency use authorization", 
+      "groups": [
+        {
+          "group": "concept", 
+          "weight": 0.171875, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "en", 
+      "groups": [
+        {
+          "group": "language", 
+          "weight": 1.0, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "end result", 
+      "groups": [
+        {
+          "group": "concept", 
+          "weight": 0.08984375, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "epidemiology professor", 
+      "groups": [
+        {
+          "group": "concept", 
+          "weight": 0.08984375, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "factory operators", 
+      "groups": [
+        {
+          "group": "concept", 
+          "weight": 0.08984375, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "features", 
+      "groups": [
+        {
+          "group": "keyword", 
+          "weight": 0.01171875, 
+          "count": 1
+        }, 
+        {
+          "group": "pn-tags", 
+          "weight": 1.0, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "finger pricks", 
+      "groups": [
+        {
+          "group": "concept", 
+          "weight": 0.08984375, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "flow strips", 
+      "groups": [
+        {
+          "group": "concept", 
+          "weight": 0.08984375, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "food and drug administration", 
+      "groups": [
+        {
+          "group": "entity", 
+          "weight": 0.171875, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "game changer", 
+      "groups": [
+        {
+          "group": "concept", 
+          "weight": 0.08984375, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "genetics company", 
+      "groups": [
+        {
+          "group": "concept", 
+          "weight": 0.08984375, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "grocery stories", 
+      "groups": [
+        {
+          "group": "concept", 
+          "weight": 0.08984375, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "handheld coronavirus test", 
+      "groups": [
+        {
+          "group": "concept", 
+          "weight": 0.08984375, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "handheld pcr device", 
+      "groups": [
+        {
+          "group": "concept", 
+          "weight": 0.08984375, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "harvard", 
+      "groups": [
+        {
+          "group": "entity", 
+          "weight": 0.58984375, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "health", 
+      "groups": [
+        {
+          "group": "entity", 
+          "weight": 0.0703125, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "health system", 
+      "groups": [
+        {
+          "group": "concept", 
+          "weight": 0.08984375, 
+          "count": 1
+        }, 
+        {
+          "group": "keyword", 
+          "weight": 0.08984375, 
+          "count": 1
+        }, 
+        {
+          "group": "pn-tags", 
+          "weight": 1.0, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "healthcare", 
+      "groups": [
+        {
+          "group": "keyword", 
+          "weight": 0.08984375, 
+          "count": 1
+        }, 
+        {
+          "group": "pn-section", 
+          "weight": 1.0, 
+          "count": 1
+        }, 
+        {
+          "group": "pn-tags", 
+          "weight": 1.0, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "healthcare industry", 
+      "groups": [
+        {
+          "group": "concept", 
+          "weight": 0.08984375, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "healthcare settings", 
+      "groups": [
+        {
+          "group": "concept", 
+          "weight": 0.8671875, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "home tests", 
+      "groups": [
+        {
+          "group": "concept", 
+          "weight": 0.171875, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "home use", 
+      "groups": [
+        {
+          "group": "concept", 
+          "weight": 0.546875, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "ingo chakravarty", 
+      "groups": [
+        {
+          "group": "person", 
+          "weight": 0.171875, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "jack jeng", 
+      "groups": [
+        {
+          "group": "person", 
+          "weight": 0.8515625, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "janice chen", 
+      "groups": [
+        {
+          "group": "person", 
+          "weight": 0.81640625, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "jay wohlgemuth", 
+      "groups": [
+        {
+          "group": "person", 
+          "weight": 0.171875, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "johns hopkins", 
+      "groups": [
+        {
+          "group": "person", 
+          "weight": 0.08203125, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "khosla ventures", 
+      "groups": [
+        {
+          "group": "entity", 
+          "weight": 0.171875, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "lab equipment", 
+      "groups": [
+        {
+          "group": "concept", 
+          "weight": 0.171875, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "labcorp", 
+      "groups": [
+        {
+          "group": "entity", 
+          "weight": 0.171875, 
+          "count": 1
+        }, 
+        {
+          "group": "keyword", 
+          "weight": 0.08984375, 
+          "count": 1
+        }, 
+        {
+          "group": "pn-tags", 
+          "weight": 1.0, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "laboratories", 
+      "groups": [
+        {
+          "group": "entity", 
+          "weight": 0.171875, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "lemonaid health", 
+      "groups": [
+        {
+          "group": "entity", 
+          "weight": 0.171875, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "los angeles", 
+      "groups": [
+        {
+          "group": "location", 
+          "weight": 0.04296875, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "mammoth biosciences", 
+      "groups": [
+        {
+          "group": "entity", 
+          "weight": 0.8515625, 
+          "count": 1
+        }, 
+        {
+          "group": "keyword", 
+          "weight": 0.08984375, 
+          "count": 1
+        }, 
+        {
+          "group": "pn-tags", 
+          "weight": 1.0, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "massachusetts institute", 
+      "groups": [
+        {
+          "group": "entity", 
+          "weight": 0.171875, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "massachusetts institute of technology", 
+      "groups": [
+        {
+          "group": "entity", 
+          "weight": 0.171875, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "medical-health", 
+      "groups": [
+        {
+          "group": "classification", 
+          "weight": 0.78125, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "mesa", 
+      "groups": [
+        {
+          "group": "location", 
+          "weight": 0.171875, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "mina", 
+      "groups": [
+        {
+          "group": "location", 
+          "weight": 0.171875, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "national institutes", 
+      "groups": [
+        {
+          "group": "entity", 
+          "weight": 0.171875, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "national institutes of health", 
+      "groups": [
+        {
+          "group": "entity", 
+          "weight": 0.171875, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "new zealand", 
+      "groups": [
+        {
+          "group": "location", 
+          "weight": 0.0703125, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "novel coronavirus", 
+      "groups": [
+        {
+          "group": "concept", 
+          "weight": 0.171875, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "paul pickering", 
+      "groups": [
+        {
+          "group": "person", 
+          "weight": 0.171875, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "pregnancy tests", 
+      "groups": [
+        {
+          "group": "concept", 
+          "weight": 0.546875, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "queensland", 
+      "groups": [
+        {
+          "group": "location", 
+          "weight": 0.171875, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "quest diagnostic", 
+      "groups": [
+        {
+          "group": "entity", 
+          "weight": 0.8828125, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "quest diagnostics", 
+      "groups": [
+        {
+          "group": "keyword", 
+          "weight": 0.08984375, 
+          "count": 1
+        }, 
+        {
+          "group": "pn-tags", 
+          "weight": 1.0, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "rahul dhanda", 
+      "groups": [
+        {
+          "group": "entity", 
+          "weight": 0.8515625, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "s. pickering", 
+      "groups": [
+        {
+          "group": "entity", 
+          "weight": 0.171875, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "san diego", 
+      "groups": [
+        {
+          "group": "location", 
+          "weight": 0.07421875, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "scanwell", 
+      "groups": [
+        {
+          "group": "entity", 
+          "weight": 0.81640625, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "sean parsons", 
+      "groups": [
+        {
+          "group": "person", 
+          "weight": 0.171875, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "sherlock biosciences", 
+      "groups": [
+        {
+          "group": "entity", 
+          "weight": 0.81640625, 
+          "count": 1
+        }, 
+        {
+          "group": "keyword", 
+          "weight": 0.08984375, 
+          "count": 1
+        }, 
+        {
+          "group": "pn-tags", 
+          "weight": 1.0, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "swiss", 
+      "groups": [
+        {
+          "group": "entity", 
+          "weight": 0.078125, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "telehealth", 
+      "groups": [
+        {
+          "group": "entity", 
+          "weight": 0.171875, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "test", 
+      "groups": [
+        {
+          "group": "concept", 
+          "weight": 1.0, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "testing", 
+      "groups": [
+        {
+          "group": "keyword", 
+          "weight": 0.08984375, 
+          "count": 1
+        }, 
+        {
+          "group": "pn-tags", 
+          "weight": 1.0, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "tests", 
+      "groups": [
+        {
+          "group": "concept", 
+          "weight": 0.90625, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "travis kisner", 
+      "groups": [
+        {
+          "group": "person", 
+          "weight": 0.81640625, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "walmart", 
+      "groups": [
+        {
+          "group": "company", 
+          "weight": 0.02734375, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": "white house", 
+      "groups": [
+        {
+          "group": "entity", 
+          "weight": 0.5625, 
+          "count": 1
+        }, 
+        {
+          "group": "keyword", 
+          "weight": 0.046875, 
+          "count": 1
+        }, 
+        {
+          "group": "pn-tags", 
+          "weight": 1.0, 
+          "count": 1
+        }
+      ]
+    }, 
+    {
+      "item": 1604341200, 
+      "groups": [
+        {
+          "group": "publishtime:time", 
+          "weight": 1.0, 
+          "count": 1
+        }
+      ]
+    }
+  ], 
+  "thumbnails": [
+    {
+      "type": "screenshot", 
+      "width": 200, 
+      "height": 150, 
+      "url": "https://content-thumbnail.cxpublic.com/content/thumbnail200x150/4ef4b4a551cdfe3b2dfaea9ccdffa71d146b89fd.jpg?627f19de"
+    }, 
+    {
+      "type": "dominant", 
+      "width": 300, 
+      "height": 150, 
+      "url": "https://content-thumbnail.cxpublic.com/content/dominantthumbnail/4ef4b4a551cdfe3b2dfaea9ccdffa71d146b89fd.jpg?627f19de"
+    }, 
+    {
+      "type": "screenshot_full_height", 
+      "width": 200, 
+      "height": 2500, 
+      "url": "https://content-thumbnail.cxpublic.com/content/thumbnailfullheight/4ef4b4a551cdfe3b2dfaea9ccdffa71d146b89fd.jpg?627f19de"
+    }
+  ]
+}
