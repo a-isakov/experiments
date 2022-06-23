@@ -108,7 +108,7 @@
                 }
             }
         }
-    // remove insight button
+        // remove insight button
         navDiv = document.getElementById('ghx-controls-buttons');
         if (navDiv != null) {
             let navParent = navDiv.parentNode
@@ -120,6 +120,15 @@
         // expand content
         document.documentElement.style.setProperty('--leftSidebarWidth', '0px');
         document.getElementById('ghx-work').style.height = `${window.innerHeight - 60}px`;
+        const items = Array.from(
+            document.getElementsByClassName('ghx-xtra-narrow-card')
+        );
+
+        items.forEach(item => {
+            // item.style.backgroundColor = 'purple';
+            item.style.padding = '1px';
+            console.log('fix');
+        });
         // console.log('------------------------');
     }
 })();
