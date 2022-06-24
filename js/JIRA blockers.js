@@ -13,14 +13,15 @@
 // ==/UserScript==
 
 
-(function () {
-    'use strict';
-    let links = ['is blocked by', 'Predecessor'];
 
-    waitForKeyElements(
+(function() {
+    'use strict';
+    let links = ['is blocked by', 'Successor'];
+
+    waitForKeyElements (
         '<div id="content" class="z-index-content">',
         appendButtons
-    );
+        );
 
     function appendButtons(element) {
         const content = document.getElementById('custom_blockers_button');
@@ -33,8 +34,8 @@
                         let subFilter = subFilters[1]
                         let expandButton = document.createElement('li');
                         expandButton.className = 'sc-11jaxx1-0 LppZN';
-                        expandButton.innerHTML = '<button aria-pressed="false" class="css-1e2j28g" type="button" tabindex="0" id="custom_blockers_button"><span class="css-19r5em7">[Blockers]</span></button>';
-                        expandButton.addEventListener('click', function () {
+                        expandButton.innerHTML = '<button aria-pressed="false" class="css-1e2j28g" type="button" tabindex="0" id="custom_blockers_button"><span class="css-19r5em7">[blockers]</span></button>';
+                        expandButton.addEventListener('click', function() {
                             Buttons()
                         }, false);
                         subFilter.appendChild(expandButton);
@@ -44,7 +45,23 @@
         }
     }
 
-    async function Buttons() {
+    async function Buttons(element){
+        let progress_bar = document.createElement('li'); // create a progress bar
+        let filters = document.getElementById('ghx-quick-filters');
+        if (filters != null) {
+            let subFilters = filters.getElementsByTagName("ul");
+            if (subFilters != null) {
+                if (subFilters.length == 2) {
+                    let subFilter = subFilters[1];
+                    progress_bar.innerHTML = '<div class="progress-container" style="height: 0.4rem; width: 12rem;border-radius: 0.2rem; background: #000;"><div class="progress" id="bar_element" style="height: 100%;width: 0;border-radius: 0.2rem;background: #ff4754;transition: width 0.4s ease;"></div></div>'
+                    subFilter.appendChild(progress_bar);
+                }
+            }
+        }
+        const changeProgress = (progress) => {
+            let bar = document.getElementById('bar_element');
+            bar.style.width = `${progress}%`;
+        };
         await new Promise(resolve => setTimeout(resolve, 3000));
         let divs = document.getElementsByClassName("ghx-issue");
         for (let i = 0; i < divs.length; i++) {
@@ -58,7 +75,7 @@
                     const jiraIssue = await response.json();
                     let fields = jiraIssue['fields'];
                     let issuelinks = fields['issuelinks'];
-                    if (issuelinks.length != 0) {
+                    if (issuelinks.length != 0){
                         for (let g = 0; g < issuelinks.length; g++) {
                             let issuelink = issuelinks[g];
                             let direction = '';
@@ -67,17 +84,18 @@
                             } else if ('outwardIssue' in issuelink) {
                                 direction = 'outward';
                             }
-                            for (let z = 0; z < links.length; z++) {
-                                if (issuelinks[g]['type'][direction] == links[z]) { // choose necessary Linked issues
-                                    let linkedissue = issuelink[direction + 'Issue'];
-                                    if (linkedissue != null && direction != '') {
+                            for (let z = 0; z < links.length; z++){
+                                if (issuelinks[g]['type'][direction] == links[z]){ // choose necessary Linked issues
+                                    let linkedissue = issuelink[direction +'Issue'];
+                                    if (linkedissue != null && direction != ''){
                                         let linked_number = issuelink[direction + 'Issue']['key']; // conected task number
-                                        if (div != null && div.childElementCount > 0) { // append blockers links
+                                        if (div != null && div.childElementCount > 0) { // create button
                                             let element = document.createElement('div');
                                             let check_links = linkedissue['fields']['status']['statusCategory']['key'];
-                                            if (check_links != 'done') {
+                                            if (check_links != 'done'){
                                                 element.innerHTML = '<a  href="https://tinypass.atlassian.net/browse/' + linked_number + '" class="aui-lozenge  ghx-label-14" style="font-size:70%" onclick="window.open(\'https://tinypass.atlassian.net/browse/' + linked_number + '\')" >' + linked_number + '</a>';
-                                            } else {
+                                            }
+                                            if (check_links == 'done'){
                                                 element.innerHTML = '<a  href="https://tinypass.atlassian.net/browse/' + linked_number + '" class="aui-lozenge  ghx-label-6" style="text-decoration: line-through; font-size:70%" onclick="windiw.open(\'https://tinypass.atlassian.net/browse/' + linked_number + '\')">' + linked_number + '</a>';
                                             }
                                             div.appendChild(element);
@@ -88,6 +106,13 @@
                         }
                     }
                 }
+            }
+            changeProgress((i + 1)/divs.length * 100);
+        }
+        if (progress_bar != null) { //delite a progress bar
+            let navParent = progress_bar.parentNode
+            if (navParent != null) {
+                navParent.removeChild(progress_bar);
             }
         }
     }
