@@ -51,11 +51,9 @@
         if (filters != null) {
             let subFilters = filters.getElementsByTagName("ul");
             if (subFilters != null) {
-                if (subFilters.length == 2) {
-                    let subFilter = subFilters[1];
-                    progress_bar.innerHTML = '<div class="progress-container" style="height: 0.4rem; width: 12rem;border-radius: 0.2rem; background: #000;"><div class="progress" id="bar_element" style="height: 100%;width: 0;border-radius: 0.2rem;background: #ff4754;transition: width 0.4s ease;"></div></div>'
-                    subFilter.appendChild(progress_bar);
-                }
+                let subFilter = subFilters[subFilters.length - 1];
+                progress_bar.innerHTML = '<div class="progress-container" style="height: 0.4rem; width: 12rem;border-radius: 0.2rem; background: #000;"><div class="progress" id="bar_element" style="height: 100%;width: 0;border-radius: 0.2rem;background: #ff4754;transition: width 0.4s ease;"></div></div>'
+                subFilter.appendChild(progress_bar);
             }
         }
         const changeProgress = (progress) => {
