@@ -65,7 +65,9 @@
         for (let j = 0; j < cards.length; j++) {
             let card = cards[j];
             let card_key = card.getAttribute("aria-label"); // task number
-            let epics = card.getElementsByClassName("aui-lozenge");
+            let card_container = card.parentNode.parentNode.parentNode;
+            let epics = card_container.getElementsByClassName("aui-lozenge");
+            console.log(epics);
             for (let ec = 0; ec < epics.length; ec++) {
                 let epic = epics[ec];
                 let clas = epic.getAttribute("class");
