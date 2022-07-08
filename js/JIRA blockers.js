@@ -60,7 +60,7 @@
             let bar = document.getElementById('bar_element');
             bar.style.width = `${progress}%`;
         };
-        await new Promise(resolve => setTimeout(resolve, 3000));
+        // await new Promise(resolve => setTimeout(resolve, 3000));
         let cards = document.getElementsByClassName("ghx-key");
         for (let j = 0; j < cards.length; j++) {
             let card = cards[j];
@@ -131,7 +131,7 @@
                                     if (check_links == 'done') {
                                         element.innerHTML = '<a  href="https://tinypass.atlassian.net/browse/' + linked_number + '" class="aui-lozenge  ghx-label-6" style="text-decoration: line-through; font-size:70%" onclick="windiw.open(\'https://tinypass.atlassian.net/browse/' + linked_number + '\')">' + linked_number + '</a>';
                                     }
-                                    card.parentNode.appendChild(element);
+                                    card.parentNode.parentNode.appendChild(element);
                                 }
                             }
                         }
