@@ -16,7 +16,7 @@
     'use strict';
     let links = ['is blocked by', 'Successor'];
     let now = new Date();
-    const cache_limit_minutes = 60;
+    const cache_limit_minutes = 120;
 
     waitForKeyElements(
         '<div id="content" class="z-index-content">',
@@ -133,7 +133,7 @@
                                     if (check_links == 'done') {
                                         element.innerHTML = '<a  href="https://tinypass.atlassian.net/browse/' + linked_number + '" class="aui-lozenge  ghx-label-6" style="text-decoration: line-through; font-size:70%" onclick="windiw.open(\'https://tinypass.atlassian.net/browse/' + linked_number + '\')">' + linked_number + '</a>';
                                     }
-                                    card.parentNode.parentNode.appendChild(element);
+                                    card.parentNode.parentNode.parentNode.appendChild(element);
                                 }
                             }
                         }
