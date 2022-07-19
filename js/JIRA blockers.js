@@ -80,7 +80,6 @@
                 parent.appendChild(new_epic);
             }
 
-
             let jiraIssue = null;
             let flag = false;
             if (localStorage.getItem(card_key) == null) {
@@ -133,7 +132,7 @@
                                     if (check_links == 'done') {
                                         element.innerHTML = '<a  href="https://tinypass.atlassian.net/browse/' + linked_number + '" class="aui-lozenge  ghx-label-6" style="text-decoration: line-through; font-size:70%" onclick="windiw.open(\'https://tinypass.atlassian.net/browse/' + linked_number + '\')">' + linked_number + '</a>';
                                     }
-                                    card.parentNode.parentNode.parentNode.appendChild(element);
+                                    card_container.appendChild(element);
                                 }
                             }
                         }
@@ -142,7 +141,7 @@
             }
             changeProgress((j + 1) / cards.length * 100);
         }
-        if (progress_bar != null) { //delite a progress bar
+        if (progress_bar != null) { //delete a progress bar
             let navParent = progress_bar.parentNode
             if (navParent != null) {
                 navParent.removeChild(progress_bar);
