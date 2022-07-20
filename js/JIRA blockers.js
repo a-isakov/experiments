@@ -67,17 +67,19 @@
             let card_key = card.getAttribute("aria-label"); // task number
             let card_container = card.parentNode.parentNode.parentNode;
             let epics = card_container.getElementsByClassName("aui-lozenge");
-            console.log(epics);
+            // console.log(epics);
             for (let ec = 0; ec < epics.length; ec++) {
                 let epic = epics[ec];
-                let clas = epic.getAttribute("class");
-                let titles = epic.getAttribute("title");
                 let data_epickey = epic.getAttribute("data-epickey");
-                let parent = epic.parentNode;
-                parent.removeChild(epic);
-                let new_epic = document.createElement('div');
-                new_epic.innerHTML = '<span class="' + clas + '" title="' + titles + '" data-epickey="' + data_epickey + '" style="font-size:90%"  onclick="window.open(\'https://tinypass.atlassian.net/browse/' + data_epickey + '\')" >' + titles + '</span>';
-                parent.appendChild(new_epic);
+                if (data_epickey != null) {
+                    let clas = epic.getAttribute("class");
+                    let titles = epic.getAttribute("title");
+                    let parent = epic.parentNode;
+                    parent.removeChild(epic);
+                    let new_epic = document.createElement('div');
+                    new_epic.innerHTML = '<span class="' + clas + '" title="' + titles + '" data-epickey="' + data_epickey + '" style="font-size:90%" onclick="window.open(\'https://tinypass.atlassian.net/browse/' + data_epickey + '\')" >' + titles + '</span>';
+                    parent.appendChild(new_epic);
+                }
             }
 
             let jiraIssue = null;
@@ -127,10 +129,10 @@
                                     let element = document.createElement('div');
                                     let check_links = linkedissue['fields']['status']['statusCategory']['key'];
                                     if (check_links != 'done') {
-                                        element.innerHTML = '<a  href="https://tinypass.atlassian.net/browse/' + linked_number + '" class="aui-lozenge  ghx-label-14" style="font-size:70%" onclick="window.open(\'https://tinypass.atlassian.net/browse/' + linked_number + '\')" >' + linked_number + '</a>';
+                                        element.innerHTML = '<a  href="https://tinypass.atlassian.net/browse/' + linked_number + '" class="aui-lozenge ghx-label-14" style="font-size:70%" onclick="window.open(\'https://tinypass.atlassian.net/browse/' + linked_number + '\')" >' + linked_number + '</a>';
                                     }
                                     if (check_links == 'done') {
-                                        element.innerHTML = '<a  href="https://tinypass.atlassian.net/browse/' + linked_number + '" class="aui-lozenge  ghx-label-6" style="text-decoration: line-through; font-size:70%" onclick="windiw.open(\'https://tinypass.atlassian.net/browse/' + linked_number + '\')">' + linked_number + '</a>';
+                                        element.innerHTML = '<a  href="https://tinypass.atlassian.net/browse/' + linked_number + '" class="aui-lozenge ghx-label-6" style="text-decoration: line-through; font-size:70%" onclick="windiw.open(\'https://tinypass.atlassian.net/browse/' + linked_number + '\')">' + linked_number + '</a>';
                                     }
                                     card_container.appendChild(element);
                                 }
