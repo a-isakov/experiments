@@ -55,9 +55,9 @@
                     }
                     let remiderText = document.createElement('div');
                     if (daysValue <= delayMax) {
-                        remiderText.setAttribute('class', 'aui-lozenge  ghx-label-6');
+                        remiderText.setAttribute('class', 'ghx-label-6');
                     } else {
-                        remiderText.setAttribute('class', 'aui-lozenge  ghx-label-14');
+                        remiderText.setAttribute('class', 'ghx-label-14');
                     }
                     remiderText.textContent = daysText;
                     card.appendChild(remiderText);
