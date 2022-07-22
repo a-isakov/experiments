@@ -43,12 +43,15 @@
         let cards = boardContainer.getElementsByClassName('ghx-issue');
         for (let i = 0; i < cards.length; i++) {
             let card = cards[i];
-            // bring days count
+            // bring days count to card
             if (showDelays) {
                 let daysReminders = card.getElementsByClassName('ghx-days');
                 for (let j = 0; j < daysReminders.length; j++) {
                     let reminder = daysReminders[j];
-                    const daysText = reminder.getAttribute('data-tooltip');
+                    let daysText = reminder.getAttribute('data-tooltip');
+                    if (daysText == null) {
+                        daysText = reminder.getAttribute('title'); // Alternative way of reporting that
+                    }
                     const daysValue = parseInt(daysText);
                     if (daysValue < delayMin) {
                         continue;
