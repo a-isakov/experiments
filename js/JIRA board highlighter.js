@@ -16,6 +16,7 @@
     const showDelays = true; // show value of the days in column
     const delayMin = 2;      // min days to show delays to indicate in green
     const delayMax = 5;      // max days to indicate in red
+    const removeDots = true; // remove dots after showing text delays
 
     const clickableEpics = true; // enables opening of the epics by clicking on epics name on issue card
 
@@ -89,6 +90,11 @@
                     }
                     remiderText.textContent = daysText;
                     card.appendChild(remiderText);
+                    // remove dots
+                    if (removeDots) {
+                        let reminderParent = reminder.parentNode;
+                        reminderParent.removeChild(reminder);
+                    }
                 }
             }
         }
