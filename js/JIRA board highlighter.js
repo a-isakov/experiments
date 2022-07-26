@@ -17,6 +17,8 @@
     const delayMin = 2;      // min days to show delays to indicate in green
     const delayMax = 5;      // max days to indicate in red
 
+    const clickableEpics = true; // enables opening of the epics by clicking on epics name on issue card
+
     let counter = 0;
 
     waitForKeyElements(
@@ -40,6 +42,29 @@
     }
 
     function onRefresh(boardContainer) {
+        // make epic clickable
+        if (clickableEpics) {
+            let epics = boardContainer.getElementsByClassName("aui-lozenge");
+            for (let ec = 0; ec < epics.length; ec++) {
+                let epic = epics[ec];
+                let data_epickey = epic.getAttribute("data-epickey");
+                if (data_epickey != null) {
+                    // console.log(epic);
+                    let epic_class = epic.getAttribute("class");
+                    let epic_title = epic.getAttribute("title");
+                    let parent = epic.parentNode;
+                    parent.removeChild(epic);
+                    let new_epic = document.createElement('span');
+                    new_epic.setAttribute('class', epic_class);
+                    new_epic.setAttribute('title', epic_title);
+                    new_epic.setAttribute('data-epickey', data_epickey);
+                    new_epic.setAttribute('onclick', 'window.open(\'https://tinypass.atlassian.net/browse/' + data_epickey + '\')');
+                    new_epic.textContent = epic_title;
+                    parent.appendChild(new_epic);
+                }
+            }
+        }
+
         let cards = boardContainer.getElementsByClassName('ghx-issue');
         for (let i = 0; i < cards.length; i++) {
             let card = cards[i];

@@ -66,21 +66,6 @@
             let card = cards[j];
             let card_key = card.getAttribute("aria-label"); // task number
             let card_container = card.parentNode.parentNode.parentNode;
-            let epics = card_container.getElementsByClassName("aui-lozenge");
-            // console.log(epics);
-            for (let ec = 0; ec < epics.length; ec++) {
-                let epic = epics[ec];
-                let data_epickey = epic.getAttribute("data-epickey");
-                if (data_epickey != null) {
-                    let clas = epic.getAttribute("class");
-                    let titles = epic.getAttribute("title");
-                    let parent = epic.parentNode;
-                    parent.removeChild(epic);
-                    let new_epic = document.createElement('div');
-                    new_epic.innerHTML = '<span class="' + clas + '" title="' + titles + '" data-epickey="' + data_epickey + '" style="font-size:90%" onclick="window.open(\'https://tinypass.atlassian.net/browse/' + data_epickey + '\')" >' + titles + '</span>';
-                    parent.appendChild(new_epic);
-                }
-            }
 
             let jiraIssue = null;
             let flag = false;
