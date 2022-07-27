@@ -97,6 +97,7 @@
         // remove top quick filters
         let filters = document.getElementById('ghx-quick-filters');
         if (filters != null) {
+            filters.style.marginBottom = '5px';
             let subFilters = filters.getElementsByTagName("ul");
             if (subFilters != null) {
                 if (subFilters.length == 2) {
@@ -123,6 +124,12 @@
         const items = Array.from(
             document.getElementsByClassName('ghx-xtra-narrow-card')
         );
+        // resize columns' captions
+        let captions = document.getElementsByClassName('ghx-column');
+        for (let i = 0; i < captions.length; i++) {
+            let caption = captions[i];
+            caption.style.padding = '5px';
+        }
 
         items.forEach(item => {
             // item.style.backgroundColor = 'purple';
