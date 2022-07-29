@@ -35,8 +35,8 @@
                     if (subFilters.length == 2) {
                         let subFilter = subFilters[1]
                         let expandButton = document.createElement('li');
-                        expandButton.className = 'sc-11jaxx1-0 LppZN';
-                        expandButton.innerHTML = '<button aria-pressed="false" class="css-1e2j28g" type="button" tabindex="0" id="custom_expand_button"><span class="css-19r5em7">[X]</span></button>';
+                        expandButton.className = 'sc-1gvv0kj-0 biXMbB';
+                        expandButton.innerHTML = '<button aria-pressed="false" class="css-7uss0q" type="button" tabindex="0" id="custom_expand_button"><span class="css-19r5em7">[X]</span></button>';
                         expandButton.addEventListener('click', function() {
                             customExpandListener()
                         }, false);
