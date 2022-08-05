@@ -1,3 +1,5 @@
+// apps script for google sheet
+
 const baseURL = 'https://tinypass.atlassian.net';
 const boardURLRow = 1;
 const boardURLColumn = 2;
@@ -113,6 +115,9 @@ function runReport() {
   const tableColumn = configSheet.getRange(configValueRow, configTableColumnColumn).getValue();
   const tableRow = configSheet.getRange(configValueRow, configTableRowColumn).getValue();
   sheet.getRange(tableRow, tableColumn, 1000, 1000).clear(); // clean old content before execution
+  sheet.getRange(tableRow + 2, tableColumn - 1, 1000, 1)     // clean old content before execution
+    .clear()
+    .setFontWeight('bold');
   let typesForCount = [];
   let i = 0;
   while (true) {
@@ -149,15 +154,19 @@ function runReport() {
   for (let i = 0; i < typesForSP.length; i++) {
     configTypesForSP[typesForSP[i]] = {'countRow': rowIndex++};
     configTypesForSP[typesForSP[i]]['completedRow'] = rowIndex++;
+    configTypesForSP[typesForSP[i]]['completedPercentRow'] = rowIndex++;
     sheet.getRange(configTypesForSP[typesForSP[i]].countRow, 1).setValue(typesForSP[i] + ' SP');
     sheet.getRange(configTypesForSP[typesForSP[i]].completedRow, 1).setValue(typesForSP[i] + ' SP completed');
+    sheet.getRange(configTypesForSP[typesForSP[i]].completedPercentRow, 1).setValue(typesForSP[i] + ' SP %');
   }
   let configTypesForCount = {}; // keeps row numbers for each type to report count of issues
   for (let i = 0; i < typesForCount.length; i++) {
     configTypesForCount[typesForCount[i]] = {'countRow': rowIndex++};
     configTypesForCount[typesForCount[i]]['completedRow'] = rowIndex++;
+    configTypesForCount[typesForCount[i]]['completedPercentRow'] = rowIndex++;
     sheet.getRange(configTypesForCount[typesForCount[i]].countRow, 1).setValue(typesForCount[i]);
     sheet.getRange(configTypesForCount[typesForCount[i]].completedRow, 1).setValue(typesForCount[i] + ' completed');
+    sheet.getRange(configTypesForCount[typesForCount[i]].completedPercentRow, 1).setValue(typesForCount[i] + ' %');
   }
 
   // check connectivity
@@ -255,12 +264,26 @@ function runReport() {
 
     // write counters
     for (let j = 0; j < typesForSP.length; j++) {
-      sheet.getRange(configTypesForSP[typesForSP[j]].countRow, tableColumn + i).setValue(counter[typesForSP[j]].SP);
-      sheet.getRange(configTypesForSP[typesForSP[j]].completedRow, tableColumn + i).setValue(counter[typesForSP[j]].completedSP);
+      sheet.getRange(configTypesForSP[typesForSP[j]].countRow, tableColumn + i)
+        .setValue(counter[typesForSP[j]].SP)
+        .setNumberFormat('0');
+      sheet.getRange(configTypesForSP[typesForSP[j]].completedRow, tableColumn + i)
+        .setValue(counter[typesForSP[j]].completedSP)
+        .setNumberFormat('0');
+      sheet.getRange(configTypesForSP[typesForSP[j]].completedPercentRow, tableColumn + i)
+        .setFormulaR1C1('=R[-1]C[0]/R[-2]C[0]')
+        .setNumberFormat('0.#%');
     }
     for (let j = 0; j < typesForCount.length; j++) {
-      sheet.getRange(configTypesForCount[typesForCount[j]].countRow, tableColumn + i).setValue(counter[typesForCount[j]].count);
-      sheet.getRange(configTypesForCount[typesForCount[j]].completedRow, tableColumn + i).setValue(counter[typesForCount[j]].completed);
+      sheet.getRange(configTypesForCount[typesForCount[j]].countRow, tableColumn + i)
+        .setValue(counter[typesForCount[j]].count)
+        .setNumberFormat('0');
+      sheet.getRange(configTypesForCount[typesForCount[j]].completedRow, tableColumn + i)
+        .setValue(counter[typesForCount[j]].completed)
+        .setNumberFormat('0');
+      sheet.getRange(configTypesForCount[typesForCount[j]].completedPercentRow, tableColumn + i)
+        .setFormulaR1C1('=R[-1]C[0]/R[-2]C[0]')
+        .setNumberFormat('0.#%');
     }
     // break;
     SpreadsheetApp.flush();
