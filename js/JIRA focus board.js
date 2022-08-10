@@ -98,15 +98,13 @@
         let filters = document.getElementById('ghx-quick-filters');
         if (filters != null) {
             filters.style.marginBottom = '6px';
-            let subFilters = filters.getElementsByTagName("ul");
-            if (subFilters != null) {
-                if (subFilters.length == 2) {
-                    let subFilter = subFilters[0]
-                    let navParent = subFilter.parentNode
-                    if (navParent != null) {
-                        navParent.removeChild(subFilter);
-                    }
-                }
+            if (filters.childNodes.length == 2) {
+                let subFilter = filters.childNodes[0];
+                filters.removeChild(subFilter);
+            } else if (filters.childNodes.length == 1) {
+                let subFilter = filters.childNodes[0];
+                let filterBlockToRemove = subFilter.childNodes[0];
+                subFilter.removeChild(filterBlockToRemove);
             }
         }
         // remove insight button
