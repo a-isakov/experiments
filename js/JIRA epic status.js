@@ -28,7 +28,7 @@
         if (customButton != null) {
             return;
         }
-        const label = findByText('h2', 'Issues in this epic')
+        const label = findByText('h2', 'Child issues')
         if (label != null) {
             let statusButtons = document.querySelector("[data-test-id='issue.views.issue-base.context.status-and-approvals-wrapper.status-and-approval']")
             if (statusButtons != null) {
@@ -40,7 +40,7 @@
                 const response = await fetch('/rest/api/2/issue/' + jiraKey + '?fields=issuetype,customfield_10105'); // retrieve issue details to close
                 if (response.status == 200) {
                     const jiraIssue = await response.json();
-                    console.log(jiraIssue);
+                    // console.log(jiraIssue);
                     const status = jiraIssue['fields']['customfield_10105']['value'];
                     const type = jiraIssue['fields']['issuetype']['id'];
                     if (type == TYPE_EPIC && status != 'Done') {
