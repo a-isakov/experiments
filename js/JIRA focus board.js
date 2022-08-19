@@ -6,7 +6,6 @@
 // @author       You
 // @match        https://tinypass.atlassian.net/jira/*
 // @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
-// @grant        GM_registerMenuCommand
 // @grant        GM_addStyle
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js
 // @require      https://gist.github.com/raw/2625891/waitForKeyElements.js
@@ -100,6 +99,9 @@
             filters.style.marginBottom = '6px';
             if (filters.childNodes.length == 2) {
                 let subFilter = filters.childNodes[0];
+                let peopleFilter = subFilter.childNodes[1];
+                let quickFilters = filters.childNodes[1];
+                quickFilters.insertBefore(peopleFilter, quickFilters.childNodes[0]); // move people filter before quick filters block
                 filters.removeChild(subFilter);
             } else if (filters.childNodes.length == 1) {
                 let subFilter = filters.childNodes[0];
