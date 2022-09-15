@@ -6,7 +6,6 @@
 // @author       You
 // @match        https://tinypass.atlassian.net/jira/*
 // @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
-// @grant        GM_registerMenuCommand
 // @grant        GM_addStyle
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js
 // @require      https://gist.github.com/raw/2625891/waitForKeyElements.js

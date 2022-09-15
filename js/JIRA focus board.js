@@ -18,11 +18,6 @@
         '<div id="content" class="z-index-content">',
         appendButtons
     );
-    // GM_registerMenuCommand('Expand content', customExpandListener, 'E');
-
-    // function nothing() {
-    //     console.log('++++++');
-    // }
 
     function appendButtons(element) {
         const content = document.getElementById('custom_expand_button');
