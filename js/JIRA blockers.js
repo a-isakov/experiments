@@ -65,6 +65,10 @@
         for (let j = 0; j < cards.length; j++) {
             let card = cards[j];
             let card_key = card.getAttribute("aria-label"); // task number
+            if (card_key == null) {
+                // that happens for subtasks because parent doesn't have full body
+                continue;
+            }
             let card_container = card.parentNode.parentNode.parentNode;
 
             let jiraIssue = null;
