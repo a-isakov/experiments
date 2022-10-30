@@ -1,4 +1,6 @@
+import 'google-apps-script'; // comment it before pasting to the google scripts
 // apps script for google sheet
+// scroll down for report code
 
 const baseURL = 'https://tinypass.atlassian.net';
 const boardURLRow = 1;
@@ -14,10 +16,39 @@ const configTypesSPColumn = 2;
 const configTableColumnColumn = 3;
 const configTableRowColumn = 4;
 
+const config = {
+  mainSheet: {
+    name: 'Main',
+    execDateRow: 1,
+    execDateCol: 2,
+    progressRow: 2,
+    progressCol: 2,
+    subProgressRow: 2,
+    subProgressCol: 3
+  },
+  settingsSheet: {
+    name: 'Settings',
+    startDateRow: 1,
+    startDateCol: 2,
+    configTableRow: 4,
+    teamCol: 1,
+    boardURLCol: 2,
+    typesForCountCol: 3,
+    typesForSPCol: 4
+  },
+  reportSheet: {
+    sprintsReportedRow: 1,
+    sprintsReportedCol: 2,
+    tableFirstRow: 3,
+    tableFirstCol: 2
+  }
+};
+
 // create custom menu on sheet load
 function onOpen(e) {
   SpreadsheetApp.getUi()
       .createMenu('Piano actions')
+      .addItem('Run multi report', 'runMultiReport')
       .addItem('Run report', 'runReport')
       .addItem('Refresh JIRA login', 'requestAccessString')
       .addToUi();
@@ -102,10 +133,140 @@ function reportProgress(progressCell, progressText, color) {
   progressCell.setFontColor(color);
 }
 
+function reportSubProgress(progressCell, progressText, color) {
+  progressCell.setValue(progressText);
+  progressCell.setFontColor(color);
+}
+
+// -------------------------------------------------------------------
+// multi report code
+// scroll down for original report code
+function runMultiReport() {
+  let sheet = SpreadsheetApp.getActive().getSheetByName(config.mainSheet.name);
+  sheet.activate();
+  let progressCell = sheet.getRange(config.mainSheet.progressRow, config.mainSheet.progressCol);
+  let subProgressCell = sheet.getRange(config.mainSheet.subProgressRow, config.mainSheet.subProgressCol);
+  reportProgress(progressCell, 'Running', 'black');
+  reportSubProgress(subProgressCell, '', 'black');
+  SpreadsheetApp.flush();
+
+  // read configuration
+  const configSheet = SpreadsheetApp.getActive().getSheetByName(config.settingsSheet.name);
+  const minDate = configSheet.getRange(config.settingsSheet.startDateRow, config.settingsSheet.startDateCol).getValue();
+  let reports = [];
+  let configRow = config.settingsSheet.configTableRow;
+  while (true) {
+    // team configuration template
+    let teamConfig = {
+      name: '',
+      boardURL: '',
+      typesForCount: [],
+      typesForSP: []
+    };
+    // fill team configuration
+    teamConfig.name = configSheet.getRange(configRow, config.settingsSheet.teamCol).getValue();
+    if (teamConfig.name == '') {
+      break;
+    }
+    teamConfig.boardURL = configSheet.getRange(configRow, config.settingsSheet.boardURLCol).getValue();
+    let commaArray = configSheet.getRange(configRow, config.settingsSheet.typesForCountCol).getValue();
+    teamConfig.typesForCount = commaArray.split(',');
+    commaArray = configSheet.getRange(configRow, config.settingsSheet.typesForSPCol).getValue();
+    teamConfig.typesForSP = commaArray.split(',');
+    // append configuration to the array
+    reports.push(teamConfig);
+    configRow++;
+  }
+
+  // check connectivity
+  if (!pingJira()) {
+    reportProgress(progressCell, 'Failed: Refresh JIRA login', 'red');
+    return;
+  }
+  // const boardURL = boardCell.getValue().toString();
+  // if (boardURL == '') {
+  //   reportProgress(progressCell, 'Failed: Board URL is empty', 'red');
+  //   return;
+  // }
+
+  // run report for each team
+  for (let i = 0; i < reports.length; i++) {
+    // check sheet
+    let reportSheet = SpreadsheetApp.getActive().getSheetByName(reports[i].name);
+    if (reportSheet == null) {
+      reportSheet = SpreadsheetApp.getActive().insertSheet(reports[i].name);
+    }
+    reportProgress(progressCell, 'Scanning teams ' + parseInt((i + 1)*100/reports.length) + '%', 'black');
+    if (!generateReport(reportSheet, minDate, reports[i], progressCell, subProgressCell)) {
+      break;
+    }
+  }
+}
+
+// generation of the team's report
+function generateReport(reportSheet, minDate, teamConfig, progressCell, subProgressCell) {
+  const boardId = getBoardId(teamConfig.boardURL);
+  if (boardId == -1) {
+    reportProgress(progressCell, 'Failed: Bad Board URL for team ' + teamConfig.name, 'red');
+    return false;
+  }
+  // collect processed sprints
+  let excludeSprints = [];
+  while (true) {
+    const processedSprintId = reportSheet.getRange(config.reportSheet.sprintsReportedRow, config.reportSheet.sprintsReportedCol).getValue();
+    if (processedSprintId == '') {
+      break;
+    }
+    excludeSprints.push(processedSprintId);
+  }
+  // collect all sprints for the board
+  let sprints = [];
+  if (!getSprints(boardId, minDate, excludeSprints, teamConfig, sprints)) {
+    return false;
+  }
+  // scan all sprints
+  for (let i = 0; i < sprints.length; i++) {
+    reportSubProgress(subProgressCell, 'Scanning sprints ' + parseInt((i + 1)*100/sprints.length) + '%', 'black');
+    let sprint = sprints[i];
+    // TODO
+  }
+  return true;
+}
+
+// collect sprints of the board
+function getSprints(boardId, minDate, excludeSprints, teamConfig, sprints) {
+  let startAt = 0;
+  while (true) {
+    let apiURL = '/rest/agile/1.0/board/' + boardId + '/sprint?state=closed&startAt=' + startAt;
+    // Logger.log(apiURL);
+    let response = fetchJira(apiURL);
+    if (response.getResponseCode() < 200 || response.getResponseCode() >= 300) {
+      reportProgress(progressCell, 'Failed: Cannot retrieve sprints for team ' + teamConfig.name, 'red');
+      return false;
+    }
+    let jsonResponse = JSON.parse(response.getContentText());
+    let values = jsonResponse.values;
+    for (let i = 0; i < values.length; i++) {
+      const sprintStartDate = new Date(values[i].startDate.substring(0, 10));
+      if (sprintStartDate >= minDate) {
+        // TODO: check excluded
+        sprints.push(values[i]);
+      }
+    }
+    if (jsonResponse.isLast) {
+      break;
+    }
+    startAt += parseInt(jsonResponse.maxResults);
+  }
+  sprints.sort((a, b) => (a.startDate > b.startDate) ? 1 : -1); // sort by date asc
+  return true;
+}
+
 // -------------------------------------------------------------------
 // report code
 function runReport() {
-  let sheet = SpreadsheetApp.getActive().getSheetByName('Main');
+  let sheet = SpreadsheetApp.getActive().getSheetByName('Main-archive');
+  sheet.activate();
   let boardCell = sheet.getRange(boardURLRow, boardURLColumn);
   let progressCell = sheet.getRange(progressRow, progressColumn);
   reportProgress(progressCell, 'Running', 'black');
