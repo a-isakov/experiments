@@ -39,8 +39,11 @@ const config = {
   reportSheet: {
     sprintsReportedRow: 1,
     sprintsReportedCol: 2,
-    tableFirstRow: 3,
-    tableFirstCol: 2
+    // tableFirstRow: 3,
+    tableFirstCol: 2,
+    sprintRow: 3,
+    datesRow: 4,
+    dataRow: 5
   }
 };
 
@@ -183,11 +186,6 @@ function runMultiReport() {
     reportProgress(progressCell, 'Failed: Refresh JIRA login', 'red');
     return;
   }
-  // const boardURL = boardCell.getValue().toString();
-  // if (boardURL == '') {
-  //   reportProgress(progressCell, 'Failed: Board URL is empty', 'red');
-  //   return;
-  // }
 
   // run report for each team
   for (let i = 0; i < reports.length; i++) {
@@ -201,6 +199,9 @@ function runMultiReport() {
       break;
     }
   }
+  // set final status
+  reportProgress(progressCell, 'Finished', 'green');
+  reportSubProgress(subProgressCell, '', 'black');
 }
 
 // generation of the team's report
@@ -212,11 +213,13 @@ function generateReport(reportSheet, minDate, teamConfig, progressCell, subProgr
   }
   // collect processed sprints
   let excludeSprints = [];
+  let reportedSprintColIndex = config.reportSheet.sprintsReportedCol;
   while (true) {
-    const processedSprintId = reportSheet.getRange(config.reportSheet.sprintsReportedRow, config.reportSheet.sprintsReportedCol).getValue();
+    const processedSprintId = reportSheet.getRange(config.reportSheet.sprintsReportedRow, reportedSprintColIndex).getValue();
     if (processedSprintId == '') {
       break;
     }
+    reportedSprintColIndex++;
     excludeSprints.push(processedSprintId);
   }
   // collect all sprints for the board
@@ -225,16 +228,25 @@ function generateReport(reportSheet, minDate, teamConfig, progressCell, subProgr
     return false;
   }
   // scan all sprints
+  let tableColumn = config.reportSheet.tableFirstCol;
   for (let i = 0; i < sprints.length; i++) {
     reportSubProgress(subProgressCell, 'Scanning sprints ' + parseInt((i + 1)*100/sprints.length) + '%', 'black');
     let sprint = sprints[i];
+    // write sprint metadata
+    reportSheet.getRange(config.reportSheet.sprintRow, tableColumn).setValue(sprint.name);
+    reportSheet.getRange(config.reportSheet.datesRow, tableColumn).setValue(sprint.startDate.substring(0, 10) + ' - ' + sprint.endDate.substring(0, 10));
+    reportSheet.autoResizeColumn(tableColumn);
     // TODO
+    // store processed sprint id
+    reportSheet.getRange(config.reportSheet.sprintsReportedRow, reportedSprintColIndex++).setValue(sprint.id);
+    SpreadsheetApp.flush();
+    tableColumn++;
   }
   return true;
 }
 
 // collect sprints of the board
-function getSprints(boardId, minDate, excludeSprints, teamConfig, sprints) {
+function getSprints(boardId, minDate, excludeSprints, teamConfig, sprints /*output*/) {
   let startAt = 0;
   while (true) {
     let apiURL = '/rest/agile/1.0/board/' + boardId + '/sprint?state=closed&startAt=' + startAt;
@@ -247,10 +259,13 @@ function getSprints(boardId, minDate, excludeSprints, teamConfig, sprints) {
     let jsonResponse = JSON.parse(response.getContentText());
     let values = jsonResponse.values;
     for (let i = 0; i < values.length; i++) {
-      const sprintStartDate = new Date(values[i].startDate.substring(0, 10));
+      const sprint = values[i];
+      const sprintStartDate = new Date(sprint.startDate.substring(0, 10));
       if (sprintStartDate >= minDate) {
-        // TODO: check excluded
-        sprints.push(values[i]);
+        // check excluded sprints
+        if (excludeSprints.indexOf(sprint.id) == -1) {
+          sprints.push(sprint);
+        }
       }
     }
     if (jsonResponse.isLast) {
