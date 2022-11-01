@@ -227,20 +227,127 @@ function generateReport(reportSheet, minDate, teamConfig, progressCell, subProgr
   if (!getSprints(boardId, minDate, excludeSprints, teamConfig, sprints)) {
     return false;
   }
-  // scan all sprints
+  // fill captions
   let tableColumn = config.reportSheet.tableFirstCol;
-  for (let i = 0; i < sprints.length; i++) {
-    reportSubProgress(subProgressCell, 'Scanning sprints ' + parseInt((i + 1)*100/sprints.length) + '%', 'black');
-    let sprint = sprints[i];
+  let reportRow = config.reportSheet.dataRow;
+  for (let i = 0; i < teamConfig.typesForCount.length; i++) {
+    reportSheet.getRange(reportRow++, tableColumn - 1)
+      .setValue(teamConfig.typesForCount[i] + ' count')
+      .setFontWeight('bold');
+    reportSheet.getRange(reportRow++, tableColumn - 1)
+      .setValue(teamConfig.typesForCount[i] + ' completed')
+      .setFontWeight('bold');
+    reportSheet.getRange(reportRow++, tableColumn - 1)
+      .setValue(teamConfig.typesForCount[i] + ' %')
+      .setFontWeight('bold');
+  }
+  for (let i = 0; i < teamConfig.typesForSP.length; i++) {
+    reportSheet.getRange(reportRow++, tableColumn - 1)
+      .setValue(teamConfig.typesForSP[i] + ' SP planned')
+      .setFontWeight('bold');
+    reportSheet.getRange(reportRow++, tableColumn - 1)
+      .setValue(teamConfig.typesForSP[i] + ' SP completed')
+      .setFontWeight('bold');
+    reportSheet.getRange(reportRow++, tableColumn - 1)
+      .setValue(teamConfig.typesForSP[i] + ' SP %')
+      .setFontWeight('bold');
+  }
+  // TODO: merge old and new captions
+  // look for first empty column
+  while (reportSheet.getRange(config.reportSheet.dataRow, tableColumn).getValue() != '') {
+    tableColumn++;
+  }
+  // scan all sprints
+  for (let sprintIndex = 0; sprintIndex < sprints.length; sprintIndex++) {
+    reportSubProgress(subProgressCell, 'Scanning sprints ' + parseInt((sprintIndex + 1)*100/sprints.length) + '%', 'black');
+    let sprint = sprints[sprintIndex];
     // write sprint metadata
     reportSheet.getRange(config.reportSheet.sprintRow, tableColumn).setValue(sprint.name);
     reportSheet.getRange(config.reportSheet.datesRow, tableColumn).setValue(sprint.startDate.substring(0, 10) + ' - ' + sprint.endDate.substring(0, 10));
     reportSheet.autoResizeColumn(tableColumn);
-    // TODO
+    // collect sprint results
+    let accumulator = {
+      number: {}, // each type inside has {total: 0, completed: 0} structure
+      SP: {}      // each type inside has {total: 0, completed: 0} structure
+    };
+    for (let i = 0; i < teamConfig.typesForCount.length; i++) {
+      accumulator.number[teamConfig.typesForCount[i]] = {total: 0, completed: 0};
+    }
+    for (let i = 0; i < teamConfig.typesForSP.length; i++) {
+      accumulator.SP[teamConfig.typesForSP[i]] = {total: 0, completed: 0};
+    }
+    if (!getSprintResults(boardId, sprint, progressCell, accumulator)) {
+      return false;
+    }
+    // write counters
+    reportRow = config.reportSheet.dataRow;
+    for (let i = 0; i < teamConfig.typesForCount.length; i++) {
+      reportSheet.getRange(reportRow++, tableColumn)
+        .setValue(accumulator.number[teamConfig.typesForCount[i]].total)
+        .setNumberFormat('0');
+      reportSheet.getRange(reportRow++, tableColumn)
+        .setValue(accumulator.number[teamConfig.typesForCount[i]].completed)
+        .setNumberFormat('0');
+      reportSheet.getRange(reportRow++, tableColumn)
+        .setFormulaR1C1('=R[-1]C[0]/R[-2]C[0]')
+        .setNumberFormat('0.#%');
+    }
+    for (let i = 0; i < teamConfig.typesForSP.length; i++) {
+      reportSheet.getRange(reportRow++, tableColumn)
+        .setValue(accumulator.number[teamConfig.typesForSP[i]].total)
+        .setNumberFormat('0');
+      reportSheet.getRange(reportRow++, tableColumn)
+        .setValue(accumulator.number[teamConfig.typesForSP[i]].completed)
+        .setNumberFormat('0');
+      reportSheet.getRange(reportRow++, tableColumn)
+        .setFormulaR1C1('=R[-1]C[0]/R[-2]C[0]')
+        .setNumberFormat('0.#%');
+    }
     // store processed sprint id
     reportSheet.getRange(config.reportSheet.sprintsReportedRow, reportedSprintColIndex++).setValue(sprint.id);
     SpreadsheetApp.flush();
     tableColumn++;
+  }
+  return true;
+}
+
+// collect sprint results
+function getSprintResults(boardId, sprint, progressCell, accumulator /* output */) {
+  // get all issues
+  let apiURL = '/rest/greenhopper/1.0/rapid/charts/sprintreport?rapidViewId=' + boardId + '&sprintId=' + sprint.id;
+  let response = fetchJira(apiURL);
+  if (response.getResponseCode() < 200 || response.getResponseCode() >= 300) {
+    reportProgress(progressCell, 'Failed: Cannot retrieve issues for sprint ' + sprint.name, 'red');
+    return false;
+  }
+  let jsonResponse = JSON.parse(response.getContentText());
+  // accumulate completed items
+  let completedIssues = jsonResponse.contents.completedIssues;
+  for (let j = 0; j < completedIssues.length; j++) {
+    let completedIssue = completedIssues[j];
+    let type = completedIssue.typeName;
+    if (type in accumulator.number) {
+      accumulator.number[type].total++;
+      accumulator.number[type].completed++;
+    }
+    if (type in accumulator.SP) {
+      const sp = getIssueSP(completedIssue.key);
+      accumulator.SP[type].total += sp;
+      accumulator.SP[type].completed += sp;
+    }
+  }
+  // accumlate non-completed items
+  let notCompletedIssues = jsonResponse.contents.issuesNotCompletedInCurrentSprint;
+  for (let j = 0; j < notCompletedIssues.length; j++) {
+    let notCompletedIssue = notCompletedIssues[j];
+    let type = notCompletedIssue.typeName;
+    if (type in accumulator.number) {
+      accumulator.number[type].total++;
+    }
+    if (type in accumulator.SP) {
+      const sp = getIssueSP(notCompletedIssue.key);
+      accumulator.SP[type].total += sp;
+    }
   }
   return true;
 }
