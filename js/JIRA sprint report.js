@@ -37,6 +37,7 @@ const config = {
     typesForSPCol: 4
   },
   reportSheet: {
+    titlesCol: 1,
     sprintsReportedRow: 1,
     sprintsReportedCol: 2,
     // tableFirstRow: 3,
@@ -145,10 +146,10 @@ function reportSubProgress(progressCell, progressText, color) {
 // multi report code
 // scroll down for original report code
 function runMultiReport() {
-  let sheet = SpreadsheetApp.getActive().getSheetByName(config.mainSheet.name);
-  sheet.activate();
-  let progressCell = sheet.getRange(config.mainSheet.progressRow, config.mainSheet.progressCol);
-  let subProgressCell = sheet.getRange(config.mainSheet.subProgressRow, config.mainSheet.subProgressCol);
+  let mainSheet = SpreadsheetApp.getActive().getSheetByName(config.mainSheet.name);
+  mainSheet.activate();
+  let progressCell = mainSheet.getRange(config.mainSheet.progressRow, config.mainSheet.progressCol);
+  let subProgressCell = mainSheet.getRange(config.mainSheet.subProgressRow, config.mainSheet.subProgressCol);
   reportProgress(progressCell, 'Running', 'black');
   reportSubProgress(subProgressCell, '', 'black');
   SpreadsheetApp.flush();
@@ -192,7 +193,8 @@ function runMultiReport() {
     // check sheet
     let reportSheet = SpreadsheetApp.getActive().getSheetByName(reports[i].name);
     if (reportSheet == null) {
-      reportSheet = SpreadsheetApp.getActive().insertSheet(reports[i].name);
+      reportSheet = initReportSheet(reports[i].name);
+      mainSheet.activate();
     }
     reportProgress(progressCell, 'Scanning teams ' + parseInt((i + 1)*100/reports.length) + '%', 'black');
     if (!generateReport(reportSheet, minDate, reports[i], progressCell, subProgressCell)) {
@@ -202,6 +204,22 @@ function runMultiReport() {
   // set final status
   reportProgress(progressCell, 'Finished', 'green');
   reportSubProgress(subProgressCell, '', 'black');
+}
+
+// create standard titles in an empty report sheet
+function initReportSheet(sheetName) {
+  let reportSheet = SpreadsheetApp.getActive().insertSheet(sheetName);
+  reportSheet.getRange(config.reportSheet.sprintsReportedRow, config.reportSheet.titlesCol)
+    .setValue('Sprints reported')
+    .setFontWeight('bold');
+  reportSheet.getRange(config.reportSheet.sprintRow, config.reportSheet.titlesCol)
+    .setValue('Sprint name')
+    .setFontWeight('bold');
+  reportSheet.getRange(config.reportSheet.datesRow, config.reportSheet.titlesCol)
+    .setValue('Sprint dates')
+    .setFontWeight('bold');
+  reportSheet.autoResizeColumn(config.reportSheet.titlesCol);
+  return reportSheet;
 }
 
 // generation of the team's report
@@ -231,27 +249,28 @@ function generateReport(reportSheet, minDate, teamConfig, progressCell, subProgr
   let tableColumn = config.reportSheet.tableFirstCol;
   let reportRow = config.reportSheet.dataRow;
   for (let i = 0; i < teamConfig.typesForCount.length; i++) {
-    reportSheet.getRange(reportRow++, tableColumn - 1)
+    reportSheet.getRange(reportRow++, config.reportSheet.titlesCol)
       .setValue(teamConfig.typesForCount[i] + ' count')
       .setFontWeight('bold');
-    reportSheet.getRange(reportRow++, tableColumn - 1)
+    reportSheet.getRange(reportRow++, config.reportSheet.titlesCol)
       .setValue(teamConfig.typesForCount[i] + ' completed')
       .setFontWeight('bold');
-    reportSheet.getRange(reportRow++, tableColumn - 1)
+    reportSheet.getRange(reportRow++, config.reportSheet.titlesCol)
       .setValue(teamConfig.typesForCount[i] + ' %')
       .setFontWeight('bold');
   }
   for (let i = 0; i < teamConfig.typesForSP.length; i++) {
-    reportSheet.getRange(reportRow++, tableColumn - 1)
+    reportSheet.getRange(reportRow++, config.reportSheet.titlesCol)
       .setValue(teamConfig.typesForSP[i] + ' SP planned')
       .setFontWeight('bold');
-    reportSheet.getRange(reportRow++, tableColumn - 1)
+    reportSheet.getRange(reportRow++, config.reportSheet.titlesCol)
       .setValue(teamConfig.typesForSP[i] + ' SP completed')
       .setFontWeight('bold');
-    reportSheet.getRange(reportRow++, tableColumn - 1)
+    reportSheet.getRange(reportRow++, config.reportSheet.titlesCol)
       .setValue(teamConfig.typesForSP[i] + ' SP %')
       .setFontWeight('bold');
   }
+  reportSheet.autoResizeColumn(config.reportSheet.titlesCol);
   // TODO: merge old and new captions
   // look for first empty column
   while (reportSheet.getRange(config.reportSheet.dataRow, tableColumn).getValue() != '') {
