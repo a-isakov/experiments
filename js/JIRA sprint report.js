@@ -200,11 +200,30 @@ function runMultiReport() {
   // set final status
   reportProgress(progressCell, 'Finished', 'green');
   reportSubProgress(subProgressCell, '', 'black');
+  mainSheet.getRange(config.mainSheet.execDateRow, config.mainSheet.execDateCol).setValue(Date.now());
 }
 
 // create standard titles in an empty report sheet
 function initReportSheet(sheetName) {
   let reportSheet = SpreadsheetApp.getActive().insertSheet(sheetName);
+  reportSheet.getRange(config.reportSheet.countTotalRow, config.reportSheet.titlesCol)
+    .setValue('Total count')
+    .setFontWeight('bold');
+  reportSheet.getRange(config.reportSheet.countCompletedRow, config.reportSheet.titlesCol)
+    .setValue('Total completed')
+    .setFontWeight('bold');
+  reportSheet.getRange(config.reportSheet.countPercentRow, config.reportSheet.titlesCol)
+    .setValue('Total %')
+    .setFontWeight('bold');
+  reportSheet.getRange(config.reportSheet.spTotalRow, config.reportSheet.titlesCol)
+    .setValue('Total SP planned')
+    .setFontWeight('bold');
+  reportSheet.getRange(config.reportSheet.spCompletedRow, config.reportSheet.titlesCol)
+    .setValue('Total SP completed')
+    .setFontWeight('bold');
+  reportSheet.getRange(config.reportSheet.spPercentRow, config.reportSheet.titlesCol)
+    .setValue('Total SP %')
+    .setFontWeight('bold');
   reportSheet.getRange(config.reportSheet.sprintsReportedRow, config.reportSheet.titlesCol)
     .setValue('Sprints reported')
     .setFontWeight('bold');
