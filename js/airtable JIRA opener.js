@@ -4,7 +4,7 @@
 // @version      1
 // @description  enables to open JIRA from airtable record
 // @author       You
-// @match        https://airtable.com/appvIpUKeCZPt2kAq/tbllPW0bNpMusk8Ss/viwDIHGD8fwIU2FS4/*
+// @match        https://airtable.com/appvIpUKeCZPt2kAq/tbllPW0bNpMusk8Ss/viwDIHGD8fwIU2FS4*
 // @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
 // @grant        GM_addStyle
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js
@@ -17,13 +17,9 @@
     const FAKE_ID = 'custom_air_jira_button';
 
     waitForKeyElements (
-        '<div class="DetailViewWithActivityFeed flex flex-column height-full white rounded-big overflow-hidden" data-testid="DetailViewWithActivityFeed">',
-        func
+        '<div class="fieldLabel quiet text-dark break-word white-space-normal">Unique Project Code (UPC)</div>',
+        appendJIRAButton
     );
-
-    function func() {
-        console.log('====================');
-    }
 
     function appendJIRAButton() {
         const customButton = document.getElementById(FAKE_ID);
