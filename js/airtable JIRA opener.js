@@ -21,12 +21,12 @@
         appendJIRAButton
     );
 
-    function appendJIRAButton() {
+    async function appendJIRAButton() {
         const customButton = document.getElementById(FAKE_ID);
         if (customButton != null) {
             return;
         }
-        let uniqueProjectCode = getUniqueProjectCode();
+        let uniqueProjectCode = await getUniqueProjectCode();
         if (uniqueProjectCode != '') {
             let record = document.querySelector('[data-testid="DetailViewWithActivityFeed"]');
             if (record != null) {
@@ -49,7 +49,7 @@
         }
     }
 
-    function getUniqueProjectCode() {
+    async function getUniqueProjectCode() {
         let tags = document.getElementsByTagName('div');
         for (let i = 0; i < tags.length; i++) {
             if (tags[i].textContent == 'Unique Project Code (UPC)') {
