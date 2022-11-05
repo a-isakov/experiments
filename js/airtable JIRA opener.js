@@ -4,7 +4,7 @@
 // @version      1
 // @description  enables to open JIRA from airtable record
 // @author       You
-// @match        https://airtable.com/appvIpUKeCZPt2kAq/tbllPW0bNpMusk8Ss/viwDIHGD8fwIU2FS4*
+// @match        https://airtable.com/appvIpUKeCZPt2kAq/*
 // @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
 // @grant        GM_addStyle
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js
