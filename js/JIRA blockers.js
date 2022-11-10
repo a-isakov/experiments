@@ -33,7 +33,7 @@
                         let subFilter = subFilters[1]
                         let expandButton = document.createElement('li');
                         expandButton.className = 'sc-1gvv0kj-0 biXMbB';
-                        expandButton.innerHTML = '<button aria-pressed="false" class="css-7uss0q" type="button" tabindex="0" id="custom_blockers_button"><span class="css-19r5em7">[blockers]</span></button>';
+                        expandButton.innerHTML = '<button aria-pressed="false" class="css-7q1vr1" type="button" tabindex="0" id="custom_blockers_button"><span class="css-178ag6o">[blockers]</span></button>';
                         expandButton.addEventListener('click', function () {
                             Buttons()
                         }, false);

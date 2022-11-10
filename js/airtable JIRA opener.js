@@ -33,7 +33,7 @@
                 let flag = document.createElement('div');
                 flag.setAttribute('id', FAKE_ID);
                 record.appendChild(flag);
-                let labelContainer = record.getElementsByClassName('labelContainer mb1');
+                let labelContainer = record.getElementsByClassName('labelContainer');
                 if (labelContainer != null) {
                     let baseline = labelContainer[0].getElementsByClassName('flex-auto flex-inline items-baseline');
                     if (baseline != null) {
