@@ -200,7 +200,8 @@ function runMultiReport() {
   // set final status
   reportProgress(progressCell, 'Finished', 'green');
   reportSubProgress(subProgressCell, '', 'black');
-  mainSheet.getRange(config.mainSheet.execDateRow, config.mainSheet.execDateCol).setValue(Date.now());
+  const now = Utilities.formatDate(new Date(), "GMT", "yyyy-MM-dd hh:mm") + ' GMT';
+  mainSheet.getRange(config.mainSheet.execDateRow, config.mainSheet.execDateCol).setValue(now);
 }
 
 // create standard titles in an empty report sheet
