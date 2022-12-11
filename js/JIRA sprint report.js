@@ -90,60 +90,364 @@ function pingJira() {
   return result;
 }
 
-// parse board URL and get Id from it
-function getBoardId(boardURL) {
-  let leftIndex = boardURL.indexOf('/boards/');
-  if (leftIndex == -1) {
-    return -1;
+
+// main report class
+class MultiReport {
+  constructor() {
+    this.minDate = null;
+    this.mainSheet = SpreadsheetApp.getActive().getSheetByName(config.mainSheet.name);
+    this.configSheet = SpreadsheetApp.getActive().getSheetByName(config.settingsSheet.name);
+    this.progressCell = this.mainSheet.getRange(config.mainSheet.progressRow, config.mainSheet.progressCol);
+    this.subProgressCell = this.mainSheet.getRange(config.mainSheet.subProgressRow, config.mainSheet.subProgressCol);
   }
-  leftIndex += 8;
-  let boardId = boardURL.substring(leftIndex);
-  let rightIndex = boardId.indexOf('?');
-  if (rightIndex != -1) {
-    boardId = boardId.substring(0, rightIndex);
+
+  reportProgress(progressText, color) {
+    this.progressCell.setValue(progressText);
+    this.progressCell.setFontColor(color);
   }
-  rightIndex = boardId.indexOf('/');
-  if (rightIndex != -1) {
-    boardId = boardId.substring(0, rightIndex);
+  
+  reportSubProgress(progressText, color) {
+    this.subProgressCell.setValue(progressText);
+    this.subProgressCell.setFontColor(color);
   }
-  return boardId;
+  
+  init() {
+    this.mainSheet.activate();
+    this.reportProgress('Running', 'black');
+    this.reportSubProgress('', 'black');
+    SpreadsheetApp.flush();
+    this.minDate = this.configSheet.getRange(config.settingsSheet.startDateRow, config.settingsSheet.startDateCol).getValue();
+  }
+
+  finalize() {
+    const now = Utilities.formatDate(new Date(), "GMT", "yyyy-MM-dd hh:mm") + ' GMT';
+    this.mainSheet.getRange(config.mainSheet.execDateRow, config.mainSheet.execDateCol).setValue(now);
+    // set final status
+    this.reportProgress('Finished', 'green');
+    this.reportSubProgress('', 'black');
+  }
+
+  // parse board URL and get Id from it
+  getBoardId(boardURL) {
+    let leftIndex = boardURL.indexOf('/boards/');
+    if (leftIndex == -1) {
+      return -1;
+    }
+    leftIndex += 8;
+    let boardId = boardURL.substring(leftIndex);
+    let rightIndex = boardId.indexOf('?');
+    if (rightIndex != -1) {
+      boardId = boardId.substring(0, rightIndex);
+    }
+    rightIndex = boardId.indexOf('/');
+    if (rightIndex != -1) {
+      boardId = boardId.substring(0, rightIndex);
+    }
+    return boardId;
+  }
+
+  // read configurations per each team
+  getTeamsConfig() {
+    let configs = [];
+    let configRow = config.settingsSheet.configTableRow;
+    while (true) {
+      // team configuration template
+      let teamConfig = {
+        name: '',
+        boardId: -1,
+        typesForCount: [],
+        typesForSP: []
+      };
+      // fill team configuration
+      teamConfig.name = this.configSheet.getRange(configRow, config.settingsSheet.teamCol).getValue();
+      if (teamConfig.name == '') {
+        break;
+      }
+      const boardURL = this.configSheet.getRange(configRow, config.settingsSheet.boardURLCol).getValue();
+      teamConfig.boardId = this.getBoardId(boardURL);
+      let commaArray = this.configSheet.getRange(configRow, config.settingsSheet.typesForCountCol).getValue();
+      teamConfig.typesForCount = commaArray.split(',');
+      commaArray = this.configSheet.getRange(configRow, config.settingsSheet.typesForSPCol).getValue();
+      teamConfig.typesForSP = commaArray.split(',');
+      // append configuration to the array
+      configs.push(teamConfig);
+      configRow++;
+    }
+    return configs;
+  }
+
+  // return sheet of the team, create if need
+  getTeamSheet(teamName) {
+    let reportSheet = SpreadsheetApp.getActive().getSheetByName(teamName);
+    if (reportSheet == null) {
+      reportSheet = this.createReportSheet(teamName);
+      this.mainSheet.activate();
+    }
+    return reportSheet;
+  }
+
+  // create standard titles in an empty report sheet
+  createReportSheet(sheetName) {
+    let reportSheet = SpreadsheetApp.getActive().insertSheet(sheetName);
+    reportSheet.getRange(config.reportSheet.countTotalRow, config.reportSheet.titlesCol)
+      .setValue('Total count')
+      .setFontWeight('bold');
+    reportSheet.getRange(config.reportSheet.countCompletedRow, config.reportSheet.titlesCol)
+      .setValue('Total completed')
+      .setFontWeight('bold');
+    reportSheet.getRange(config.reportSheet.countPercentRow, config.reportSheet.titlesCol)
+      .setValue('Total %')
+      .setFontWeight('bold');
+    reportSheet.getRange(config.reportSheet.spTotalRow, config.reportSheet.titlesCol)
+      .setValue('Total SP planned')
+      .setFontWeight('bold');
+    reportSheet.getRange(config.reportSheet.spCompletedRow, config.reportSheet.titlesCol)
+      .setValue('Total SP completed')
+      .setFontWeight('bold');
+    reportSheet.getRange(config.reportSheet.spPercentRow, config.reportSheet.titlesCol)
+      .setValue('Total SP %')
+      .setFontWeight('bold');
+    reportSheet.getRange(config.reportSheet.sprintsReportedRow, config.reportSheet.titlesCol)
+      .setValue('Sprints reported')
+      .setFontWeight('bold');
+    reportSheet.getRange(config.reportSheet.sprintRow, config.reportSheet.titlesCol)
+      .setValue('Sprint name')
+      .setFontWeight('bold');
+    reportSheet.getRange(config.reportSheet.datesRow, config.reportSheet.titlesCol)
+      .setValue('Sprint dates')
+      .setFontWeight('bold');
+    reportSheet.autoResizeColumn(config.reportSheet.titlesCol);
+    return reportSheet;
+  }
+
+  // report main func
+  generateReport(reportSheet, teamConfig) {
+    if (teamConfig.boardId == -1) {
+      report.reportProgress('Failed: Bad Board URL for team ' + teamConfig.name, 'red');
+      return false;
+    }
+    let teamReport = new TeamReport(teamConfig, reportSheet, this);
+    return teamReport.run(this.minDate);
+  }
 }
 
-// get assigned story points value for the issue
-function getIssueSP(issueKey) {
-  let apiURL = '/rest/agile/1.0/issue/' + issueKey + '?fields=customfield_10004';
-  let response = fetchJira(apiURL);
-  if (response.getResponseCode() < 200 || response.getResponseCode() >= 300) {
-    return 0;
+
+// class for one team report
+class TeamReport {
+  constructor (teamConfig, reportSheet, report) {
+    this.report = report;
+    this.teamConfig = teamConfig;
+    this.reportSheet = reportSheet;
+    this.reportRow = config.reportSheet.dataRow;
+    this.sprints = [];
+    this.excludeSprints = [];
+    // collect processed sprints
+    this.reportedSprintColIndex = config.reportSheet.sprintsReportedCol;
+    while (true) {
+      const processedSprintId = reportSheet.getRange(config.reportSheet.sprintsReportedRow, this.reportedSprintColIndex).getValue();
+      if (processedSprintId == '') {
+        break;
+      }
+      this.reportedSprintColIndex++;
+      this.excludeSprints.push(processedSprintId);
+    }
+    // init default captions
+    this.initSheet();
   }
-  let jsonResponse = JSON.parse(response.getContentText());
-  let sp = parseInt(jsonResponse.fields.customfield_10004);
-  if (isNaN(sp)) {
-    sp = 0;
+  
+  // fill table captions
+  initSheet() {
+    // TODO: merge old and new captions
+    for (let i = 0; i < this.teamConfig.typesForCount.length; i++) {
+      this.reportSheet.getRange(this.reportRow++, config.reportSheet.titlesCol)
+        .setValue(this.teamConfig.typesForCount[i] + ' count')
+        .setFontWeight('bold');
+      this.reportSheet.getRange(this.reportRow++, config.reportSheet.titlesCol)
+        .setValue(this.teamConfig.typesForCount[i] + ' completed')
+        .setFontWeight('bold');
+      this.reportSheet.getRange(this.reportRow++, config.reportSheet.titlesCol)
+        .setValue(this.teamConfig.typesForCount[i] + ' %')
+        .setFontWeight('bold');
+    }
+    for (let i = 0; i < this.teamConfig.typesForSP.length; i++) {
+      this.reportSheet.getRange(this.reportRow++, config.reportSheet.titlesCol)
+        .setValue(this.teamConfig.typesForSP[i] + ' SP planned')
+        .setFontWeight('bold');
+      this.reportSheet.getRange(this.reportRow++, config.reportSheet.titlesCol)
+        .setValue(this.teamConfig.typesForSP[i] + ' SP completed')
+        .setFontWeight('bold');
+      this.reportSheet.getRange(this.reportRow++, config.reportSheet.titlesCol)
+        .setValue(this.teamConfig.typesForSP[i] + ' SP %')
+        .setFontWeight('bold');
+    }
+    this.reportSheet.autoResizeColumn(config.reportSheet.titlesCol);
   }
-  return sp;
+
+  // collect all sprints for the board
+  getSprints(minDate) {
+    let startAt = 0;
+    while (true) {
+      let apiURL = '/rest/agile/1.0/board/' + this.teamConfig.boardId + '/sprint?state=closed&startAt=' + startAt;
+      // Logger.log(apiURL);
+      let response = fetchJira(apiURL);
+      if (response.getResponseCode() < 200 || response.getResponseCode() >= 300) {
+        this.report.reportProgress('Failed: Cannot retrieve sprints for team ' + this.teamConfig.name, 'red');
+        return false;
+      }
+      let jsonResponse = JSON.parse(response.getContentText());
+      let values = jsonResponse.values;
+      for (let i = 0; i < values.length; i++) {
+        const sprint = values[i];
+        const sprintStartDate = new Date(sprint.startDate.substring(0, 10));
+        if (sprintStartDate >= minDate) {
+          // check excluded sprints
+          if (this.excludeSprints.indexOf(sprint.id) == -1) {
+            this.sprints.push(sprint);
+          }
+        }
+      }
+      if (jsonResponse.isLast) {
+        break;
+      }
+      startAt += parseInt(jsonResponse.maxResults);
+    }
+    this.sprints.sort((a, b) => (a.startDate > b.startDate) ? 1 : -1); // sort by date asc
+    return true;
+  }
+
+  // get assigned story points value for the issue
+  getIssueSP(issueKey) {
+    let apiURL = '/rest/agile/1.0/issue/' + issueKey + '?fields=customfield_10004';
+    let response = fetchJira(apiURL);
+    if (response.getResponseCode() < 200 || response.getResponseCode() >= 300) {
+      return 0;
+    }
+    let jsonResponse = JSON.parse(response.getContentText());
+    let sp = parseInt(jsonResponse.fields.customfield_10004);
+    if (isNaN(sp)) {
+      sp = 0;
+    }
+    return sp;
+  }
+
+  // get sprint results
+  getSprintResults (sprint, accumulator) {
+    // set default values
+    for (let i = 0; i < this.teamConfig.typesForCount.length; i++) {
+      accumulator.number[this.teamConfig.typesForCount[i]] = {total: 0, completed: 0};
+    }
+    for (let i = 0; i < this.teamConfig.typesForSP.length; i++) {
+      accumulator.SP[this.teamConfig.typesForSP[i]] = {total: 0, completed: 0};
+    }
+    // get all issues
+    let apiURL = '/rest/greenhopper/1.0/rapid/charts/sprintreport?rapidViewId=' + this.teamConfig.boardId + '&sprintId=' + sprint.id;
+    let response = fetchJira(apiURL);
+    if (response.getResponseCode() < 200 || response.getResponseCode() >= 300) {
+      this.report.reportProgress('Failed: Cannot retrieve issues for sprint ' + sprint.name, 'red');
+      return false;
+    }
+    let jsonResponse = JSON.parse(response.getContentText());
+    // accumulate completed items
+    let completedIssues = jsonResponse.contents.completedIssues;
+    for (let j = 0; j < completedIssues.length; j++) {
+      let completedIssue = completedIssues[j];
+      let type = completedIssue.typeName;
+      if (type in accumulator.number) {
+        accumulator.number[type].total++;
+        accumulator.number[type].completed++;
+      }
+      if (type in accumulator.SP) {
+        const sp = this.getIssueSP(completedIssue.key);
+        accumulator.SP[type].total += sp;
+        accumulator.SP[type].completed += sp;
+      }
+    }
+    // accumlate non-completed items
+    let notCompletedIssues = jsonResponse.contents.issuesNotCompletedInCurrentSprint;
+    for (let j = 0; j < notCompletedIssues.length; j++) {
+      let notCompletedIssue = notCompletedIssues[j];
+      let type = notCompletedIssue.typeName;
+      if (type in accumulator.number) {
+        accumulator.number[type].total++;
+      }
+      if (type in accumulator.SP) {
+        const sp = this.getIssueSP(notCompletedIssue.key);
+        accumulator.SP[type].total += sp;
+      }
+    }
+    return true;
+  }
+
+  // report main func
+  run(minDate) {
+    if (!this.getSprints(minDate)) {
+      return false;
+    }
+    // look for first empty column
+    let tableColumn = config.reportSheet.tableFirstCol;
+    while (this.reportSheet.getRange(config.reportSheet.dataRow, tableColumn).getValue() != '') {
+      tableColumn++;
+    }
+    // scan all sprints
+    for (let sprintIndex = 0; sprintIndex < this.sprints.length; sprintIndex++) {
+      this.report.reportSubProgress('Scanning sprints ' + parseInt((sprintIndex + 1)*100/this.sprints.length) + '%', 'black');
+      let sprint = this.sprints[sprintIndex];
+      // write sprint metadata
+      this.reportSheet.getRange(config.reportSheet.sprintRow, tableColumn).setValue(sprint.name);
+      this.reportSheet.getRange(config.reportSheet.datesRow, tableColumn).setValue(sprint.startDate.substring(0, 10) + ' - ' + sprint.endDate.substring(0, 10));
+      this.reportSheet.autoResizeColumn(tableColumn);
+      // collect sprint results
+      let accumulator = {
+        number: {}, // each type inside has {total: 0, completed: 0} structure
+        SP: {}      // each type inside has {total: 0, completed: 0} structure
+      };
+      if (!this.getSprintResults(sprint, accumulator)) {
+        return false;
+      }
+      // write counters
+      for (let i = 0; i < this.teamConfig.typesForCount.length; i++) {
+        this.reportSheet.getRange(this.reportRow++, tableColumn)
+          .setValue(accumulator.number[this.teamConfig.typesForCount[i]].total)
+          .setNumberFormat('0');
+        this.reportSheet.getRange(this.reportRow++, tableColumn)
+          .setValue(accumulator.number[this.teamConfig.typesForCount[i]].completed)
+          .setNumberFormat('0');
+        this.reportSheet.getRange(this.reportRow++, tableColumn)
+          .setFormulaR1C1('=R[-1]C[0]/R[-2]C[0]')
+          .setNumberFormat('0.#%');
+      }
+      for (let i = 0; i < this.teamConfig.typesForSP.length; i++) {
+        this.reportSheet.getRange(this.reportRow++, tableColumn)
+          .setValue(accumulator.number[this.teamConfig.typesForSP[i]].total)
+          .setNumberFormat('0');
+        this.reportSheet.getRange(this.reportRow++, tableColumn)
+          .setValue(accumulator.number[this.teamConfig.typesForSP[i]].completed)
+          .setNumberFormat('0');
+        this.reportSheet.getRange(this.reportRow++, tableColumn)
+          .setFormulaR1C1('=R[-1]C[0]/R[-2]C[0]')
+          .setNumberFormat('0.#%');
+      }
+      // store processed sprint id
+      this.reportSheet.getRange(config.reportSheet.sprintsReportedRow, this.reportedSprintColIndex++).setValue(sprint.id);
+      SpreadsheetApp.flush();
+      tableColumn++;
+    }
+    return true;
+  }
 }
 
-function reportProgress(progressCell, progressText, color) {
-  progressCell.setValue(progressText);
-  progressCell.setFontColor(color);
-}
-
-function reportSubProgress(progressCell, progressText, color) {
-  progressCell.setValue(progressText);
-  progressCell.setFontColor(color);
-}
 
 // -------------------------------------------------------------------
 // multi report code
 function runMultiReport() {
-  let mainSheet = SpreadsheetApp.getActive().getSheetByName(config.mainSheet.name);
-  mainSheet.activate();
-  let progressCell = mainSheet.getRange(config.mainSheet.progressRow, config.mainSheet.progressCol);
-  let subProgressCell = mainSheet.getRange(config.mainSheet.subProgressRow, config.mainSheet.subProgressCol);
-  reportProgress(progressCell, 'Running', 'black');
-  reportSubProgress(subProgressCell, '', 'black');
-  SpreadsheetApp.flush();
+  let report = new MultiReport();
+  report.init();
+
+  // check connectivity
+  if (!pingJira()) {
+    report.reportProgress('Failed: Refresh JIRA login', 'red');
+    return;
+  }
 
   // sheet.getRange(tableRow, tableColumn, 1000, 1000).clear(); // clean old content before execution
   // sheet.getRange(tableRow + 2, tableColumn - 1, 1000, 1)     // clean old content before execution
@@ -151,270 +455,14 @@ function runMultiReport() {
   //   .setFontWeight('bold');
 
   // read configuration
-  const configSheet = SpreadsheetApp.getActive().getSheetByName(config.settingsSheet.name);
-  const minDate = configSheet.getRange(config.settingsSheet.startDateRow, config.settingsSheet.startDateCol).getValue();
-  let reports = [];
-  let configRow = config.settingsSheet.configTableRow;
-  while (true) {
-    // team configuration template
-    let teamConfig = {
-      name: '',
-      boardURL: '',
-      typesForCount: [],
-      typesForSP: []
-    };
-    // fill team configuration
-    teamConfig.name = configSheet.getRange(configRow, config.settingsSheet.teamCol).getValue();
-    if (teamConfig.name == '') {
-      break;
-    }
-    teamConfig.boardURL = configSheet.getRange(configRow, config.settingsSheet.boardURLCol).getValue();
-    let commaArray = configSheet.getRange(configRow, config.settingsSheet.typesForCountCol).getValue();
-    teamConfig.typesForCount = commaArray.split(',');
-    commaArray = configSheet.getRange(configRow, config.settingsSheet.typesForSPCol).getValue();
-    teamConfig.typesForSP = commaArray.split(',');
-    // append configuration to the array
-    reports.push(teamConfig);
-    configRow++;
-  }
-
-  // check connectivity
-  if (!pingJira()) {
-    reportProgress(progressCell, 'Failed: Refresh JIRA login', 'red');
-    return;
-  }
-
+  let configs = report.getTeamsConfig();
   // run report for each team
-  for (let i = 0; i < reports.length; i++) {
-    // check sheet
-    let reportSheet = SpreadsheetApp.getActive().getSheetByName(reports[i].name);
-    if (reportSheet == null) {
-      reportSheet = initReportSheet(reports[i].name);
-      mainSheet.activate();
-    }
-    reportProgress(progressCell, 'Scanning teams ' + parseInt((i + 1)*100/reports.length) + '%', 'black');
-    if (!generateReport(reportSheet, minDate, reports[i], progressCell, subProgressCell)) {
+  for (let i = 0; i < configs.length; i++) {
+    report.reportProgress('Scanning teams ' + parseInt((i + 1)*100/configs.length) + '%', 'black');
+    let reportSheet = report.getTeamSheet(configs[i].name);
+    if (report.generateReport(reportSheet, configs[i])) {
       break;
     }
   }
-  // set final status
-  reportProgress(progressCell, 'Finished', 'green');
-  reportSubProgress(subProgressCell, '', 'black');
-  const now = Utilities.formatDate(new Date(), "GMT", "yyyy-MM-dd hh:mm") + ' GMT';
-  mainSheet.getRange(config.mainSheet.execDateRow, config.mainSheet.execDateCol).setValue(now);
-}
-
-// create standard titles in an empty report sheet
-function initReportSheet(sheetName) {
-  let reportSheet = SpreadsheetApp.getActive().insertSheet(sheetName);
-  reportSheet.getRange(config.reportSheet.countTotalRow, config.reportSheet.titlesCol)
-    .setValue('Total count')
-    .setFontWeight('bold');
-  reportSheet.getRange(config.reportSheet.countCompletedRow, config.reportSheet.titlesCol)
-    .setValue('Total completed')
-    .setFontWeight('bold');
-  reportSheet.getRange(config.reportSheet.countPercentRow, config.reportSheet.titlesCol)
-    .setValue('Total %')
-    .setFontWeight('bold');
-  reportSheet.getRange(config.reportSheet.spTotalRow, config.reportSheet.titlesCol)
-    .setValue('Total SP planned')
-    .setFontWeight('bold');
-  reportSheet.getRange(config.reportSheet.spCompletedRow, config.reportSheet.titlesCol)
-    .setValue('Total SP completed')
-    .setFontWeight('bold');
-  reportSheet.getRange(config.reportSheet.spPercentRow, config.reportSheet.titlesCol)
-    .setValue('Total SP %')
-    .setFontWeight('bold');
-  reportSheet.getRange(config.reportSheet.sprintsReportedRow, config.reportSheet.titlesCol)
-    .setValue('Sprints reported')
-    .setFontWeight('bold');
-  reportSheet.getRange(config.reportSheet.sprintRow, config.reportSheet.titlesCol)
-    .setValue('Sprint name')
-    .setFontWeight('bold');
-  reportSheet.getRange(config.reportSheet.datesRow, config.reportSheet.titlesCol)
-    .setValue('Sprint dates')
-    .setFontWeight('bold');
-  reportSheet.autoResizeColumn(config.reportSheet.titlesCol);
-  return reportSheet;
-}
-
-// generation of the team's report
-function generateReport(reportSheet, minDate, teamConfig, progressCell, subProgressCell) {
-  const boardId = getBoardId(teamConfig.boardURL);
-  if (boardId == -1) {
-    reportProgress(progressCell, 'Failed: Bad Board URL for team ' + teamConfig.name, 'red');
-    return false;
-  }
-  // collect processed sprints
-  let excludeSprints = [];
-  let reportedSprintColIndex = config.reportSheet.sprintsReportedCol;
-  while (true) {
-    const processedSprintId = reportSheet.getRange(config.reportSheet.sprintsReportedRow, reportedSprintColIndex).getValue();
-    if (processedSprintId == '') {
-      break;
-    }
-    reportedSprintColIndex++;
-    excludeSprints.push(processedSprintId);
-  }
-  // collect all sprints for the board
-  let sprints = [];
-  if (!getSprints(boardId, minDate, excludeSprints, teamConfig, sprints)) {
-    return false;
-  }
-  // fill captions
-  let tableColumn = config.reportSheet.tableFirstCol;
-  let reportRow = config.reportSheet.dataRow;
-  for (let i = 0; i < teamConfig.typesForCount.length; i++) {
-    reportSheet.getRange(reportRow++, config.reportSheet.titlesCol)
-      .setValue(teamConfig.typesForCount[i] + ' count')
-      .setFontWeight('bold');
-    reportSheet.getRange(reportRow++, config.reportSheet.titlesCol)
-      .setValue(teamConfig.typesForCount[i] + ' completed')
-      .setFontWeight('bold');
-    reportSheet.getRange(reportRow++, config.reportSheet.titlesCol)
-      .setValue(teamConfig.typesForCount[i] + ' %')
-      .setFontWeight('bold');
-  }
-  for (let i = 0; i < teamConfig.typesForSP.length; i++) {
-    reportSheet.getRange(reportRow++, config.reportSheet.titlesCol)
-      .setValue(teamConfig.typesForSP[i] + ' SP planned')
-      .setFontWeight('bold');
-    reportSheet.getRange(reportRow++, config.reportSheet.titlesCol)
-      .setValue(teamConfig.typesForSP[i] + ' SP completed')
-      .setFontWeight('bold');
-    reportSheet.getRange(reportRow++, config.reportSheet.titlesCol)
-      .setValue(teamConfig.typesForSP[i] + ' SP %')
-      .setFontWeight('bold');
-  }
-  reportSheet.autoResizeColumn(config.reportSheet.titlesCol);
-  // TODO: merge old and new captions
-  // look for first empty column
-  while (reportSheet.getRange(config.reportSheet.dataRow, tableColumn).getValue() != '') {
-    tableColumn++;
-  }
-  // scan all sprints
-  for (let sprintIndex = 0; sprintIndex < sprints.length; sprintIndex++) {
-    reportSubProgress(subProgressCell, 'Scanning sprints ' + parseInt((sprintIndex + 1)*100/sprints.length) + '%', 'black');
-    let sprint = sprints[sprintIndex];
-    // write sprint metadata
-    reportSheet.getRange(config.reportSheet.sprintRow, tableColumn).setValue(sprint.name);
-    reportSheet.getRange(config.reportSheet.datesRow, tableColumn).setValue(sprint.startDate.substring(0, 10) + ' - ' + sprint.endDate.substring(0, 10));
-    reportSheet.autoResizeColumn(tableColumn);
-    // collect sprint results
-    let accumulator = {
-      number: {}, // each type inside has {total: 0, completed: 0} structure
-      SP: {}      // each type inside has {total: 0, completed: 0} structure
-    };
-    for (let i = 0; i < teamConfig.typesForCount.length; i++) {
-      accumulator.number[teamConfig.typesForCount[i]] = {total: 0, completed: 0};
-    }
-    for (let i = 0; i < teamConfig.typesForSP.length; i++) {
-      accumulator.SP[teamConfig.typesForSP[i]] = {total: 0, completed: 0};
-    }
-    if (!getSprintResults(boardId, sprint, progressCell, accumulator)) {
-      return false;
-    }
-    // write counters
-    reportRow = config.reportSheet.dataRow;
-    for (let i = 0; i < teamConfig.typesForCount.length; i++) {
-      reportSheet.getRange(reportRow++, tableColumn)
-        .setValue(accumulator.number[teamConfig.typesForCount[i]].total)
-        .setNumberFormat('0');
-      reportSheet.getRange(reportRow++, tableColumn)
-        .setValue(accumulator.number[teamConfig.typesForCount[i]].completed)
-        .setNumberFormat('0');
-      reportSheet.getRange(reportRow++, tableColumn)
-        .setFormulaR1C1('=R[-1]C[0]/R[-2]C[0]')
-        .setNumberFormat('0.#%');
-    }
-    for (let i = 0; i < teamConfig.typesForSP.length; i++) {
-      reportSheet.getRange(reportRow++, tableColumn)
-        .setValue(accumulator.number[teamConfig.typesForSP[i]].total)
-        .setNumberFormat('0');
-      reportSheet.getRange(reportRow++, tableColumn)
-        .setValue(accumulator.number[teamConfig.typesForSP[i]].completed)
-        .setNumberFormat('0');
-      reportSheet.getRange(reportRow++, tableColumn)
-        .setFormulaR1C1('=R[-1]C[0]/R[-2]C[0]')
-        .setNumberFormat('0.#%');
-    }
-    // store processed sprint id
-    reportSheet.getRange(config.reportSheet.sprintsReportedRow, reportedSprintColIndex++).setValue(sprint.id);
-    SpreadsheetApp.flush();
-    tableColumn++;
-  }
-  return true;
-}
-
-// collect sprint results
-function getSprintResults(boardId, sprint, progressCell, accumulator /* output */) {
-  // get all issues
-  let apiURL = '/rest/greenhopper/1.0/rapid/charts/sprintreport?rapidViewId=' + boardId + '&sprintId=' + sprint.id;
-  let response = fetchJira(apiURL);
-  if (response.getResponseCode() < 200 || response.getResponseCode() >= 300) {
-    reportProgress(progressCell, 'Failed: Cannot retrieve issues for sprint ' + sprint.name, 'red');
-    return false;
-  }
-  let jsonResponse = JSON.parse(response.getContentText());
-  // accumulate completed items
-  let completedIssues = jsonResponse.contents.completedIssues;
-  for (let j = 0; j < completedIssues.length; j++) {
-    let completedIssue = completedIssues[j];
-    let type = completedIssue.typeName;
-    if (type in accumulator.number) {
-      accumulator.number[type].total++;
-      accumulator.number[type].completed++;
-    }
-    if (type in accumulator.SP) {
-      const sp = getIssueSP(completedIssue.key);
-      accumulator.SP[type].total += sp;
-      accumulator.SP[type].completed += sp;
-    }
-  }
-  // accumlate non-completed items
-  let notCompletedIssues = jsonResponse.contents.issuesNotCompletedInCurrentSprint;
-  for (let j = 0; j < notCompletedIssues.length; j++) {
-    let notCompletedIssue = notCompletedIssues[j];
-    let type = notCompletedIssue.typeName;
-    if (type in accumulator.number) {
-      accumulator.number[type].total++;
-    }
-    if (type in accumulator.SP) {
-      const sp = getIssueSP(notCompletedIssue.key);
-      accumulator.SP[type].total += sp;
-    }
-  }
-  return true;
-}
-
-// collect sprints of the board
-function getSprints(boardId, minDate, excludeSprints, teamConfig, sprints /*output*/) {
-  let startAt = 0;
-  while (true) {
-    let apiURL = '/rest/agile/1.0/board/' + boardId + '/sprint?state=closed&startAt=' + startAt;
-    // Logger.log(apiURL);
-    let response = fetchJira(apiURL);
-    if (response.getResponseCode() < 200 || response.getResponseCode() >= 300) {
-      reportProgress(progressCell, 'Failed: Cannot retrieve sprints for team ' + teamConfig.name, 'red');
-      return false;
-    }
-    let jsonResponse = JSON.parse(response.getContentText());
-    let values = jsonResponse.values;
-    for (let i = 0; i < values.length; i++) {
-      const sprint = values[i];
-      const sprintStartDate = new Date(sprint.startDate.substring(0, 10));
-      if (sprintStartDate >= minDate) {
-        // check excluded sprints
-        if (excludeSprints.indexOf(sprint.id) == -1) {
-          sprints.push(sprint);
-        }
-      }
-    }
-    if (jsonResponse.isLast) {
-      break;
-    }
-    startAt += parseInt(jsonResponse.maxResults);
-  }
-  sprints.sort((a, b) => (a.startDate > b.startDate) ? 1 : -1); // sort by date asc
-  return true;
+  report.finalize();
 }
