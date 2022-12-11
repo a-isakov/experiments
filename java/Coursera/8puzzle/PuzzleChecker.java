@@ -33,7 +33,7 @@ public class PuzzleChecker {
     public static void main(String[] args) {
 
         // for each command-line argument
-        // for (String filename : args) {
+         for (String filename : args) {
 
             // read in the board specified in the filename
             String filename = "puzzle07.txt";
@@ -67,6 +67,6 @@ public class PuzzleChecker {
                 StdOut.print(step.toString());
             }
             StdOut.println("Final");
-        // }
+         }
     }
 }
