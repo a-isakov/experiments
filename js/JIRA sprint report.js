@@ -238,7 +238,6 @@ class TeamReport {
     this.report = report;
     this.teamConfig = teamConfig;
     this.reportSheet = reportSheet;
-    this.reportRow = config.reportSheet.dataRow;
     this.sprints = [];
     this.excludeSprints = [];
     // collect processed sprints
@@ -258,25 +257,26 @@ class TeamReport {
   // fill table captions
   initSheet() {
     // TODO: merge old and new captions
+    let reportRow = config.reportSheet.dataRow;
     for (let i = 0; i < this.teamConfig.typesForCount.length; i++) {
-      this.reportSheet.getRange(this.reportRow++, config.reportSheet.titlesCol)
+      this.reportSheet.getRange(reportRow++, config.reportSheet.titlesCol)
         .setValue(this.teamConfig.typesForCount[i] + ' count')
         .setFontWeight('bold');
-      this.reportSheet.getRange(this.reportRow++, config.reportSheet.titlesCol)
+      this.reportSheet.getRange(reportRow++, config.reportSheet.titlesCol)
         .setValue(this.teamConfig.typesForCount[i] + ' completed')
         .setFontWeight('bold');
-      this.reportSheet.getRange(this.reportRow++, config.reportSheet.titlesCol)
+      this.reportSheet.getRange(reportRow++, config.reportSheet.titlesCol)
         .setValue(this.teamConfig.typesForCount[i] + ' %')
         .setFontWeight('bold');
     }
     for (let i = 0; i < this.teamConfig.typesForSP.length; i++) {
-      this.reportSheet.getRange(this.reportRow++, config.reportSheet.titlesCol)
+      this.reportSheet.getRange(reportRow++, config.reportSheet.titlesCol)
         .setValue(this.teamConfig.typesForSP[i] + ' SP planned')
         .setFontWeight('bold');
-      this.reportSheet.getRange(this.reportRow++, config.reportSheet.titlesCol)
+      this.reportSheet.getRange(reportRow++, config.reportSheet.titlesCol)
         .setValue(this.teamConfig.typesForSP[i] + ' SP completed')
         .setFontWeight('bold');
-      this.reportSheet.getRange(this.reportRow++, config.reportSheet.titlesCol)
+      this.reportSheet.getRange(reportRow++, config.reportSheet.titlesCol)
         .setValue(this.teamConfig.typesForSP[i] + ' SP %')
         .setFontWeight('bold');
     }
@@ -405,25 +405,26 @@ class TeamReport {
         return false;
       }
       // write counters
+      let reportRow = config.reportSheet.dataRow;
       for (let i = 0; i < this.teamConfig.typesForCount.length; i++) {
-        this.reportSheet.getRange(this.reportRow++, tableColumn)
+        this.reportSheet.getRange(reportRow++, tableColumn)
           .setValue(accumulator.number[this.teamConfig.typesForCount[i]].total)
           .setNumberFormat('0');
-        this.reportSheet.getRange(this.reportRow++, tableColumn)
+        this.reportSheet.getRange(reportRow++, tableColumn)
           .setValue(accumulator.number[this.teamConfig.typesForCount[i]].completed)
           .setNumberFormat('0');
-        this.reportSheet.getRange(this.reportRow++, tableColumn)
+        this.reportSheet.getRange(reportRow++, tableColumn)
           .setFormulaR1C1('=R[-1]C[0]/R[-2]C[0]')
           .setNumberFormat('0.#%');
       }
       for (let i = 0; i < this.teamConfig.typesForSP.length; i++) {
-        this.reportSheet.getRange(this.reportRow++, tableColumn)
+        this.reportSheet.getRange(reportRow++, tableColumn)
           .setValue(accumulator.number[this.teamConfig.typesForSP[i]].total)
           .setNumberFormat('0');
-        this.reportSheet.getRange(this.reportRow++, tableColumn)
+        this.reportSheet.getRange(reportRow++, tableColumn)
           .setValue(accumulator.number[this.teamConfig.typesForSP[i]].completed)
           .setNumberFormat('0');
-        this.reportSheet.getRange(this.reportRow++, tableColumn)
+        this.reportSheet.getRange(reportRow++, tableColumn)
           .setFormulaR1C1('=R[-1]C[0]/R[-2]C[0]')
           .setNumberFormat('0.#%');
       }
@@ -460,7 +461,7 @@ function runMultiReport() {
   for (let i = 0; i < configs.length; i++) {
     report.reportProgress('Scanning teams ' + parseInt((i + 1)*100/configs.length) + '%', 'black');
     let reportSheet = report.getTeamSheet(configs[i].name);
-    if (report.generateReport(reportSheet, configs[i])) {
+    if (!report.generateReport(reportSheet, configs[i])) {
       break;
     }
   }
