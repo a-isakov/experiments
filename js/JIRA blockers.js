@@ -23,10 +23,10 @@
     
     waitForKeyElements(
         '<div id="content" class="z-index-content">',
-        appendButtons
+        checkFlag
     );
 
-    async function appendButtons(element) {
+    async function checkFlag(element) {
         const runFlag = document.getElementById('custom_blockers_run_flag');
         if (runFlag == null) {
             let boardContainer = document.getElementById('ghx-pool');
@@ -35,10 +35,6 @@
                 onceElement.setAttribute('id', 'custom_blockers_run_flag');
                 onceElement.setAttribute('counter', counter++); // just to reflect updates count
                 boardContainer.appendChild(onceElement);
-                // console.log('-------------------');
-                // console.log('isMainLoopRunning: ' + isMainLoopRunning);
-                // console.log('breakMainLoop: ' + breakMainLoop);
-                // console.log('testCounter: ' + testCounter);
                 // break loop if it was running
                 if (isMainLoopRunning) {
                     breakMainLoop = true;
@@ -53,21 +49,7 @@
         }
     }
 
-    // async function testLoop() {
-    //     isMainLoopRunning = true;
-    //     while (true) {
-    //         await new Promise(resolve => setTimeout(resolve, 2000));
-    //         console.log('testCounter: ' + testCounter);
-    //         if (breakMainLoop) {
-    //             console.log('caught breakMainLoop');
-    //             isMainLoopRunning = false;
-    //             breakMainLoop = false;
-    //             break;
-    //         }
-    //     }
-    // }
-
-    async function mainLoop(element) {
+    async function mainLoop() {
         isMainLoopRunning = true; // indicate main loop started
         let progress_bar = document.createElement('div'); // create a progress bar
         let ghxOperations = document.getElementById('ghx-operations');
