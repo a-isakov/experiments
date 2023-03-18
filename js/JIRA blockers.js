@@ -16,44 +16,64 @@
     let links = ['is blocked by', 'Successor'];
     let now = new Date();
     const cache_limit_minutes = 120;
-
+    let counter = 0;
+    let breakMainLoop = false;
+    let isMainLoopRunning = false;
+    let testCounter = 0;
+    
     waitForKeyElements(
         '<div id="content" class="z-index-content">',
         appendButtons
     );
 
-    function appendButtons(element) {
-        const content = document.getElementById('custom_blockers_button');
-        if (content == null) {
-            let filters = document.getElementById('ghx-quick-filters');
-            if (filters != null) {
-                let subFilters = filters.getElementsByTagName("ul");
-                if (subFilters != null) {
-                    if (subFilters.length == 2) {
-                        let subFilter = subFilters[1]
-                        let expandButton = document.createElement('li');
-                        expandButton.className = 'sc-1gvv0kj-0 biXMbB';
-                        expandButton.innerHTML = '<button aria-pressed="false" class="css-7q1vr1" type="button" tabindex="0" id="custom_blockers_button"><span class="css-178ag6o">[blockers]</span></button>';
-                        expandButton.addEventListener('click', function () {
-                            Buttons()
-                        }, false);
-                        subFilter.appendChild(expandButton);
+    async function appendButtons(element) {
+        const runFlag = document.getElementById('custom_blockers_run_flag');
+        if (runFlag == null) {
+            let boardContainer = document.getElementById('ghx-pool');
+            if (boardContainer != null) {
+                let onceElement = document.createElement('div');
+                onceElement.setAttribute('id', 'custom_blockers_run_flag');
+                onceElement.setAttribute('counter', counter++); // just to reflect updates count
+                boardContainer.appendChild(onceElement);
+                // console.log('-------------------');
+                // console.log('isMainLoopRunning: ' + isMainLoopRunning);
+                // console.log('breakMainLoop: ' + breakMainLoop);
+                // console.log('testCounter: ' + testCounter);
+                // break loop if it was running
+                if (isMainLoopRunning) {
+                    breakMainLoop = true;
+                    while (breakMainLoop) {
+                        console.log('waiting');
+                        await new Promise(resolve => setTimeout(resolve, 500));
                     }
                 }
+                ++testCounter;
+                mainLoop();
             }
         }
     }
 
-    async function Buttons(element) {
-        let progress_bar = document.createElement('li'); // create a progress bar
-        let filters = document.getElementById('ghx-quick-filters');
-        if (filters != null) {
-            let subFilters = filters.getElementsByTagName("ul");
-            if (subFilters != null) {
-                let subFilter = subFilters[subFilters.length - 1];
-                progress_bar.innerHTML = '<div class="progress-container" style="height: 0.4rem; width: 12rem;border-radius: 0.2rem; background: #000;"><div class="progress" id="bar_element" style="height: 100%;width: 0;border-radius: 0.2rem;background: #ff4754;transition: width 0.4s ease;"></div></div>'
-                subFilter.appendChild(progress_bar);
-            }
+    // async function testLoop() {
+    //     isMainLoopRunning = true;
+    //     while (true) {
+    //         await new Promise(resolve => setTimeout(resolve, 2000));
+    //         console.log('testCounter: ' + testCounter);
+    //         if (breakMainLoop) {
+    //             console.log('caught breakMainLoop');
+    //             isMainLoopRunning = false;
+    //             breakMainLoop = false;
+    //             break;
+    //         }
+    //     }
+    // }
+
+    async function mainLoop(element) {
+        isMainLoopRunning = true; // indicate main loop started
+        let progress_bar = document.createElement('div'); // create a progress bar
+        let ghxOperations = document.getElementById('ghx-operations');
+        if (ghxOperations != null) {
+            progress_bar.innerHTML = '<div class="progress-container" style="height: 0.4rem; width: 12rem;border-radius: 0.2rem; background: #000;"><div class="progress" id="bar_element" style="height: 100%;width: 0;border-radius: 0.2rem;background: #ff4754;transition: width 0.4s ease;"></div></div>'
+            ghxOperations.appendChild(progress_bar);
         }
         const changeProgress = (progress) => {
             let bar = document.getElementById('bar_element');
@@ -122,12 +142,29 @@
                                     if (check_links == 'done') {
                                         element.innerHTML = '<a  href="https://tinypass.atlassian.net/browse/' + linked_number + '" class="aui-lozenge ghx-label-6" style="text-decoration: line-through; font-size:70%" onclick="windiw.open(\'https://tinypass.atlassian.net/browse/' + linked_number + '\')">' + linked_number + '</a>';
                                     }
-                                    card_container.appendChild(element);
+                                    // check if it wasn't stopped
+                                    if (!breakMainLoop) {
+                                        // continue;
+                                        card_container.appendChild(element);
+                                    }
                                 }
                             }
                         }
                     }
                 }
+            }
+            // check if it needs to stop
+            if (breakMainLoop) {
+                if (progress_bar != null) { //delete a progress bar
+                    let navParent = progress_bar.parentNode
+                    if (navParent != null) {
+                        navParent.removeChild(progress_bar);
+                    }
+                }
+                await new Promise(resolve => setTimeout(resolve, 500));
+                isMainLoopRunning = false; // indicate main loop stopped
+                breakMainLoop = false; // reset break flag
+                return;
             }
             changeProgress((j + 1) / cards.length * 100);
         }
@@ -137,5 +174,6 @@
                 navParent.removeChild(progress_bar);
             }
         }
+        isMainLoopRunning = false; // indicate main loop finished
     }
 })();
