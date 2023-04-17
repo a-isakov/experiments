@@ -30,7 +30,7 @@
                         let subFilter = subFilters[1]
                         let expandButton = document.createElement('li');
                         expandButton.className = 'sc-1gvv0kj-0 biXMbB';
-                        expandButton.innerHTML = '<button aria-pressed="false" class="css-7q1vr1" type="button" tabindex="0" id="custom_expand_button"><span class="css-178ag6o">[X]</span></button>';
+                        expandButton.innerHTML = '<button aria-pressed="false" class="css-1f7f0z2" type="button" tabindex="0" id="custom_expand_button"><span class="css-178ag6o">[X]</span></button>';
                         expandButton.addEventListener('click', function() {
                             customExpandListener()
                         }, false);

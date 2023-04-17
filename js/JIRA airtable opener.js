@@ -43,8 +43,7 @@
             // if found add reference
             if (uniqueProjectCode != '') {
                 let airTableButton = document.createElement('button');
-                // airTableButton.setAttribute('class', 'ewxv9o42 css-dvspa0');
-                airTableButton.setAttribute('class', 'css-1d9vn68');
+                airTableButton.setAttribute('class', 'css-gon3qk');
                 airTableButton.setAttribute('type', 'button');
                 airTableButton.setAttribute('onclick', 'window.open(\'https://airtable.com/appvIpUKeCZPt2kAq/tbllPW0bNpMusk8Ss/viwDIHGD8fwIU2FS4/' + uniqueProjectCode + '?blocks=hide\')');
                 // airTableButton.innerHTML += 'Airtable <svg width="16" height="16" viewBox="0 0 13 13" fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" xmlns="http://www.w3.org/2000/svg"><path d="M5.99751 5L10.4975 5C10.7737 5 10.9975 5.22386 10.9975 5.5L10.9975 10C10.9975 10.2761 10.7737 10.5 10.4975 10.5C10.2214 10.5 9.99751 10.2761 9.99751 10L9.99751 6.70711L4.48711 12.2175L3.78 11.5104L9.29041 6L5.99751 6C5.72137 6 5.49751 5.77614 5.49751 5.5C5.49751 5.22386 5.72137 5 5.99751 5Z"></path></svg>';
