@@ -10,7 +10,6 @@
 // @grant        GM_addStyle
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js
 // @require      https://gist.github.com/raw/2625891/waitForKeyElements.js
-// @require      https://apis.google.com/js/api.js
 // ==/UserScript==
 
 (function () {
@@ -37,37 +36,105 @@
         }
     }
 
-    /**
-     * Callback after the API client is loaded. Loads the
-     * discovery doc to initialize the API.
-     */
-    async function intializeGapiClient() {
-        await gapi.client.init({
-            apiKey: API_KEY,
-            discoveryDocs: [DISCOVERY_DOC],
-        });
-        // gapiInited = true;
-        // maybeEnableButtons();
-    }
+
+    async function get_statusCategory(id){
+        const response = await fetch('/rest/api/3/status/' + id)
+        if (response.status == 200) {
+            let id_of_task = id;
+            let result_for_status = await response.json();
+            let certain_id = result_for_status['statusCategory']['id'];
+            if (localStorage.getItem(id_of_task) === null){
+                localStorage.setItem(id_of_task, certain_id);
+                return  await localStorage.getItem(id_of_task);
+            }else{
+                return await localStorage.getItem(id_of_task);
+            }
+        }
+  }
 
     async function onClick() {
+        let arr = new Array();
+        let k = 0;
         const searchText = document.getElementById('advanced-search');
-        console.log(searchText.value);
-        // const title = 'test';
-        // gapi.load('client', intializeGapiClient);
-        // try {
-        //     gapi.client.sheets.spreadsheets.create({
-        //         properties: {
-        //             title: title,
-        //         },
-        //     }).then((response) => {
-        //         // if (callback) callback(response);
-        //         console.log('Spreadsheet ID: ' + response.result.spreadsheetId);
-        //     });
-        // } catch (err) {
-        //     document.getElementById('content').innerText = err.message;
-        //     return;
-        // }
+        let encoded = encodeURI(searchText.value);
+        const response = await fetch('/rest/api/3/search?jql=' + encoded + '&expand=changelog&fields=key,summary,status,created,resolution');
+                if (response.status == 200) {
+                    let answer = await response.json();
+                    let issues = answer['issues'];
+                    for (let i = 0; i < issues.length; i++) {
+                        let issue = issues[i];
+                        let time_created = issue['fields']['created'];
+                        let resolution = issue['fields']['resolution'];
+                        let issue_changelog = issue["changelog"]["histories"];
+                        if (issue_changelog.length != 0){
+                            let begin = null;
+                            let finish = null;
+                            let issueKey = issue["key"];
+                            for (let j = 0; j < issue_changelog.length; j++){
+                                let changes = issue_changelog[j];
+                                let change = changes["items"];
+                                for (let e = 0; e < change.length; e++){
+                                    if(typeof change[e].fieldId !== 'undefined' && (change[e].fieldId === 'status')){
+                                        k += 1;
+                                        arr[k - 1] = changes["created"]
+                                        let id = change[e]["to"];
+                                        let check = await get_statusCategory(id);
+                                        if (check == 4 | check == 2){
+                                            begin = changes["created"];
+                                        }
+                                        if (check == 3){
+                                            finish = changes["created"];
+                                        }
+                                    }
+                                }
+                            }
+                            let flag = true;
+                            if (begin === null | finish === null){
+                                flag = false;
+                            }
+                            if (flag == true){
+                                begin = new Date(begin);
+                                finish = new Date(finish);
+                                let different = finish - begin;
+                                if ((different/3600000) >= 1){
+                                    let dif = Math.round(different/3600000);
+                                    console.log('time contributed for task number '+ issueKey + ' is ' + dif +  ' hours');
+                                }
+                                if ((different/3600000) < 1){
+                                    console.log('time contributed for task number '+ issueKey + ' is ' + different/60000 + ' minutes');
+                                }
+                                if (resolution !== null){
+                                    console.log('resolution of task number ' + issueKey + ' ' + (resolution['name']));
+                                }
+                            }
+                            if (finish === null && begin !== null){
+                                console.log('start time of work on task number '+ issueKey + ' is ' + begin);
+                            }
+                            if (begin === null && finish !== null ){
+                                begin = new Date(time_created);
+                                finish = new Date(finish);
+                                let different = finish - begin;
+                                //console.log(begin);
+                                //console.log(finish);
+                                if ((different/3600000) >= 1){
+                                    let dif = Math.round(different/3600000);
+                                    console.log('task number ' + issueKey + ' was closed without any other steps. Time after creation ' + dif + ' hours' );
+                                }
+                                if ((different/3600000) < 1){
+                                    console.log('task number ' + issueKey + ' was closed without any other steps. Time after creation ' + different/60000 + ' minutes');
+                                }
+                                if (resolution !== null){
+                                    console.log('resolution of task number ' + issueKey + ' is ' + (resolution['name']));
+                                }
+                            }
+                            if (begin === null && finish === null){
+                                begin = time_created;
+                                console.log('work on ' + issueKey + ' has not started yet, however task was created at ' + begin);
+                            }
+                            arr = [];
+                            k = 0;
+                        }
+                    }
+                }
     }
-
 })();
