@@ -143,9 +143,10 @@
     }
 
     function filterEpic(epicKey, epic) {
+        const doFilter = epicKey != '';
         closePopup();
         let epicsButton = document.getElementById('custom_epics_button');
-        if (epicKey == '') {
+        if (!doFilter) {
             epicsButton.setAttribute('epic', '');
             // epicsButton.setAttribute('aria-pressed', 'false');
             // epicsButton.setAttribute('class', 'css-1f7f0z2');
@@ -176,9 +177,11 @@
                 }
             }
             if (data_epickey != '') {
-                card.style.visibility = (epicKey != '' && data_epickey != epicKey) ? 'hidden' : 'visible';
+                // card.style.visibility = (doFilter && data_epickey != epicKey) ? 'hidden' : 'visible';
+                card.style.display = (doFilter && data_epickey != epicKey) ? 'none' : 'block';
             } else {
-                card.style.visibility = (epicKey != '') ? 'hidden' : 'visible';
+                // card.style.visibility = doFilter ? 'hidden' : 'visible';
+                card.style.display = doFilter ? 'none' : 'block';
             }
         }
     }
