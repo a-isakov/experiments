@@ -20,6 +20,7 @@
     );
 
     function onElement(element) {
+        // create div to handle board refresh
         const content = document.getElementById('custom_epic_filter');
         if (content == null) {
             let boardContainer = document.getElementById('ghx-pool');
@@ -28,9 +29,10 @@
                 onceElement.setAttribute('id', 'custom_epic_filter');
                 onceElement.setAttribute('counter', counter++); // just to reflect updates count
                 boardContainer.appendChild(onceElement);
-                // onRefresh(boardContainer);
+                onRefresh();
             }
         }
+         // append custom button to the quick filters
         const epicsButton = document.getElementById('custom_epics_button');
         if (epicsButton == null) {
             let boardContainer = document.getElementById('ghx-pool');
@@ -48,6 +50,7 @@
                                 showEpicsList(boardContainer)
                             }, false);
                             subFilter.appendChild(epicFilterButton);
+                            // insert hidden epics popup to show list of epics later on
                             insertPopup(subFilter);
                         }
                     }
@@ -56,6 +59,7 @@
         }
     }
 
+    // prepare popup to show list of epics later on
     function insertPopup(parent) {
         let popupDiv = document.createElement('div');
         popupDiv.setAttribute('id', 'epic_popup');
@@ -86,6 +90,7 @@
         parent.appendChild(popupDiv);
     }
 
+    // append close button to the epics popup
     function appendCloseButton(parent) {
         let popupCloseButton = document.createElement('button');
         popupCloseButton.setAttribute('type', 'button');
@@ -96,19 +101,21 @@
         parent.appendChild(popupCloseButton);
     }
 
+    // hide the epics popup
     function closePopup() {
         const popup = document.getElementById('epic_popup');
         popup.style.visibility = 'hidden';
     }
 
+    // show epics on the custom popup
     function showEpicsList(boardContainer) {
         const epicsButton = document.getElementById('custom_epics_button');
         const epicKey = epicsButton.getAttribute('epic');
         if (epicKey == '')
         {
-            // find all Epics
+            // find all Epics in board
             let popupContent = document.getElementById('epic_popup_content');
-            popupContent.innerHTML = ''; // erase
+            popupContent.innerHTML = ''; // erase popup content
             let epics = boardContainer.getElementsByClassName('aui-lozenge');
             let clonedEpics = {};
             for (let ec = 0; ec < epics.length; ec++) {
@@ -125,13 +132,16 @@
                     epicClone.addEventListener('click', function() {
                         filterEpic(data_epickey, epicClone)
                     }, false);
+                    // store found clones
                     clonedEpics[data_epickey] = epicClone;
                 }
             }
+            // add all found clones to the popup
             for (let key in clonedEpics) {
                 popupContent.appendChild(clonedEpics[key]);
                 popupContent.appendChild(document.createElement('br'));
             }
+            // return close button after erasing popup content
             appendCloseButton(popupContent);
             // shop popup to select the Epic
             const popup = document.getElementById('epic_popup');
@@ -142,32 +152,46 @@
         }
     }
 
+    // when board refreshed apply the same filter if need
+    function onRefresh() {
+        const epicsButton = document.getElementById('custom_epics_button');
+        const epicKey = epicsButton.getAttribute('epic');
+        filterEpic(epicKey, null)
+    }
+
+    // apply/reset filter
     function filterEpic(epicKey, epic) {
         const doFilter = epicKey != '';
         closePopup();
         let epicsButton = document.getElementById('custom_epics_button');
         if (!doFilter) {
+            // reset custom button to the initial state
             epicsButton.setAttribute('epic', '');
             epicsButton.setAttribute('aria-pressed', 'false');
             epicsButton.setAttribute('class', 'css-1f7f0z2');
             epicsButton.innerHTML = '<span class="css-178ag6o"><img src="https://tinypass.atlassian.net/rest/api/2/universal_avatar/view/type/issuetype/avatar/11407?size=medium" class="_1reo15vq _18m915vq"></img></span>';
         } else {
-            epicsButton.setAttribute('epic', epicKey);
-            epicsButton.setAttribute('aria-pressed', 'true');
-            epicsButton.setAttribute('class', 'css-370xbg');
-            epicsButton.innerHTML = '';
-            let span = document.createElement('span');
-            span.setAttribute('class', 'css-178ag6o');
-            span.appendChild(epic);
-            epicsButton.appendChild(span);
+            // check refresh
+            if (epic != null) {
+                // set custom button to the pressed state only when Epic selected from the popup (epic is not null)
+                epicsButton.setAttribute('epic', epicKey);
+                epicsButton.setAttribute('aria-pressed', 'true');
+                epicsButton.setAttribute('class', 'css-370xbg');
+                epicsButton.innerHTML = '';
+                let span = document.createElement('span');
+                span.setAttribute('class', 'css-178ag6o');
+                span.appendChild(epic);
+                epicsButton.appendChild(span);
+            }
         }
         // find all cards
         let boardContainer = document.getElementById('ghx-pool');
         let popupContent = document.getElementById('epic_popup_content');
-        popupContent.innerHTML = ''; // erase
+        popupContent.innerHTML = ''; // erase popup
         let cards = boardContainer.getElementsByClassName('ghx-issue');
         for (let ec = 0; ec < cards.length; ec++) {
             let card = cards[ec];
+            // check epic in the card
             const epics = card.getElementsByClassName('aui-lozenge');
             let data_epickey = '';
             for (let i = 0; i < epics.length; i++) {
@@ -176,6 +200,7 @@
                     data_epickey = attr;
                 }
             }
+            // hide/restore cards by epc filter
             if (data_epickey != '') {
                 card.style.display = (doFilter && data_epickey != epicKey) ? 'none' : 'block';
             } else {
