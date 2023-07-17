@@ -40,7 +40,6 @@
                     let subFilters = filters.getElementsByTagName("ul");
                     if (subFilters != null) {
                         if (subFilters.length == 2) {
-                            insertPopup(filters);
                             let subFilter = subFilters[1]
                             let epicFilterButton = document.createElement('li');
                             epicFilterButton.className = 'sc-1gvv0kj-0 biXMbB';
@@ -49,6 +48,7 @@
                                 showEpicsList(boardContainer)
                             }, false);
                             subFilter.appendChild(epicFilterButton);
+                            insertPopup(subFilter);
                         }
                     }
                 }
@@ -148,13 +148,13 @@
         let epicsButton = document.getElementById('custom_epics_button');
         if (!doFilter) {
             epicsButton.setAttribute('epic', '');
-            // epicsButton.setAttribute('aria-pressed', 'false');
-            // epicsButton.setAttribute('class', 'css-1f7f0z2');
+            epicsButton.setAttribute('aria-pressed', 'false');
+            epicsButton.setAttribute('class', 'css-1f7f0z2');
             epicsButton.innerHTML = '<span class="css-178ag6o"><img src="https://tinypass.atlassian.net/rest/api/2/universal_avatar/view/type/issuetype/avatar/11407?size=medium" class="_1reo15vq _18m915vq"></img></span>';
         } else {
             epicsButton.setAttribute('epic', epicKey);
-            // epicsButton.setAttribute('aria-pressed', 'true');
-            // epicsButton.setAttribute('class', 'css-370xbg');
+            epicsButton.setAttribute('aria-pressed', 'true');
+            epicsButton.setAttribute('class', 'css-370xbg');
             epicsButton.innerHTML = '';
             let span = document.createElement('span');
             span.setAttribute('class', 'css-178ag6o');
@@ -177,10 +177,8 @@
                 }
             }
             if (data_epickey != '') {
-                // card.style.visibility = (doFilter && data_epickey != epicKey) ? 'hidden' : 'visible';
                 card.style.display = (doFilter && data_epickey != epicKey) ? 'none' : 'block';
             } else {
-                // card.style.visibility = doFilter ? 'hidden' : 'visible';
                 card.style.display = doFilter ? 'none' : 'block';
             }
         }
