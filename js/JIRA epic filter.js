@@ -45,7 +45,7 @@
                             let subFilter = subFilters[1]
                             let epicFilterButton = document.createElement('li');
                             epicFilterButton.className = 'sc-1gvv0kj-0 biXMbB';
-                            epicFilterButton.innerHTML = '<button epic="" aria-pressed="false" class="css-1f7f0z2" type="button" tabindex="0" id="custom_epics_button"><span class="css-178ag6o"><img src="https://tinypass.atlassian.net/rest/api/2/universal_avatar/view/type/issuetype/avatar/11407?size=medium" class="_1reo15vq _18m915vq"></img></span></button>';
+                            epicFilterButton.innerHTML = '<button epic="" aria-pressed="false" class="css-1f7f0z2" type="button" tabindex="0" id="custom_epics_button"><span style="display: flex; align-self: center;" class="css-178ag6o"><img src="https://tinypass.atlassian.net/rest/api/2/universal_avatar/view/type/issuetype/avatar/11407?size=medium" class="_1reo15vq _18m915vq"></img></span></button>';
                             epicFilterButton.addEventListener('click', function() {
                                 showEpicsList(boardContainer)
                             }, false);
@@ -169,7 +169,7 @@
             epicsButton.setAttribute('epic', '');
             epicsButton.setAttribute('aria-pressed', 'false');
             epicsButton.setAttribute('class', 'css-1f7f0z2');
-            epicsButton.innerHTML = '<span class="css-178ag6o"><img src="https://tinypass.atlassian.net/rest/api/2/universal_avatar/view/type/issuetype/avatar/11407?size=medium" class="_1reo15vq _18m915vq"></img></span>';
+            epicsButton.innerHTML = '<span class="css-178ag6o" style="display: flex; align-self: center;"><img src="https://tinypass.atlassian.net/rest/api/2/universal_avatar/view/type/issuetype/avatar/11407?size=medium" class="_1reo15vq _18m915vq"></img></span>';
         } else {
             // check refresh
             if (epic != null) {
@@ -180,6 +180,7 @@
                 epicsButton.innerHTML = '';
                 let span = document.createElement('span');
                 span.setAttribute('class', 'css-178ag6o');
+                span.setAttribute('style', 'display: flex; align-self: center;');
                 span.appendChild(epic);
                 epicsButton.appendChild(span);
             }
