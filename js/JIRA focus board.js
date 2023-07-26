@@ -97,6 +97,7 @@
         let filters = document.getElementById('ghx-quick-filters');
         if (filters != null) {
             updateElement(filters, 'margin-bottom', expandButtonPressed ? '6px' : '', false);
+            // TODO: restore doesn't work properly, need to save original structure somewhere
             if (filters.childNodes.length == 2) {
                 let subFilter = filters.childNodes[0];
                 let peopleFilter = subFilter.childNodes[1];
@@ -119,7 +120,7 @@
             }
         }
         // expand content
-        updateElement(document.documentElement, '--leftSidebarWidth', expandButtonPressed ? '0px' : '', true);
+        updateElement(document.documentElement, '--leftSidebarWidth', expandButtonPressed ? '0px' : '', false);
         updateElement(document.getElementById('ghx-work'), 'height', expandButtonPressed ? `${window.innerHeight - 60}px` : '', false);
         const items = Array.from(
             document.getElementsByClassName('ghx-xtra-narrow-card')
@@ -157,8 +158,9 @@
         }
     }
 
-    async function updateElement(element, styleName, newValue, log) {
+    async function updateElement(element, styleName, newValue, log /* for debugging */) {
         if (newValue != '') {
+            // get original value, backup it and set new
             const styleValue = window.getComputedStyle(element).getPropertyValue(styleName);
             if (log) {
                 console.log(element);
@@ -167,6 +169,7 @@
             element.setAttribute('backup-' + styleName, styleValue);
             element.style.setProperty(styleName, newValue);
         } else {
+            // get original value from backup and restore it
             const backupStyle = element.getAttribute('backup-' + styleName);
             if (log) {
                 console.log('WAS: ' + element.style.getPropertyValue(styleName) + '. NOW: ' + backupStyle);
