@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         JIRA focus board
 // @namespace    http://tampermonkey.net/
-// @version      1
+// @version      1.1
 // @description  hide unnecessary elements
 // @author       You
 // @match        https://tinypass.atlassian.net/jira/*
@@ -42,6 +42,11 @@
     }
 
     function customExpandListener() {
+        const expandButton = document.getElementById('custom_expand_button');
+        let expandButtonPressed = getButtonPressed(expandButton);
+        expandButtonPressed = !expandButtonPressed; // invert state after hitting the button
+        setButtonPressed(expandButton, expandButtonPressed);
+
         let topParent = null
         // remove left sidebar
         let navDiv = document.getElementById('ak-side-navigation');
@@ -50,7 +55,7 @@
             if (navDiv != null) {
                 let navParent = navDiv.parentNode
                 if (navParent != null) {
-                    navParent.removeChild(navDiv);
+                    updateElement(navDiv, 'display', expandButtonPressed ? 'none' : '', false);
                 }
             }
         }
@@ -61,21 +66,21 @@
             if (navDiv != null) {
                 let navParent = navDiv.parentNode
                 if (navParent != null) {
-                    navParent.removeChild(navDiv);
+                    updateElement(navDiv, 'display', expandButtonPressed ? 'none' : '', false);
                     topParent = navParent;
                 }
             }
         }
         // remove grid style
         if (topParent != null) {
-            topParent.style.display = "flex";
+            updateElement(topParent, 'display', expandButtonPressed ? 'flex' : '', false);
         }
         // remove navigation breadcrumbs
         navDiv = document.querySelector("[data-testid='rapidboard-breadcrumbs']")
         if (navDiv != null) {
             let navParent = navDiv.parentNode
             if (navParent != null) {
-                navParent.removeChild(navDiv);
+                updateElement(navDiv, 'display', expandButtonPressed ? 'none' : '', false);
                 topParent = navParent;
             }
         }
@@ -84,24 +89,24 @@
         if (navDiv != null) {
             let navParent = navDiv.parentNode
             if (navParent != null) {
-                navParent.removeChild(navDiv);
+                updateElement(navDiv, 'display', expandButtonPressed ? 'none' : '', false);
                 topParent = navParent;
             }
         }
         // remove top quick filters
         let filters = document.getElementById('ghx-quick-filters');
         if (filters != null) {
-            filters.style.marginBottom = '6px';
+            updateElement(filters, 'margin-bottom', expandButtonPressed ? '6px' : '', false);
             if (filters.childNodes.length == 2) {
                 let subFilter = filters.childNodes[0];
                 let peopleFilter = subFilter.childNodes[1];
                 let quickFilters = filters.childNodes[1];
                 quickFilters.insertBefore(peopleFilter, quickFilters.childNodes[0]); // move people filter before quick filters block
-                filters.removeChild(subFilter);
+                updateElement(subFilter, 'display', expandButtonPressed ? 'none' : '', false);
             } else if (filters.childNodes.length == 1) {
                 let subFilter = filters.childNodes[0];
                 let filterBlockToRemove = subFilter.childNodes[0];
-                subFilter.removeChild(filterBlockToRemove);
+                updateElement(filterBlockToRemove, 'display', expandButtonPressed ? 'none' : '', false);
             }
         }
         // remove insight button
@@ -109,32 +114,64 @@
         if (navDiv != null) {
             let navParent = navDiv.parentNode
             if (navParent != null) {
-                navParent.removeChild(navDiv);
+                updateElement(navDiv, 'display', expandButtonPressed ? 'none' : '', false);
                 topParent = navParent;
             }
         }
         // expand content
-        document.documentElement.style.setProperty('--leftSidebarWidth', '0px');
-        document.getElementById('ghx-work').style.height = `${window.innerHeight - 60}px`;
+        updateElement(document.documentElement, '--leftSidebarWidth', expandButtonPressed ? '0px' : '', true);
+        updateElement(document.getElementById('ghx-work'), 'height', expandButtonPressed ? `${window.innerHeight - 60}px` : '', false);
         const items = Array.from(
             document.getElementsByClassName('ghx-xtra-narrow-card')
         );
         let content = document.getElementById('content');
-        content.style.marginLeft = '6px';
+        updateElement(content, 'margin-left', expandButtonPressed ? '6px' : '', false);
         let poolColumn = document.getElementById('ghx-pool-column');
-        poolColumn.style.paddingRight = '16px';
+        updateElement(poolColumn, 'padding-right', expandButtonPressed ? '16px' : '', false);
         // resize columns' captions
         let captions = document.getElementsByClassName('ghx-column');
         for (let i = 0; i < captions.length; i++) {
             let caption = captions[i];
-            caption.style.padding = '6px';
+            updateElement(caption, 'padding', expandButtonPressed ? '6px' : '', false);
         }
 
         items.forEach(item => {
             // item.style.backgroundColor = 'purple';
-            item.style.padding = '1px';
-            console.log('fix');
+            updateElement(item, 'padding', expandButtonPressed ? '1px' : '', false);
         });
         // console.log('------------------------');
+    }
+
+    function getButtonPressed(button) {
+        const state = button.getAttribute('aria-pressed');
+        return state == 'true';
+    }
+
+    function setButtonPressed(button, pressed) {
+        if (pressed) {
+            button.setAttribute('aria-pressed', 'true');
+            button.setAttribute('class', 'css-370xbg');
+        } else {
+            button.setAttribute('aria-pressed', 'false');
+            button.setAttribute('class', 'css-1f7f0z2');
+        }
+    }
+
+    async function updateElement(element, styleName, newValue, log) {
+        if (newValue != '') {
+            const styleValue = window.getComputedStyle(element).getPropertyValue(styleName);
+            if (log) {
+                console.log(element);
+                console.log('WAS: ' + styleValue + '. NOW: ' + newValue);
+            }
+            element.setAttribute('backup-' + styleName, styleValue);
+            element.style.setProperty(styleName, newValue);
+        } else {
+            const backupStyle = element.getAttribute('backup-' + styleName);
+            if (log) {
+                console.log('WAS: ' + element.style.getPropertyValue(styleName) + '. NOW: ' + backupStyle);
+            }
+            element.style.setProperty(styleName, backupStyle);
+        }
     }
 })();

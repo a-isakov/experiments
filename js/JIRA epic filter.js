@@ -166,17 +166,15 @@
         let epicsButton = document.getElementById('custom_epics_button');
         if (!doFilter) {
             // reset custom button to the initial state
+            setButtonStyle(epicsButton, false);
             epicsButton.setAttribute('epic', '');
-            epicsButton.setAttribute('aria-pressed', 'false');
-            epicsButton.setAttribute('class', 'css-1f7f0z2');
             epicsButton.innerHTML = '<span class="css-178ag6o" style="display: flex; align-self: center;"><img src="https://tinypass.atlassian.net/rest/api/2/universal_avatar/view/type/issuetype/avatar/11407?size=medium" class="_1reo15vq _18m915vq"></img></span>';
         } else {
             // check refresh
             if (epic != null) {
                 // set custom button to the pressed state only when Epic selected from the popup (epic is not null)
+                setButtonStyle(epicsButton, true);
                 epicsButton.setAttribute('epic', epicKey);
-                epicsButton.setAttribute('aria-pressed', 'true');
-                epicsButton.setAttribute('class', 'css-370xbg');
                 epicsButton.innerHTML = '';
                 let span = document.createElement('span');
                 span.setAttribute('class', 'css-178ag6o');
@@ -207,6 +205,16 @@
             } else {
                 card.style.display = doFilter ? 'none' : 'block';
             }
+        }
+    }
+
+    function setButtonStyle(button, pressed) {
+        if (pressed) {
+            button.setAttribute('aria-pressed', 'true');
+            button.setAttribute('class', 'css-370xbg');
+        } else {
+            button.setAttribute('aria-pressed', 'false');
+            button.setAttribute('class', 'css-1f7f0z2');
         }
     }
 })();
