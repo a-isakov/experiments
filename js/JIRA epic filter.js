@@ -20,18 +20,6 @@
     );
 
     function onElement(element) {
-        // create div to handle board refresh
-        const content = document.getElementById('custom_epic_filter');
-        if (content == null) {
-            let boardContainer = document.getElementById('ghx-pool');
-            if (boardContainer != null) {
-                let onceElement = document.createElement('div');
-                onceElement.setAttribute('id', 'custom_epic_filter');
-                onceElement.setAttribute('counter', counter++); // just to reflect updates count
-                boardContainer.appendChild(onceElement);
-                onRefresh();
-            }
-        }
          // append custom button to the quick filters
         const epicsButton = document.getElementById('custom_epics_button');
         if (epicsButton == null) {
@@ -55,6 +43,18 @@
                         }
                     }
                 }
+            }
+        }
+        // create div to handle board refresh
+        const content = document.getElementById('custom_epic_filter');
+        if (content == null) {
+            let boardContainer = document.getElementById('ghx-pool');
+            if (boardContainer != null) {
+                let onceElement = document.createElement('div');
+                onceElement.setAttribute('id', 'custom_epic_filter');
+                onceElement.setAttribute('counter', counter++); // just to reflect updates count
+                boardContainer.appendChild(onceElement);
+                onRefresh();
             }
         }
     }
