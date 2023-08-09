@@ -155,8 +155,10 @@
     // when board refreshed apply the same filter if need
     function onRefresh() {
         const epicsButton = document.getElementById('custom_epics_button');
-        const epicKey = epicsButton.getAttribute('epic');
-        filterEpic(epicKey, null)
+        if (epicsButton != null) {
+            const epicKey = epicsButton.getAttribute('epic');
+            filterEpic(epicKey, null)
+        }
     }
 
     // apply/reset filter

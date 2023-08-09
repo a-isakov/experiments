@@ -96,18 +96,22 @@
         // remove top quick filters
         let filters = document.getElementById('ghx-quick-filters');
         if (filters != null) {
-            updateElement(filters, 'margin-bottom', expandButtonPressed ? '6px' : '', false);
-            // TODO: restore doesn't work properly, need to save original structure somewhere
-            if (filters.childNodes.length == 2) {
-                let subFilter = filters.childNodes[0];
-                let peopleFilter = subFilter.childNodes[1];
-                let quickFilters = filters.childNodes[1];
-                quickFilters.insertBefore(peopleFilter, quickFilters.childNodes[0]); // move people filter before quick filters block
-                updateElement(subFilter, 'display', expandButtonPressed ? 'none' : '', false);
-            } else if (filters.childNodes.length == 1) {
-                let subFilter = filters.childNodes[0];
-                let filterBlockToRemove = subFilter.childNodes[0];
-                updateElement(filterBlockToRemove, 'display', expandButtonPressed ? 'none' : '', false);
+            // check if it has already been modified by this script
+            const modified = filters.getAttribute('focus_modified');
+            if (modified == null || modified == '') {
+                filters.setAttribute('focus_modified', 'true');
+                updateElement(filters, 'margin-bottom', expandButtonPressed ? '6px' : '', false);
+                if (filters.childNodes.length == 2) {
+                    let subFilter = filters.childNodes[0];
+                    let peopleFilter = subFilter.childNodes[1];
+                    let quickFilters = filters.childNodes[1];
+                    quickFilters.insertBefore(peopleFilter, quickFilters.childNodes[0]); // move people filter before quick filters block
+                    updateElement(subFilter, 'display', expandButtonPressed ? 'none' : '', false);
+                } else if (filters.childNodes.length == 1) {
+                    let subFilter = filters.childNodes[0];
+                    let filterBlockToRemove = subFilter.childNodes[0];
+                    updateElement(filterBlockToRemove, 'display', expandButtonPressed ? 'none' : '', false);
+                }
             }
         }
         // remove insight button
