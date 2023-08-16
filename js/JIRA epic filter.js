@@ -32,7 +32,7 @@
                         if (subFilters.length == 2) {
                             let subFilter = subFilters[1]
                             let epicFilterButton = document.createElement('li');
-                            epicFilterButton.className = 'sc-1gvv0kj-0 biXMbB';
+                            epicFilterButton.className = 'sc-1gvv0kj-0 dSGpY';
                             epicFilterButton.innerHTML = '<button epic="" aria-pressed="false" class="css-1f7f0z2" type="button" tabindex="0" id="custom_epics_button"><span style="display: flex; align-self: center;" class="css-178ag6o"><img src="https://tinypass.atlassian.net/rest/api/2/universal_avatar/view/type/issuetype/avatar/11407?size=medium" class="_1reo15vq _18m915vq"></img></span></button>';
                             epicFilterButton.addEventListener('click', function() {
                                 showEpicsList(boardContainer)
