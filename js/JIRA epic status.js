@@ -45,7 +45,7 @@
                     const type = jiraIssue['fields']['issuetype']['id'];
                     if (type == TYPE_EPIC && status != 'Done') {
                         let epicStatusButton = document.createElement('div');
-                        epicStatusButton.innerHTML = '<button id="custom_status_label" aria-label="Close" aria-expanded="false" class="elro8wh1 css-m11wyc" type="button" tabindex="0">Close</button>';
+                        epicStatusButton.innerHTML = '<button id="custom_status_label" aria-label="Close" aria-expanded="false" class="css-1xewsy6" type="button" tabindex="0">Close</button>';
                         epicStatusButton.addEventListener('click', function() {
                             customButtonListener(jiraKey)
                         }, false);
