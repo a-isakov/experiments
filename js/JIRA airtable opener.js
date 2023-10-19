@@ -19,14 +19,14 @@
     waitForKeyElements (
         '<div class="sc-1njt3iw-0 klZhqF">',
         appendAirtableButton
-    );
-
-    async function appendAirtableButton() {
+        );
+        
+        async function appendAirtableButton() {
         const customButton = document.getElementById(FAKE_ID);
         if (customButton != null) {
             return;
         }
-        let statusButton = document.querySelector('[data-test-id="issue.views.issue-base.foundation.status.status-field-wrapper"]');
+        let statusButton = document.querySelector('[data-testid="issue.views.issue-base.foundation.status.status-field-wrapper"]');
         if (statusButton != null) {
             let airTableDiv = document.createElement('div');
             airTableDiv.setAttribute('id', FAKE_ID); // insert unique div to prevent duplicated execution
@@ -35,7 +35,7 @@
 
             // look for airtable ID
             let uniqueProjectCode = '';
-            let uniqueProjectCodeElement = document.querySelector('[data-test-id="issue.views.field.single-line-text-inline-edit.read-view.customfield_14548"]');
+            let uniqueProjectCodeElement = document.querySelector('[data-testid="issue.views.field.single-line-text-inline-edit.read-view.customfield_14548"]');
             if (uniqueProjectCodeElement != null) {
                 uniqueProjectCode = uniqueProjectCodeElement.textContent;
             }

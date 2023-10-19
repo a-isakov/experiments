@@ -30,7 +30,7 @@
         }
         const label = findByText('h2', 'Child issues')
         if (label != null) {
-            let statusButtons = document.querySelector("[data-test-id='issue.views.issue-base.context.status-and-approvals-wrapper.status-and-approval']")
+            let statusButtons = document.querySelector("[data-testid='issue.views.issue-base.context.status-and-approvals-wrapper.status-and-approval']")
             if (statusButtons != null) {
                 let epicStatusElement = document.createElement('div');
                 epicStatusElement.innerHTML = '<span id="custom_status_label" class="sc-1tohg2d-1 diRGjn"/>';
