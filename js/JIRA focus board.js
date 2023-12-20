@@ -99,27 +99,24 @@
                 updateElement(navParent, 'display', expandButtonPressed ? 'none' : '', false);
             }
         }
-        // // remove top quick filters
-        // let filters = document.getElementById('ghx-quick-filters');
-        // if (filters != null) {
-        //     // check if it has already been modified by this script
-        //     const modified = filters.getAttribute('focus_modified');
-        //     if (modified == null || modified == '') {
-        //         filters.setAttribute('focus_modified', 'true');
-        //         updateElement(filters, 'margin-bottom', expandButtonPressed ? '6px' : '', false);
-        //         if (filters.childNodes.length == 2) {
-        //             let subFilter = filters.childNodes[0];
-        //             let peopleFilter = subFilter.childNodes[1];
-        //             let quickFilters = filters.childNodes[1];
-        //             quickFilters.insertBefore(peopleFilter, quickFilters.childNodes[0]); // move people filter before quick filters block
-        //             updateElement(subFilter, 'display', expandButtonPressed ? 'none' : '', false);
-        //         } else if (filters.childNodes.length == 1) {
-        //             let subFilter = filters.childNodes[0];
-        //             let filterBlockToRemove = subFilter.childNodes[0];
-        //             updateElement(filterBlockToRemove, 'display', expandButtonPressed ? 'none' : '', false);
-        //         }
-        //     }
-        // }
+        // remove top quick filters
+        let assigneeFilters = document.querySelector("[data-testid='filters.ui.filters.assignee.stateless.assignee-filter']");
+        let quickFilters = document.querySelector("[data-testid='software-filters.ui.filter-selection-bar.filter-selection-bar']");
+        if (assigneeFilters != null && quickFilters != null)
+        {
+            const modified = quickFilters.getAttribute('focus_modified');
+            if (modified == null || modified == '') {
+                quickFilters.insertBefore(assigneeFilters.childNodes[1], quickFilters.childNodes[1]); // move people filter before quick filters block
+                quickFilters.setAttribute('focus_modified', 'true');
+            }
+            updateElement(quickFilters.parentNode.parentNode.parentNode, 'margin-top', expandButtonPressed ? '0' : '', false);
+            updateElement(quickFilters.parentNode.parentNode, 'margin-top', expandButtonPressed ? '0' : '', false);
+            updateElement(quickFilters.parentNode, 'margin-bottom', expandButtonPressed ? '0' : '', false);
+        }
+        navDiv = document.querySelector("[data-testid='software-board.header.controls-bar']");
+        if (navDiv != null) {
+            updateElement(navDiv, 'display', expandButtonPressed ? 'none' : '', false);
+        }
         // remove insight button
         navDiv = document.querySelector("[data-testid='insights-show-insights-button.ui.button-test-id-hide']");
         if (navDiv != null) {
@@ -147,30 +144,6 @@
         // expand content
         updateElement(document.documentElement, '--leftSidebarWidth', expandButtonPressed ? '0px' : '', false);
         updateElement(document.documentElement, '--topNavigationHeight', expandButtonPressed ? '0px' : '', false);
-        //updateElement(document.getElementById('ghx-work'), 'height', expandButtonPressed ? `${window.innerHeight - 60}px` : '', false);
-        // const items = Array.from(
-        //     document.getElementsByClassName('ghx-xtra-narrow-card')
-        // );
-        // let content = document.getElementById('content');
-        // console.log('===================== content');
-        // console.log(content);
-        // updateElement(content, 'margin-left', expandButtonPressed ? '6px' : '', false);
-        // let poolColumn = document.getElementById('ghx-pool-column');
-        // console.log('===================== poolColumn');
-        // console.log(poolColumn);
-        // updateElement(poolColumn, 'padding-right', expandButtonPressed ? '16px' : '', false);
-        // // resize columns' captions
-        // let captions = document.getElementsByClassName('ghx-column');
-        // for (let i = 0; i < captions.length; i++) {
-        //     let caption = captions[i];
-        //     updateElement(caption, 'padding', expandButtonPressed ? '6px' : '', false);
-        // }
-
-        // items.forEach(item => {
-        //     // item.style.backgroundColor = 'purple';
-        //     updateElement(item, 'padding', expandButtonPressed ? '1px' : '', false);
-        // });
-        // console.log('------------------------');
     }
 
     function getButtonPressed(button) {
