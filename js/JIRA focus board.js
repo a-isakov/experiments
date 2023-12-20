@@ -79,10 +79,22 @@
         if (navDiv != null) {
             updateElement(navDiv, 'display', expandButtonPressed ? 'none' : '', false);
         }
+        navDiv = document.querySelector("[data-fullscreen-id='fullscreen-backlog-breadcrumbs']");
+        if (navDiv != null) {
+            updateElement(navDiv, 'display', expandButtonPressed ? 'none' : '', false);
+        }
         // remove sprint name
         navDiv = document.querySelector("[data-testid='software-board.header.title.container']");
         if (navDiv != null) {
             let navParent = navDiv.parentNode.parentNode;
+            if (navParent != null) {
+                updateElement(navParent, 'display', expandButtonPressed ? 'none' : '', false);
+            }
+        }
+        // remove backlog name
+        navDiv = document.querySelector("[data-testid='platform.ui.fullscreen-button.fullscreen-button']");
+        if (navDiv != null) {
+            let navParent = navDiv.parentNode.parentNode.parentNode.parentNode.parentNode;
             if (navParent != null) {
                 updateElement(navParent, 'display', expandButtonPressed ? 'none' : '', false);
             }
