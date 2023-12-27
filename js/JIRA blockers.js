@@ -14,6 +14,7 @@
 (function () {
     'use strict';
     let links = ['is blocked by', 'Successor'];
+    let linksReverse = ['is blocking', 'Predecessor'];
     let now = new Date();
     const cache_limit_minutes = 120;
     
@@ -114,6 +115,7 @@
                 }
                 for (let z = 0; z < links.length; z++) {
                     if (issuelinks[g]['type'][direction] == links[z]) { // choose necessary Linked issues
+                        // TODO: remove duplication
                         let linkedissue = issuelink[direction + 'Issue'];
                         if (linkedissue != null && direction != '') {
                             let linked_number = issuelink[direction + 'Issue']['key']; // conected task number
@@ -126,12 +128,63 @@
                                 if (check_links == 'done') {
                                     element.innerHTML = '<a  href="https://tinypass.atlassian.net/browse/' + linked_number + '" class="aui-lozenge ghx-label-6" style="text-decoration: line-through; font-size:70%" onclick="windiw.open(\'https://tinypass.atlassian.net/browse/' + linked_number + '\')">' + linked_number + '</a>';
                                 }
-                                card.appendChild(element);
+                                // card.appendChild(element);
+                                let blockersContainer = await getBlockersContainer(card, true);
+                                if (blockersContainer != null) {
+                                    // console.log(blockersContainer);
+                                    blockersContainer.appendChild(element);
+                                }
+                            }
+                        }
+                    } else if (issuelinks[g]['type'][direction] == linksReverse[z]) {
+                        // TODO: remove duplication
+                        // TODO: add right alignment
+                        let linkedissue = issuelink[direction + 'Issue'];
+                        if (linkedissue != null && direction != '') {
+                            let linked_number = issuelink[direction + 'Issue']['key']; // conected task number
+                            if (card != null && card.parentNode.childElementCount > 0) { // create button
+                                let element = document.createElement('div');
+                                let check_links = linkedissue['fields']['status']['statusCategory']['key'];
+                                if (check_links != 'done') {
+                                    element.innerHTML = '<a  href="https://tinypass.atlassian.net/browse/' + linked_number + '" class="aui-lozenge ghx-label-14" style="font-size:70%" onclick="window.open(\'https://tinypass.atlassian.net/browse/' + linked_number + '\')" >' + linked_number + '</a>';
+                                }
+                                if (check_links == 'done') {
+                                    element.innerHTML = '<a  href="https://tinypass.atlassian.net/browse/' + linked_number + '" class="aui-lozenge ghx-label-6" style="text-decoration: line-through; font-size:70%" onclick="windiw.open(\'https://tinypass.atlassian.net/browse/' + linked_number + '\')">' + linked_number + '</a>';
+                                }
+                                // card.appendChild(element);
+                                let blockersContainer = await getBlockersContainer(card, false);
+                                if (blockersContainer != null) {
+                                    // console.log(blockersContainer);
+                                    blockersContainer.appendChild(element);
+                                }
                             }
                         }
                     }
                 }
             }
         }
+    }
+
+    async function getBlockersContainer(card, forBlocker) {
+        let div = card.querySelector("[id='blockers_container']");
+        if (div == null) {
+            let element = document.createElement('div');
+            element.setAttribute('id', 'blockers_container');
+            element.style.setProperty('max-width', 'none');
+            element.style.setProperty('display', 'flex');
+            element.style.setProperty('justify-content', 'space-between');
+            let leftDiv = document.createElement('div');
+            leftDiv.setAttribute('id', 'blockers_container_left');
+            leftDiv.style.setProperty('max-width', '50%');
+            let rightDiv = document.createElement('div');
+            rightDiv.setAttribute('id', 'blockers_container_right');
+            rightDiv.style.setProperty('max-width', '50%');
+            element.appendChild(leftDiv);
+            element.appendChild(rightDiv);
+            card.appendChild(element);
+            div = element;
+        }
+        let blockersContainer = div.querySelector(forBlocker ? "[id='blockers_container_left']" : "[id='blockers_container_right']");
+        return blockersContainer;
     }
 })();
