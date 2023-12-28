@@ -26,10 +26,10 @@
         onElement
     );
 
-    function onElement(element) {
+    async function onElement(element) {
         const content = document.getElementById('custom_highlighter');
         if (content == null) {
-            // let boardContainer = document.getElementById('ghx-pool-wrapper');
+            // old JIRA UI
             let boardContainer = document.getElementById('ghx-pool');
             if (boardContainer != null) {
                 let onceElement = document.createElement('div');
@@ -38,6 +38,10 @@
                 boardContainer.appendChild(onceElement);
                 onRefresh(boardContainer);
             }
+            // new JIRA UI
+            // no way to implement..
+            // wait for 1 second before next review
+            await new Promise(resolve => setTimeout(resolve, 1000));
         }
     }
 
