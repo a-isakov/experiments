@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         JIRA blockers
 // @namespace    http://tampermonkey.net/
-// @version      2
+// @version      2.1
 // @description  hide unnecessary elements
 // @author       You
 // @match        https://tinypass.atlassian.net/jira/*
@@ -49,7 +49,7 @@
         //     }
         // };
         await new Promise(resolve => setTimeout(resolve, 5000));
-        let cards = document.getElementsByClassName("_1e0c1ule _1reo15vq _18m915vq _1bto1l2s _1wyb1crf _k48pni7l _syaz1o15");
+        let cards = document.getElementsByClassName('_1e0c1ule _1reo15vq _18m915vq _1bto1l2s _1wyb1crf _k48pni7l _syaz1o15');
         for (let j = 0; j < cards.length; j++) {
             let card = cards[j];
             const cardKey = card.textContent; // task number
@@ -81,7 +81,7 @@
             flag = true;
         } else {
             jiraIssue = JSON.parse(localStorage.getItem(key));
-            let timing = jiraIssue["time_created"];
+            let timing = jiraIssue['time_created'];
             timing = new Date(timing);
             let different = now - timing;
             let dif = Math.round(different / 60000);
@@ -93,7 +93,7 @@
             const response = await fetch('/rest/api/2/issue/' + key + '?fields=issuelinks');
             if (response.status == 200) {
                 jiraIssue = await response.json();
-                jiraIssue["time_created"] = now;
+                jiraIssue['time_created'] = now;
                 jiraIssue = JSON.stringify(jiraIssue);
                 localStorage.setItem(key, jiraIssue);
             }
@@ -115,56 +115,38 @@
                 }
                 for (let z = 0; z < links.length; z++) {
                     if (issuelinks[g]['type'][direction] == links[z]) { // choose necessary Linked issues
-                        // TODO: remove duplication
-                        let linkedissue = issuelink[direction + 'Issue'];
-                        if (linkedissue != null && direction != '') {
-                            let linked_number = issuelink[direction + 'Issue']['key']; // conected task number
-                            if (card != null && card.parentNode.childElementCount > 0) { // create button
-                                let element = document.createElement('div');
-                                let check_links = linkedissue['fields']['status']['statusCategory']['key'];
-                                if (check_links != 'done') {
-                                    element.innerHTML = '<a  href="https://tinypass.atlassian.net/browse/' + linked_number + '" class="aui-lozenge ghx-label-14" style="font-size:70%" onclick="window.open(\'https://tinypass.atlassian.net/browse/' + linked_number + '\')" >' + linked_number + '</a>';
-                                }
-                                if (check_links == 'done') {
-                                    element.innerHTML = '<a  href="https://tinypass.atlassian.net/browse/' + linked_number + '" class="aui-lozenge ghx-label-6" style="text-decoration: line-through; font-size:70%" onclick="windiw.open(\'https://tinypass.atlassian.net/browse/' + linked_number + '\')">' + linked_number + '</a>';
-                                }
-                                // card.appendChild(element);
-                                let blockersContainer = await getBlockersContainer(card, true);
-                                if (blockersContainer != null) {
-                                    // console.log(blockersContainer);
-                                    blockersContainer.appendChild(element);
-                                }
-                            }
-                        }
+                        await appendLink(card, issuelink, direction, true);
                     } else if (issuelinks[g]['type'][direction] == linksReverse[z]) {
-                        // TODO: remove duplication
-                        // TODO: add right alignment
-                        let linkedissue = issuelink[direction + 'Issue'];
-                        if (linkedissue != null && direction != '') {
-                            let linked_number = issuelink[direction + 'Issue']['key']; // conected task number
-                            if (card != null && card.parentNode.childElementCount > 0) { // create button
-                                let element = document.createElement('div');
-                                let check_links = linkedissue['fields']['status']['statusCategory']['key'];
-                                if (check_links != 'done') {
-                                    element.innerHTML = '<a  href="https://tinypass.atlassian.net/browse/' + linked_number + '" class="aui-lozenge ghx-label-14" style="font-size:70%" onclick="window.open(\'https://tinypass.atlassian.net/browse/' + linked_number + '\')" >' + linked_number + '</a>';
-                                }
-                                if (check_links == 'done') {
-                                    element.innerHTML = '<a  href="https://tinypass.atlassian.net/browse/' + linked_number + '" class="aui-lozenge ghx-label-6" style="text-decoration: line-through; font-size:70%" onclick="windiw.open(\'https://tinypass.atlassian.net/browse/' + linked_number + '\')">' + linked_number + '</a>';
-                                }
-                                // card.appendChild(element);
-                                let blockersContainer = await getBlockersContainer(card, false);
-                                if (blockersContainer != null) {
-                                    // console.log(blockersContainer);
-                                    blockersContainer.appendChild(element);
-                                }
-                            }
-                        }
+                        await appendLink(card, issuelink, direction, false);
                     }
                 }
             }
         }
     }
 
+    // append blocker to the issue card
+    async function appendLink(card, issuelink, direction, forBlocker) {
+        let linkedissue = issuelink[direction + 'Issue'];
+        if (linkedissue != null && direction != '') {
+            let linked_number = issuelink[direction + 'Issue']['key']; // conected task number
+            if (card != null && card.parentNode.childElementCount > 0) { // create button
+                let element = document.createElement('div');
+                let check_links = linkedissue['fields']['status']['statusCategory']['key'];
+                if (check_links != 'done') {
+                    element.innerHTML = '<a  href="https://tinypass.atlassian.net/browse/' + linked_number + '" class="aui-lozenge ghx-label-14" style="font-size:70%" onclick="window.open(\'https://tinypass.atlassian.net/browse/' + linked_number + '\')" >' + linked_number + '</a>';
+                }
+                if (check_links == 'done') {
+                    element.innerHTML = '<a  href="https://tinypass.atlassian.net/browse/' + linked_number + '" class="aui-lozenge ghx-label-6" style="text-decoration: line-through; font-size:70%" onclick="windiw.open(\'https://tinypass.atlassian.net/browse/' + linked_number + '\')">' + linked_number + '</a>';
+                }
+                let blockersContainer = await getBlockersContainer(card, forBlocker);
+                if (blockersContainer != null) {
+                    blockersContainer.appendChild(element);
+                }
+            }
+        }
+    }
+
+    // returns div of the blockers, creates it if need
     async function getBlockersContainer(card, forBlocker) {
         let div = card.querySelector("[id='blockers_container']");
         if (div == null) {
