@@ -28,6 +28,7 @@
         const runFlag = board.getAttribute('custom_blockers_run_flag');
         if (runFlag == null || runFlag != 'true') {
             board.setAttribute('custom_blockers_run_flag', 'true');
+            checkCachedBoard();
             mainLoop();
             board.setAttribute('custom_blockers_run_flag', 'false');
         }
@@ -168,5 +169,10 @@
         }
         let blockersContainer = div.querySelector(forBlocker ? "[id='blockers_container_left']" : "[id='blockers_container_right']");
         return blockersContainer;
+    }
+
+    async function checkCachedBoard() {
+        // @Bito
+        // make rest api call to jira
     }
 })();
