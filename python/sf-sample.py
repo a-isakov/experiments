@@ -67,7 +67,7 @@ def createMeasurementObject(row, period):
     measurement["properties"]["report_name"] = reportName
     return measurement
 
-def sendMeasurements(conn, dateRange):
+def sendMeasurements(conn, apiKey, dateRange):
     for dateItem in dateRange:
         sql = queryText.replace("START_DATE_TO_REPLACE", dateItem[0]).replace("END_DATE_TO_REPLACE", dateItem[1])
         # print(sql)
@@ -87,7 +87,7 @@ def sendMeasurements(conn, dateRange):
         # print(ndjson)
         print(dateItem[0], len(measurements["measurements"]), "measurements")
 
-        headers = {'Content-Type': 'application/x-ndjson', 'x-api-key': '520bfea83a24_secret'}
+        headers = {'Content-Type': 'application/x-ndjson', 'x-api-key': '520bfea83a24_' + apiKey}
         response = requests.post("https://measurements-beta.pa-cd.com/measurements/v1/PIANO", data=ndjson, headers=headers)
         print(response.status_code)
         # print(response)
@@ -110,6 +110,8 @@ dates.append(("2024-02-15", "2024-02-16"))
 dates.append(("2024-02-16", "2024-02-17"))
 dates.append(("2024-02-17", "2024-02-18"))
 
+print("API Key:")
+apiKey = input()
 print("Username:")
 sfUser = input()
 print("Password:")
@@ -125,7 +127,7 @@ try:
         warehouse=sfWarehouse
         )
     # sendMeasurements(conn, [('2023-02-28', '2023-03-01')])
-    sendMeasurements(conn, dates)
+    sendMeasurements(conn, apiKey, dates)
     conn.close()
 
 except:
