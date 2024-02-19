@@ -106,7 +106,9 @@ dates = []
 # endDate = f"{reportYear}-{reportMonth+1:02d}-01"
 # dates.append((startDate, endDate))
 # print(dates)
-dates.append(("2024-02-14", "2024-02-15"))
+dates.append(("2024-02-15", "2024-02-16"))
+dates.append(("2024-02-16", "2024-02-17"))
+dates.append(("2024-02-17", "2024-02-18"))
 
 print("Username:")
 sfUser = input()
