@@ -74,6 +74,7 @@ def sendMeasurements(conn, apiKey, dateRange):
         cursor = conn.cursor()
         cursor.execute(sql)
         results = cursor.fetchall()
+        # prepare object with measurements
         measurements = dict()
         measurements["measurements"] = []
         for row in results:
@@ -82,6 +83,7 @@ def sendMeasurements(conn, apiKey, dateRange):
         cursor.close()
 
         # print("----------------")
+        # format ndjson
         result = [json.dumps(record) for record in measurements["measurements"]]
         ndjson = '\n'.join(result)
         # print(ndjson)
@@ -95,6 +97,7 @@ def sendMeasurements(conn, apiKey, dateRange):
 # reportYear = 2024
 # reportMonth = 2
 dates = []
+# gather days of month into the array
 # for days in range(monthrange(reportYear, reportMonth)[1] - 1):
 #     startDate = f"{reportYear}-{reportMonth:02d}-{days+1:02d}"
 #     endDate = f"{reportYear}-{reportMonth:02d}-{days+2:02d}"
@@ -106,7 +109,8 @@ dates = []
 # endDate = f"{reportYear}-{reportMonth+1:02d}-01"
 # dates.append((startDate, endDate))
 # print(dates)
-dates.append(("2024-02-18", "2024-02-19"))
+# manual array composition
+dates.append(("2024-02-19", "2024-02-20"))
 
 print("API Key:")
 apiKey = input()
@@ -124,7 +128,6 @@ try:
         account='ru86569.eu-west-1',
         warehouse=sfWarehouse
         )
-    # sendMeasurements(conn, [('2023-02-28', '2023-03-01')])
     sendMeasurements(conn, apiKey, dates)
     conn.close()
 
