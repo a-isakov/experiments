@@ -25,12 +25,15 @@
 
     async function checkFlag(element) {
         let board = document.querySelector("[data-onboarding-observer-id='board-wrapper']");
-        const runFlag = board.getAttribute('custom_blockers_run_flag');
-        if (runFlag == null || runFlag != 'true') {
-            board.setAttribute('custom_blockers_run_flag', 'true');
-            checkCachedBoard();
-            mainLoop();
-            board.setAttribute('custom_blockers_run_flag', 'false');
+        if (board != null)
+        {
+            const runFlag = board.getAttribute('custom_blockers_run_flag');
+            if (runFlag == null || runFlag != 'true') {
+                board.setAttribute('custom_blockers_run_flag', 'true');
+                checkCachedBoard();
+                mainLoop();
+                board.setAttribute('custom_blockers_run_flag', 'false');
+            }
         }
     }
 
@@ -56,11 +59,11 @@
             const cardKey = card.textContent; // task number
             let cardContainer = card.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode;
             const cardContainerClass = cardContainer.getAttribute('class');
-            if (cardContainerClass == 'yse7za_content y8i3hb-1 iizotu') {
+            if (cardContainerClass == 'yse7za_content sc-1e1lt9n-1 iAeHCG') {
+                // console.log("==================== " + cardKey);
                 // issue card
                 const blockersProcessed = cardContainer.getAttribute('blockers_processed');
                 if (blockersProcessed == null || blockersProcessed != 'true') {
-                    // console.log("==================== " + cardKey);
                     processIssueCard(cardContainer, cardKey);
                     cardContainer.setAttribute('blockers_processed', 'true');
                 }
