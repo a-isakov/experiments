@@ -11,7 +11,15 @@ WITH stats AS (
         SUBSTRING(QUERY_TAG, POSITION('aid=' in QUERY_TAG)+4, 10) as AID,
         ARRAY_REMOVE_AT(ARRAY_REMOVE_AT(SPLIT(WAREHOUSE_NAME, '_'), 0), 0) as WH_SPLIT,
         WH_SPLIT[ARRAY_SIZE(WH_SPLIT) - 2] as WH_SIZE,
-        TOTAL_ELAPSED_TIME,
+        CASE
+            WHEN WH_SIZE = 'XS' THEN 0.0003
+            WHEN WH_SIZE = 'S'  THEN 0.0006
+            WHEN WH_SIZE = 'M'  THEN 0.0011
+            WHEN WH_SIZE = 'L'  THEN 0.0022
+            WHEN WH_SIZE = 'XL' THEN 0.0044
+            ELSE 0
+        END as CREDITS,
+        (TOTAL_ELAPSED_TIME*CREDITS)*1.65/1000 as USD,
         CASE
             WHEN WAREHOUSE_NAME LIKE 'AI_REPORTS_AB_TEST_%' THEN 'A/B Test'
             WHEN WAREHOUSE_NAME LIKE 'AI_REPORTS_AAM_%' THEN 'AAM'
@@ -28,29 +36,29 @@ WITH stats AS (
             WHEN WAREHOUSE_NAME LIKE 'AI_REPORTS_SUBSCRIPTION_%' THEN 'Subscription Log'
             WHEN WAREHOUSE_NAME LIKE 'AI_REPORTS_SUSPICIOUS_ACTIVITY_%' THEN 'Suspicious Activity'
             ELSE 'Other'
-        END as REPORT_NAME,
-        CASE
-            WHEN WH_SIZE = 'XS' THEN 0.0003
-            WHEN WH_SIZE = 'S'  THEN 0.0006
-            WHEN WH_SIZE = 'M'  THEN 0.0011
-            WHEN WH_SIZE = 'L'  THEN 0.0022
-            WHEN WH_SIZE = 'XL' THEN 0.0044
-            ELSE 0
-        END as CREDITS
+        END as REPORT_NAME
     FROM query_history
     WHERE --START_TIME >= dateadd('day', -1, current_timestamp())
         START_TIME >= 'START_DATE_TO_REPLACE' AND START_TIME < 'END_DATE_TO_REPLACE'
         AND WAREHOUSE_NAME LIKE 'AI_REPORTS_%'
         AND (DATABASE_NAME is not NULL OR WAREHOUSE_NAME LIKE 'AI_REPORTS_LTS_%')
         AND (DATABASE_NAME != 'DCS_MASTER' OR WAREHOUSE_NAME LIKE 'AI_REPORTS_LTS_%')
-        --AND WAREHOUSE_NAME LIKE 'AI_REPORTS_COMPOSER_CONVERSIONS_%' -- TODO: remove from final
-    --LIMIT 10 -- TODO: remove from final
 )
 
-SELECT m.MERCHANT_ID, m.DATABASE_NAME, m.MERCHANT_NAME, s.AID, s.REPORT_NAME, SUM(s.TOTAL_ELAPSED_TIME*s.CREDITS)*1.65/1000 as USD
-FROM stats s JOIN DCS_MASTER.PUBLIC.APPLICATIONS m ON (s.DATABASE_NAME = m.DATABASE_NAME OR s.AID = LOWER(m.AID))
-GROUP BY m.DATABASE_NAME, s.REPORT_NAME, m.MERCHANT_ID, m.MERCHANT_NAME, s.AID
-ORDER BY USD DESC, m.DATABASE_NAME, s.REPORT_NAME;
+SELECT MERCHANT_ID, DATABASE_NAME, MERCHANT_NAME, AID, REPORT_NAME, SUM(USD) as USD
+FROM (
+    SELECT m.MERCHANT_ID, m.DATABASE_NAME, m.MERCHANT_NAME, s.AID, s.REPORT_NAME, s.USD
+    FROM stats s JOIN DCS_MASTER.PUBLIC.MERCHANTS m ON s.DATABASE_NAME = m.DATABASE_NAME
+    WHERE s.DATABASE_NAME is not NULL
+
+    UNION ALL
+    
+    SELECT m.MERCHANT_ID, m.DATABASE_NAME, m.MERCHANT_NAME, s.AID, s.REPORT_NAME, s.USD
+    FROM stats s JOIN DCS_MASTER.PUBLIC.APPLICATIONS m ON s.AID = LOWER(m.AID)
+    WHERE s.DATABASE_NAME is NULL
+)
+GROUP BY DATABASE_NAME, REPORT_NAME, MERCHANT_ID, MERCHANT_NAME, AID
+ORDER BY USD DESC, DATABASE_NAME, REPORT_NAME;
 """
 
 def createMeasurementObject(row, period):
@@ -100,23 +108,33 @@ def sendMeasurements(conn, apiKey, dateRange):
         print(response.status_code)
         # print(response)
 
-reportYear = 2023
-reportMonth = 3
+reportYear = 2024
+reportMonth = 2
 dates = []
 # gather days of month into the array
-for days in range(monthrange(reportYear, reportMonth)[1] - 1):
-    startDate = f"{reportYear}-{reportMonth:02d}-{days+1:02d}"
-    endDate = f"{reportYear}-{reportMonth:02d}-{days+2:02d}"
-    dates.append((startDate, endDate))
-startDate = f"{reportYear}-{reportMonth:02d}-{monthrange(reportYear, reportMonth)[1]:02d}"
-if reportMonth == 12:
-    reportYear += 1
-    reportMonth = 0
-endDate = f"{reportYear}-{reportMonth+1:02d}-01"
-dates.append((startDate, endDate))
+# for days in range(monthrange(reportYear, reportMonth)[1] - 1):
+#     startDate = f"{reportYear}-{reportMonth:02d}-{days+1:02d}"
+#     endDate = f"{reportYear}-{reportMonth:02d}-{days+2:02d}"
+#     dates.append((startDate, endDate))
+# startDate = f"{reportYear}-{reportMonth:02d}-{monthrange(reportYear, reportMonth)[1]:02d}"
+# if reportMonth == 12:
+#     reportYear += 1
+#     reportMonth = 0
+# endDate = f"{reportYear}-{reportMonth+1:02d}-01"
+# dates.append((startDate, endDate))
 # print(dates)
 # manual array composition
-# dates.append(("2023-03-08", "2023-03-09"))
+dates.append(("2023-03-01", "2023-03-02"))
+dates.append(("2023-03-02", "2023-03-03"))
+dates.append(("2023-03-03", "2023-03-04"))
+dates.append(("2023-03-04", "2023-03-05"))
+dates.append(("2023-03-05", "2023-03-06"))
+dates.append(("2023-03-06", "2023-03-07"))
+dates.append(("2023-03-07", "2023-03-08"))
+dates.append(("2023-03-08", "2023-03-09"))
+dates.append(("2023-03-09", "2023-03-10"))
+dates.append(("2023-03-10", "2023-03-11"))
+dates.append(("2023-03-11", "2023-03-12"))
 
 print("API Key:")
 apiKey = input()
