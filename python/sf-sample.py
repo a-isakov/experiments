@@ -37,7 +37,7 @@ WITH stats AS (
             WHEN WAREHOUSE_NAME LIKE 'AI_REPORTS_SUSPICIOUS_ACTIVITY_%' THEN 'Suspicious Activity'
             ELSE 'Other'
         END as REPORT_NAME
-    FROM query_history
+    FROM snowflake.account_usage.query_history
     WHERE --START_TIME >= dateadd('day', -1, current_timestamp())
         START_TIME >= 'START_DATE_TO_REPLACE' AND START_TIME < 'END_DATE_TO_REPLACE'
         AND WAREHOUSE_NAME LIKE 'AI_REPORTS_%'
@@ -82,6 +82,12 @@ def createMeasurementObject(row, period):
     return measurement
 
 def sendMeasurements(conn, apiKey, dateRange):
+    cursorPrepare = conn.cursor()
+    cursorPrepare.execute('USE SECONDARY ROLES ALL;')
+    cursorPrepare.close()
+    cursorPrepare2 = conn.cursor()
+    cursorPrepare2.execute('USE ROLE ACCOUNT_USAGE;')
+    cursorPrepare2.close()
     for dateItem in dateRange:
         sql = queryText.replace("START_DATE_TO_REPLACE", dateItem[0]).replace("END_DATE_TO_REPLACE", dateItem[1])
         # print(sql)
@@ -124,26 +130,28 @@ dates = []
 # dates.append((startDate, endDate))
 # print(dates)
 # manual array composition
-dates.append(("2024-03-18", "2024-03-19"))
+dates.append(("2024-03-19", "2024-03-20"))
 
 print("API Key:")
 apiKey = input()
 print("Username:")
 sfUser = input()
-print("Password:")
-sfPassword = input()
-print("Warehouse:")
-sfWarehouse = input()
+# print("Password:")
+# sfPassword = input()
+# print("Warehouse:")
+# sfWarehouse = input()
+sfWarehouse = 'PIANO_PUBLIC_XS'
 
 try:
     conn = snowflake.connector.connect(
         user=sfUser,
-        password=sfPassword,
+        # password=sfPassword,
+        authenticator='externalbrowser',
         account='ru86569.eu-west-1',
         warehouse=sfWarehouse
         )
     sendMeasurements(conn, apiKey, dates)
     conn.close()
 
-except:
-    print("Error")
+except Exception as err:
+    print("Error: ", err)
