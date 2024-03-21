@@ -86,7 +86,8 @@ def sendMeasurements(conn, apiKey, dateRange):
     cursorPrepare.execute('USE SECONDARY ROLES ALL;')
     cursorPrepare.close()
     cursorPrepare2 = conn.cursor()
-    cursorPrepare2.execute('USE ROLE ACCOUNT_USAGE;')
+    cursorPrepare2.execute('USE ROLE DCS_DEVELOPER;')
+    # cursorPrepare2.execute('USE ROLE ACCOUNT_USAGE;')
     cursorPrepare2.close()
     for dateItem in dateRange:
         sql = queryText.replace("START_DATE_TO_REPLACE", dateItem[0]).replace("END_DATE_TO_REPLACE", dateItem[1])
@@ -130,7 +131,7 @@ dates = []
 # dates.append((startDate, endDate))
 # print(dates)
 # manual array composition
-dates.append(("2024-03-19", "2024-03-20"))
+dates.append(("2024-03-20", "2024-03-21"))
 
 print("API Key:")
 apiKey = input()
