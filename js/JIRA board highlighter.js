@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         JIRA board highlighter
 // @namespace    http://tampermonkey.net/
-// @version      2.0
+// @version      2.1
 // @description  hide unnecessary elements
 // @author       You
 // @match        https://tinypass.atlassian.net/jira/*
@@ -16,12 +16,14 @@
     const delayMin = 2;      // min days to show delays to indicate in green
     const delayMax = 5;      // max days to indicate in red
     const removeDots = true; // remove dots after showing text delays
+    const cache_limit_minutes = 120;
 
     const clickableEpics = true; // enables opening of the epics by clicking on epics name on issue card
 
     let counter = 0;
     let boardCacheChecked = false;
-    let boardCacheLoaded = false;
+
+    const now = new Date();
 
     const cachePrefix = 'duration_';
     const processedCardTag = 'duration_processed';
@@ -44,8 +46,8 @@
                 onRefreshOld(boardContainer);
             } else {
                 // new JIRA UI
-                checkBoardCache();
                 onRefreshNew();
+                checkBoardCache();
             }
             // wait for 1 second before next review
             await new Promise(resolve => setTimeout(resolve, 1000));
@@ -72,33 +74,30 @@
                             const jiraKey = issue['key'];
                             const duration = parseInt(issue['currentTimeInColumnMillis'] / (1000 * 60 * 60 * 24));
                             // store issue duration in cache
-                            localStorage.setItem(cachePrefix + jiraKey, duration);
+                            const cacheObject = {'time': now, 'duration': duration};
+                            localStorage.setItem(cachePrefix + jiraKey, JSON.stringify(cacheObject));
                         }
                     }
-                    boardCacheLoaded = true;
                 }
             }
         }
     }
 
     async function onRefreshNew() {
-        if (boardCacheLoaded) {
-            // console.log('Cache loaded');
-            await new Promise(resolve => setTimeout(resolve, 5000));
-            let cards = document.getElementsByClassName('_1e0c1ule _1reo15vq _18m915vq _1bto1l2s _1wyb1crf _k48pni7l _syaz1o15');
-            for (let j = 0; j < cards.length; j++) {
-                let card = cards[j];
-                const cardKey = card.textContent; // task number
-                if (localStorage.getItem(cachePrefix + cardKey) != null) {
-                    let cardContainer = card.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode;
-                    const cardContainerClass = cardContainer.getAttribute('class');
-                    if (cardContainerClass == 'yse7za_content sc-1e1lt9n-1 iAeHCG') {
-                        // issue card
-                        const blockersProcessed = cardContainer.getAttribute(processedCardTag);
-                        if (blockersProcessed == null || blockersProcessed != 'true') {
-                            processIssueCard(cardContainer, cardKey);
-                            cardContainer.setAttribute(processedCardTag, 'true');
-                        }
+        await new Promise(resolve => setTimeout(resolve, 5000));
+        let cards = document.getElementsByClassName('_1e0c1ule _1reo15vq _18m915vq _1bto1l2s _1wyb1crf _k48pni7l _syaz1o15');
+        for (let j = 0; j < cards.length; j++) {
+            let card = cards[j];
+            const cardKey = card.textContent; // task number
+            if (localStorage.getItem(cachePrefix + cardKey) != null) {
+                let cardContainer = card.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode;
+                const cardContainerClass = cardContainer.getAttribute('class');
+                if (cardContainerClass == 'yse7za_content sc-1e1lt9n-1 iAeHCG') {
+                    // issue card
+                    const blockersProcessed = cardContainer.getAttribute(processedCardTag);
+                    if (blockersProcessed == null || blockersProcessed != 'true') {
+                        processIssueCard(cardContainer, cardKey);
+                        cardContainer.setAttribute(processedCardTag, 'true');
                     }
                 }
             }
@@ -108,22 +107,27 @@
     // add days into JIRA card and hide dots if need
     async function processIssueCard (card, key) {
         if (card != null && card.parentNode.childElementCount > 0) {
-            const daysValue = localStorage.getItem(cachePrefix + key);
-            let element = document.createElement('div');
-            if (daysValue <= delayMax) {
-                element.setAttribute('class', 'aui-lozenge ghx-label-6');
-            } else {
-                element.setAttribute('class', 'aui-lozenge ghx-label-14');
-            }
-            element.setAttribute('style', 'font-size:70%');
-            element.innerHTML = localStorage.getItem(cachePrefix + key) + ' days';
-            card.appendChild(element);
-            // remove dots
-            if (removeDots) {
-                let dotsContainer = card.getElementsByClassName('_4t3i1osq _1e0c1txw _4cvr1h6o _1bah1h6o _zulpv77o')[0];
-                if (dotsContainer != null) {
-                    let dotsContainerParent = dotsContainer.parentNode;
-                    dotsContainerParent.removeChild(dotsContainer);
+            const cacheObject = JSON.parse(localStorage.getItem(cachePrefix + key));
+            const differenceMinutes = parseInt((now - new Date(cacheObject['time'])) / 60000);
+            // put info if cache is not expired
+            if (differenceMinutes < cache_limit_minutes) {
+                const daysValue = cacheObject['duration'];
+                let element = document.createElement('div');
+                if (daysValue <= delayMax) {
+                    element.setAttribute('class', 'aui-lozenge ghx-label-6');
+                } else {
+                    element.setAttribute('class', 'aui-lozenge ghx-label-14');
+                }
+                element.setAttribute('style', 'font-size:80%');
+                element.innerHTML = daysValue + ' days in column';
+                card.appendChild(element);
+                // remove dots
+                if (removeDots) {
+                    let dotsContainer = card.getElementsByClassName('_4t3i1osq _1e0c1txw _4cvr1h6o _1bah1h6o _zulpv77o')[0];
+                    if (dotsContainer != null) {
+                        let dotsContainerParent = dotsContainer.parentNode;
+                        dotsContainerParent.removeChild(dotsContainer);
+                    }
                 }
             }
         }
