@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         JIRA board highlighter
 // @namespace    http://tampermonkey.net/
-// @version      2.1
-// @description  hide unnecessary elements
+// @version      2.2
+// @description  Add days in column as text, make epic clickable
 // @author       You
 // @match        https://tinypass.atlassian.net/jira/*
 // @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
@@ -73,8 +73,13 @@
                             const issue = issues[j];
                             const jiraKey = issue['key'];
                             const duration = parseInt(issue['currentTimeInColumnMillis'] / (1000 * 60 * 60 * 24));
+                            let epic = issue['epic'];
+                            let epicKey = '';
+                            if (epic != null) {
+                                epicKey = epic['key'];
+                            }
                             // store issue duration in cache
-                            const cacheObject = {'time': now, 'duration': duration};
+                            const cacheObject = {'time': now, 'duration': duration, 'epicKey': epicKey};
                             localStorage.setItem(cachePrefix + jiraKey, JSON.stringify(cacheObject));
                         }
                     }
@@ -127,6 +132,22 @@
                     if (dotsContainer != null) {
                         let dotsContainerParent = dotsContainer.parentNode;
                         dotsContainerParent.removeChild(dotsContainer);
+                    }
+                }
+                // make epic clickable
+                if (clickableEpics) {
+                    const epicKey = cacheObject['epicKey'];
+                    if (epicKey != null && epicKey != '') {
+                        let epicContainer = card.getElementsByClassName('l1vxah-0 cKAygz');
+                        console.log(key, epicKey, epicContainer);
+                        if (epicContainer != null) {
+                            let epicSpan = epicContainer[0];
+                            let epicURL = document.createElement('a');
+                            epicURL.setAttribute('href', '/browse/' + epicKey);
+                            epicURL.innerHTML = epicSpan.parentNode.innerHTML;
+                            epicSpan.parentNode.appendChild(epicURL);
+                            epicSpan.parentNode.removeChild(epicSpan);
+                        }
                     }
                 }
             }
