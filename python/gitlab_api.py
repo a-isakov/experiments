@@ -4,11 +4,11 @@ import os.path
 
 HEADERS = {'Accept': 'application/json', 'Content-Type': 'application/json', 'PRIVATE-TOKEN': 'token'}
 GITLAB_URL = 'https://gitlab.com/api/v4/'
-# AUTHOR_NAME = 'Aydar Mukhametshin'
-# AUTHOR_NAME = 'Mikhail Sherstyannikov'
-# AUTHOR_NAME = 'Ildar Timerbaev'
-# AUTHOR_NAME = 'Ilshat Galimov'
-AUTHOR_NAME = 'Ildar Nabiev'
+# AUTHOR_NAME = 'aydar.mukhametshin@piano.io'
+# AUTHOR_NAME = 'mikhail.sherstyannikov@piano.io'
+AUTHOR_NAME = 'ildar.timerbaev@piano.io'
+# AUTHOR_NAME = 'ilshat.galimov@piano.io'
+# AUTHOR_NAME = 'ildar.nabiev@piano.io'
 PROJECTS_FILE = 'projectIds.csv'
 SCAN_FIRST_DATE = '2023-01-01T00:00:00Z'
 PAGE_SIZE = 100
@@ -85,7 +85,7 @@ with open(AUTHOR_NAME + '.csv', 'w', newline='') as csvFile:
         page = 1
         commitsCount = 0
         while True:
-            params = {'since': SCAN_FIRST_DATE, 'author': AUTHOR_NAME, 'per_page': PAGE_SIZE, 'page': page}
+            params = {'since': SCAN_FIRST_DATE, 'per_page': PAGE_SIZE, 'page': page}
             url = GITLAB_URL + 'projects/' + str(projectId) + '/repository/commits'
             response = requests.get(url, params, headers=HEADERS)
             if response.status_code != 200:
@@ -94,7 +94,7 @@ with open(AUTHOR_NAME + '.csv', 'w', newline='') as csvFile:
                 commits = response.json()
                 commitsCount += len(commits)
                 for commit in commits:
-                    if commit['author_name'] == AUTHOR_NAME:
+                    if commit['author_email'].lower() == AUTHOR_NAME:
                         statsTotal = getStatsTotal(projectId, commit['id'])
                         csvWriter.writerow([commit['id'], commit['title'], statsTotal])
                 if len(commits) < PAGE_SIZE:
