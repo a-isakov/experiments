@@ -131,11 +131,7 @@ dates = []
 # dates.append((startDate, endDate))
 # print(dates)
 # manual array composition
-dates.append(("2024-07-03", "2024-07-04"))
-dates.append(("2024-07-04", "2024-07-05"))
-dates.append(("2024-07-05", "2024-07-06"))
-dates.append(("2024-07-06", "2024-07-07"))
-dates.append(("2024-07-07", "2024-07-08"))
+dates.append(("2024-07-08", "2024-07-09"))
 
 print("API Key:")
 apiKey = input()
