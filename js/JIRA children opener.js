@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         JIRA children opener
 // @namespace    http://tampermonkey.net/
-// @version      1
+// @version      1.1
 // @description  enables to open children tasks
 // @author       You
 // @match        https://tinypass.atlassian.net/browse/*
@@ -36,7 +36,7 @@
                 openerDiv.setAttribute('class', '_18u012x7');
 
                 let openerButton = document.createElement('button');
-                openerButton.setAttribute('class', 'css-1michz');
+                openerButton.setAttribute('class', 'css-db1avo');
                 openerButton.setAttribute('type', 'button');
                 openerButton.addEventListener('click', function() {
                     customChildrenOpenListener(sortButton.parentNode.parentNode.parentNode)
