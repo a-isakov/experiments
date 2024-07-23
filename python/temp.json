@@ -1,0 +1,348 @@
+{
+    "apps": {
+            // "u6vAlvTEpe": {
+            //         "siteId": [
+            //                 "631906"
+            //         ],
+            //         "atiUrl": "https://piano-ingest-composer.ati-host.net",
+            //         "exchangeRate": {},
+            //         "disablePageDisplay": false
+            // },
+            // "ZtXqs7r3pe": {
+            //         "siteId": [
+            //                 "623639"
+            //         ],
+            //         "atiUrl": "https://piano-ingest-composer.ati-host.net",
+            //         "exchangeRate": {},
+            //         "disablePageDisplay": false
+            // },
+            // "ZNXdKeRNpe": {
+            //         "siteId": [
+            //                 "632692"
+            //         ],
+            //         "atiUrl": "https://piano-ingest-composer.ati-host.net",
+            //         "exchangeRate": {},
+            //         "disablePageDisplay": false
+            // },
+            // "mlJok1t3pe": {
+            //         "siteId": [
+            //                 "634172"
+            //         ],
+            //         "atiUrl": "https://piano-ingest-composer.ati-host.net",
+            //         "exchangeRate": {},
+            //         "disablePageDisplay": false
+            // },
+            // "E1YRZRkLpe": {
+            //         "siteId": [
+            //                 "634173"
+            //         ],
+            //         "atiUrl": "https://piano-ingest-composer.ati-host.net",
+            //         "exchangeRate": {},
+            //         "disablePageDisplay": false
+            // },
+            // "RaPTdESnpe": {
+            //         "siteId": [
+            //                 "634174"
+            //         ],
+            //         "atiUrl": "https://piano-ingest-composer.ati-host.net",
+            //         "exchangeRate": {},
+            //         "disablePageDisplay": false
+            // },
+            "6uVogX5Gpe": {
+                    "siteId": [
+                            "634543"
+                    ],
+                    "atiUrl": "https://piano-ingest-composer.ati-host.net",
+                    "exchangeRate": {},
+                    "disablePageDisplay": false
+            },
+            "HzezUBlwpe": {
+                    "siteId": [
+                            "634544"
+                    ],
+                    "atiUrl": "https://piano-ingest-composer.ati-host.net",
+                    "exchangeRate": {},
+                    "disablePageDisplay": false
+            },
+            "FYeCBDdBpe": {
+                    "siteId": [
+                            "634858"
+                    ],
+                    "atiUrl": "https://piano-ingest-composer.ati-host.net",
+                    "exchangeRate": {},
+                    "disablePageDisplay": false
+            },
+            "IwtAWGCBpe": {
+                    "siteId": [
+                            "631380"
+                    ],
+                    "atiUrl": "https://piano-ingest-composer.ati-host.net",
+                    "exchangeRate": {},
+                    "disablePageDisplay": true
+            },
+            "vKGbNiYwpe": {
+                    "siteId": [
+                            "632123"
+                    ],
+                    "atiUrl": "https://piano-ingest-composer.ati-host.net",
+                    "exchangeRate": {},
+                    "disablePageDisplay": true
+            },
+            "EJNIOxQppe": {
+                    "siteId": [
+                            "637199"
+                    ],
+                    "atiUrl": "https://piano-ingest-composer.ati-host.net",
+                    "exchangeRate": {},
+                    "disablePageDisplay": false
+            },
+            "3LavoxuLpe": {
+                    "siteId": [
+                            "637200"
+                    ],
+                    "atiUrl": "https://piano-ingest-composer.ati-host.net",
+                    "exchangeRate": {},
+                    "disablePageDisplay": false
+            },
+            "PBFkl8eGpe": {
+                    "siteId": [
+                            "637201"
+                    ],
+                    "atiUrl": "https://piano-ingest-composer.ati-host.net",
+                    "exchangeRate": {},
+                    "disablePageDisplay": false
+            },
+            "K2MpsKrmpe": {
+                    "siteId": [
+                            "625851"
+                    ],
+                    "atiUrl": "https://piano-ingest-composer.ati-host.net",
+                    "exchangeRate": {},
+                    "disablePageDisplay": true
+            },
+            "iFPC4twgpe": {
+                    "siteId": [
+                            "637058"
+                    ],
+                    "atiUrl": "https://piano-ingest-composer.ati-host.net",
+                    "exchangeRate": {},
+                    "disablePageDisplay": true
+            },
+            "p8HiOl0Zpe": {
+                    "siteId": [
+                            "638833"
+                    ],
+                    "atiUrl": "https://piano-ingest-composer.ati-host.net",
+                    "exchangeRate": {},
+                    "disablePageDisplay": true
+            },
+            "oUziPp2Dpe": {
+                    "siteId": [
+                            "635746"
+                    ],
+                    "atiUrl": "https://piano-ingest-composer.ati-host.net",
+                    "exchangeRate": {},
+                    "disablePageDisplay": true
+            },
+            "lzfikWNGpe": {
+                    "siteId": [
+                            "636211"
+                    ],
+                    "atiUrl": "https://piano-ingest-composer.ati-host.net",
+                    "exchangeRate": {},
+                    "disablePageDisplay": true
+            },
+            "Diwhrmfnpe": {
+                    "siteId": [
+                            "638834"
+                    ],
+                    "atiUrl": "https://piano-ingest-composer.ati-host.net",
+                    "exchangeRate": {},
+                    "disablePageDisplay": true
+            },
+            "zFJISk5lpe": {
+                    "siteId": [
+                            "640180"
+                    ],
+                    "atiUrl": "https://piano-ingest-composer.ati-host.net",
+                    "exchangeRate": {},
+                    "disablePageDisplay": true
+            },
+            "bgH67fL3pe": {
+                    "siteId": [
+                            "639125"
+                    ],
+                    "atiUrl": "https://piano-ingest-composer.ati-host.net",
+                    "exchangeRate": {},
+                    "disablePageDisplay": true
+            },
+            "6N1iEZE6pe": {
+                    "siteId": [
+                            "639008"
+                    ],
+                    "atiUrl": "https://piano-ingest-composer.ati-host.net",
+                    "exchangeRate": {},
+                    "disablePageDisplay": true
+            },
+            "aSQFvCGype": {
+                    "siteId": [
+                            "641016"
+                    ],
+                    "atiUrl": "https://piano-ingest-composer.ati-host.net",
+                    "exchangeRate": {},
+                    "disablePageDisplay": false
+            },
+            "YKAHLQGkpe": {
+                    "siteId": [
+                            "638508"
+                    ],
+                    "atiUrl": "https://piano-ingest-composer.ati-host.net",
+                    "exchangeRate": {},
+                    "disablePageDisplay": false
+            },
+            "INnQZ9NQpe": {
+                    "siteId": [
+                            "638472"
+                    ],
+                    "atiUrl": "https://piano-ingest-composer.ati-host.net",
+                    "exchangeRate": {},
+                    "disablePageDisplay": false
+            },
+            "r6Db1E9Rpe": {
+                    "siteId": [
+                            "640770"
+                    ],
+                    "atiUrl": "https://piano-ingest-composer.ati-host.net",
+                    "exchangeRate": {},
+                    "disablePageDisplay": true
+            },
+            "9Vn1VxLype": {
+                    "siteId": [
+                            "640509"
+                    ],
+                    "atiUrl": "https://piano-ingest-composer.ati-host.net",
+                    "exchangeRate": {},
+                    "disablePageDisplay": true
+            },
+            "1ZEDsZzCpe": {
+                    "siteId": [
+                            "640859"
+                    ],
+                    "atiUrl": "https://piano-ingest-composer.ati-host.net",
+                    "exchangeRate": {},
+                    "disablePageDisplay": true
+            },
+            "tugW8mCEpe": {
+                    "siteId": [
+                            "640508"
+                    ],
+                    "atiUrl": "https://piano-ingest-composer.ati-host.net",
+                    "exchangeRate": {},
+                    "disablePageDisplay": true
+            },
+            "juogvTIfpe": {
+                    "siteId": [
+                            "641587"
+                    ],
+                    "atiUrl": "https://piano-ingest-composer.ati-host.net",
+                    "exchangeRate": {},
+                    "disablePageDisplay": true
+            },
+            "ktNmTOYspe": {
+                    "siteId": [
+                            "640510"
+                    ],
+                    "atiUrl": "https://piano-ingest-composer.ati-host.net",
+                    "exchangeRate": {},
+                    "disablePageDisplay": true
+            },
+            "syrBK3STpe": {
+                    "siteId": [
+                            "631994"
+                    ],
+                    "atiUrl": "https://piano-ingest-composer.ati-host.net",
+                    "exchangeRate": {},
+                    "disablePageDisplay": true
+            },
+            "6z3ygKiIpe": {
+                    "siteId": [
+                            "629598"
+                    ],
+                    "atiUrl": "https://piano-ingest-composer.ati-host.net",
+                    "exchangeRate": {},
+                    "disablePageDisplay": true
+            },
+            "jvzcqdpjpe": {
+                    "siteId": [
+                            "642025"
+                    ],
+                    "atiUrl": "https://piano-ingest-composer.ati-host.net",
+                    "exchangeRate": {},
+                    "disablePageDisplay": false
+            },
+            "gw6chPznpe": {
+                    "siteId": [
+                            "639674"
+                    ],
+                    "atiUrl": "https://piano-ingest-composer.ati-host.net",
+                    "exchangeRate": {},
+                    "disablePageDisplay": true
+            },
+            "no2wzsoRpe": {
+                    "siteId": [
+                            "641163"
+                    ],
+                    "atiUrl": "https://piano-ingest-composer.ati-host.net",
+                    "exchangeRate": {},
+                    "disablePageDisplay": true
+            },
+            "HeqVeYpjpe": {
+                    "siteId": [
+                            "641164"
+                    ],
+                    "atiUrl": "https://piano-ingest-composer.ati-host.net",
+                    "exchangeRate": {},
+                    "disablePageDisplay": true
+            },
+            "LzIzyfdspe": {
+                    "siteId": [
+                            "641162"
+                    ],
+                    "atiUrl": "https://piano-ingest-composer.ati-host.net",
+                    "exchangeRate": {},
+                    "disablePageDisplay": true
+            },
+            "Lqjw6Hoype": {
+                    "siteId": [
+                            "641810"
+                    ],
+                    "atiUrl": "https://piano-ingest-composer.ati-host.net",
+                    "exchangeRate": {},
+                    "disablePageDisplay": true
+            },
+            "Ftl4EZNzpe": {
+                    "siteId": [
+                            "641165"
+                    ],
+                    "atiUrl": "https://piano-ingest-composer.ati-host.net",
+                    "exchangeRate": {},
+                    "disablePageDisplay": true
+            },
+            "34PID1aQpe": {
+                    "siteId": [
+                            "637284"
+                    ],
+                    "atiUrl": "https://piano-ingest-composer.ati-host.net",
+                    "exchangeRate": {},
+                    "disablePageDisplay": true
+            },
+            "CeaiTo9Mpe": {
+                    "siteId": [
+                            "588676"
+                    ],
+                    "atiUrl": "https://piano-ingest-composer.ati-host.net",
+                    "exchangeRate": {},
+                    "disablePageDisplay": true
+            }
+    }
+}
