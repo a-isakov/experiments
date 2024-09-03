@@ -111,7 +111,8 @@ def sendMeasurements(conn, apiKey, dateRange):
         print(dateItem[0], len(measurements["measurements"]), "measurements")
 
         headers = {'Content-Type': 'application/x-ndjson', 'x-api-key': '520bfea83a24_' + apiKey}
-        response = requests.post("https://measurements-beta.pa-cd.com/measurements/v1/PIANO", data=ndjson, headers=headers)
+        # response = requests.post("https://measurements-beta.pa-cd.com/measurements/v1/PIANO", data=ndjson, headers=headers)
+        response = requests.post("https://analytics-api-eu.piano.io/import/measurements/v1", data=ndjson, headers=headers)
         print(response.status_code)
         # print(response)
 
@@ -131,7 +132,9 @@ dates = []
 # dates.append((startDate, endDate))
 # print(dates)
 # manual array composition
-dates.append(("2024-08-29", "2024-08-30"))
+dates.append(("2024-08-31", "2024-09-01"))
+dates.append(("2024-09-01", "2024-09-02"))
+dates.append(("2024-09-02", "2024-09-03"))
 
 print("API Key:")
 apiKey = input()
