@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         JIRA board highlighter
 // @namespace    http://tampermonkey.net/
-// @version      2.2
+// @version      2.3
 // @description  Add days in column as text, make epic clickable
 // @author       You
 // @match        https://tinypass.atlassian.net/jira/*
@@ -90,14 +90,16 @@
 
     async function onRefreshNew() {
         await new Promise(resolve => setTimeout(resolve, 5000));
-        let cards = document.getElementsByClassName('_1e0c1ule _1reo15vq _18m915vq _1bto1l2s _1wyb1crf _k48pni7l _syaz1o15');
+        // looking for spans with task number
+        let cards = document.getElementsByClassName('_1e0c1ule _1reo15vq _18m915vq _1bto1l2s _11c8qk37 _k48pni7l _syaz1o15');
         for (let j = 0; j < cards.length; j++) {
             let card = cards[j];
             const cardKey = card.textContent; // task number
             if (localStorage.getItem(cachePrefix + cardKey) != null) {
                 let cardContainer = card.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode;
                 const cardContainerClass = cardContainer.getAttribute('class');
-                if (cardContainerClass == 'yse7za_content sc-1e1lt9n-1 iAeHCG') {
+                // going to the card plate
+                if (cardContainerClass == '_vchhusvi _1e0c1txw _2lx21bp4 _1yt4utpp _7y2iu2gc _12tyidpf yse7za_content') {
                     // issue card
                     const blockersProcessed = cardContainer.getAttribute(processedCardTag);
                     if (blockersProcessed == null || blockersProcessed != 'true') {
