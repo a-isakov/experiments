@@ -62,7 +62,7 @@
             const cardContainerClass = cardContainer.getAttribute('class');
             // going to the card plate
             if (cardContainerClass == '_vchhusvi _1e0c1txw _2lx21bp4 _1yt4utpp _7y2iu2gc _12tyidpf yse7za_content') {
-                console.log("==================== " + cardKey);
+                // console.log("==================== " + cardKey);
                 // issue card
                 const blockersProcessed = cardContainer.getAttribute('blockers_processed');
                 if (blockersProcessed == null || blockersProcessed != 'true') {
