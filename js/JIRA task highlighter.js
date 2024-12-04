@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         JIRA task highlighter
 // @namespace    http://tampermonkey.net/
-// @version      1.1
+// @version      1.2
 // @description  removes unnecessary parts
 // @author       You
 // @match        https://tinypass.atlassian.net/browse/*
@@ -17,11 +17,16 @@
 
     waitForKeyElements (
         '<div class="css-k9aspw">',
-        removeSparkConversationMessage
+        removeUselessPanels
     );
 
-    async function removeSparkConversationMessage() {
-        let messageBlocks = document.getElementsByClassName('css-k9aspw');
+    async function removeUselessPanels() {
+        removeItemsWithClass('css-k9aspw'); // removes info block when no comments
+        removeItemsWithClass('css-dt3vb'); // removes panel with text "You're in a company-managed project"
+    }
+
+    async function removeItemsWithClass(className) {
+        let messageBlocks = document.getElementsByClassName(className);
         for (let j = 0; j < messageBlocks.length; j++) {
             let messageBlock = messageBlocks[j];
             let parent = messageBlock.parentNode;
