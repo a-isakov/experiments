@@ -115,7 +115,7 @@
 
     async function getChild(node, level, path) {
         let child = node;
-        for (i = 0; i < level; i++) {
+        for (let i = 0; i < level; i++) {
             const childPosition = path[i];
             if (childPosition > child.childNodes.length - 1) {
                 // check array index
