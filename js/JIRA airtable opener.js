@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         JIRA airtable opener
 // @namespace    http://tampermonkey.net/
-// @version      1.1
+// @version      1.2
 // @description  enables to open airtable record
 // @author       You
 // @match        https://tinypass.atlassian.net/browse/*
@@ -19,9 +19,9 @@
     waitForKeyElements (
         '<div class="sc-1njt3iw-0 klZhqF">',
         appendAirtableButton
-        );
+    );
         
-        async function appendAirtableButton() {
+    async function appendAirtableButton() {
         const customButton = document.getElementById(FAKE_ID);
         if (customButton != null) {
             return;
@@ -43,7 +43,7 @@
             // if found add reference
             if (uniqueProjectCode != '') {
                 let airTableButton = document.createElement('button');
-                airTableButton.setAttribute('class', 'css-1l34k60'); // copied from button in the same screen
+                airTableButton.setAttribute('class', await getStyle()); // copied from button in the same screen
                 airTableButton.setAttribute('type', 'button');
                 airTableButton.setAttribute('onclick', 'window.open(\'https://airtable.com/appvIpUKeCZPt2kAq/tbllPW0bNpMusk8Ss/viwDIHGD8fwIU2FS4/' + uniqueProjectCode + '?blocks=hide\')');
                 // airTableButton.innerHTML += 'Airtable <svg width="16" height="16" viewBox="0 0 13 13" fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" xmlns="http://www.w3.org/2000/svg"><path d="M5.99751 5L10.4975 5C10.7737 5 10.9975 5.22386 10.9975 5.5L10.9975 10C10.9975 10.2761 10.7737 10.5 10.4975 10.5C10.2214 10.5 9.99751 10.2761 9.99751 10L9.99751 6.70711L4.48711 12.2175L3.78 11.5104L9.29041 6L5.99751 6C5.72137 6 5.49751 5.77614 5.49751 5.5C5.49751 5.22386 5.72137 5 5.99751 5Z"></path></svg>';
@@ -51,5 +51,14 @@
                 airTableDiv.appendChild(airTableButton);
             }
         }
+    }
+
+    async function getStyle() {
+        let style = 'css-1979g2e'; // fallback style
+        const addButton = document.querySelector('[data-testid="issue-view-foundation.quick-add.quick-add-items-compact.add-button-dropdown--trigger"]');
+        if (addButton != null) {
+            style = addButton.getAttribute('class');
+        }
+        return style;
     }
 })();
