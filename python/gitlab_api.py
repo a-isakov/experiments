@@ -95,12 +95,12 @@ for projectId in projectIds:
         continue
 
     with open(reportFilePath, 'w', newline='') as csvFile:
-        print(counter, 'Project ID', projectId, end='')
+        print(counter, 'Project ID', projectId, end='', flush=True)
         csvWriter = csv.writer(csvFile, delimiter=',', dialect='excel')
         page = 1
         commitsCount = 0
         while True:
-            print(".", end='', sep='')
+            print(".", end='', sep='', flush=True)
             params = {'since': SCAN_FIRST_DATE, 'per_page': PAGE_SIZE, 'page': page}
             url = GITLAB_URL + 'projects/' + str(projectId) + '/repository/commits'
             response = requests.get(url, params, headers=HEADERS)
@@ -128,7 +128,7 @@ for projectId in projectIds:
                     break
             page += 1
         csvFile.close()
-        print('commits:', commitsCount)
+        print('commits:', commitsCount, flush=True)
 
 # print('Finished with', AUTHOR_NAME + '.csv')
 print('Finished with', REPORT_NAME + '.csv')
