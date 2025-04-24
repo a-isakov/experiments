@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         JIRA task highlighter
 // @namespace    http://tampermonkey.net/
-// @version      1.3
+// @version      1.4
 // @description  removes unnecessary parts
 // @author       You
 // @match        https://tinypass.atlassian.net/browse/*
@@ -23,6 +23,7 @@
     async function removeUselessPanels() {
         removeItemsWithClass('css-1k3wdpm'); // removes info block when no comments
         removeItemsWithClass('_19itglyw _vchhusvi _r06hglyw _1q51u2gc _85i5pxbi _bozgu2gc _y4tiu2gc _kqswh2mm'); // removes panel with text "You're in a company-managed project"
+        removeItemsWithClass('_ca0qutpp _u5f3utpp _n3tdutpp _19bvutpp _7myae4h9 _1sw7nqa1 _qgnumuej _bfhkhp5a'); // removes panel with text "Give feedback on the new navigation"
     }
 
     async function removeItemsWithClass(className) {

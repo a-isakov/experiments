@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         JIRA focus board
 // @namespace    http://tampermonkey.net/
-// @version      2.2
+// @version      2.3
 // @description  hide unnecessary elements
 // @author       You
 // @match        https://tinypass.atlassian.net/jira/*
@@ -45,28 +45,32 @@
 
     function getButtonStyle() {
         let className = '_uiztglyw'; // fallback style
-        //take release button
-        const releaseButton = document.querySelector("[data-testid='software-board.header.release-version.trigger']");
-        if (releaseButton != null) {
-            className = releaseButton.getAttribute('class');
+        // take standard expand button
+        const expandButton = document.querySelector("[data-testid='platform.ui.fullscreen-button.fullscreen-button']");
+        if (expandButton != null) {
+            className = expandButton.getAttribute('class');
+            // console.log("expandButton");
         } else {
-            //take sprint button
-            const sprintButton = document.querySelector("[data-testid='software-board.header.complete-sprint-button']");
-            if (sprintButton != null) {
-                className = sprintButton.getAttribute('class');
+            //take release button
+            const releaseButton = document.querySelector("[data-testid='software-board.header.release-version.trigger']");
+            if (releaseButton != null) {
+                className = releaseButton.getAttribute('class');
+                // console.log("releaseButton");
             } else {
-                //take config button
-                let configButton = document.querySelector("[data-testid='software-view-settings.ui.view-settings-button.responsive-button.expanded']");
-                if (configButton == null) {
-                    configButton = document.querySelector("[data-testid='software-view-settings.ui.view-settings-button.responsive-button.collapsed']");
-                }
-                if (configButton != null) {
-                    className = configButton.getAttribute('class');
+                //take sprint button
+                const sprintButton = document.querySelector("[data-testid='software-board.header.complete-sprint-button']");
+                if (sprintButton != null) {
+                    className = sprintButton.getAttribute('class');
+                    // console.log("sprintButton");
                 } else {
-                    // take standard expand button
-                    const sprintButton = document.querySelector("[data-testid='platform.ui.fullscreen-button.fullscreen-button']");
-                    if (sprintButton != null) {
-                        className = sprintButton.getAttribute('class');
+                    //take config button
+                    let configButton = document.querySelector("[data-testid='software-view-settings.ui.view-settings-button.responsive-button.expanded']");
+                    if (configButton == null) {
+                        configButton = document.querySelector("[data-testid='software-view-settings.ui.view-settings-button.responsive-button.collapsed']");
+                    }
+                    if (configButton != null) {
+                        className = configButton.getAttribute('class');
+                        // console.log("configButton");
                     }
                 }
             }
@@ -80,100 +84,136 @@
         expandButtonPressed = !expandButtonPressed; // invert state after hitting the button
         setButtonPressed(expandButton, expandButtonPressed);
 
+        let newNavigation = false;
         let topParent = null
-        // remove left sidebar
-        let navDiv = document.getElementById('ak-side-navigation');
+        // remove left sidebar (new navigation)
+        let navDiv = document.querySelector("[data-testid='page-layout.sidebar']");
+        if (navDiv != null) {
+            updateElement(navDiv, 'display', expandButtonPressed ? 'none' : '', false);
+            newNavigation = true;
+        }
+        // remove left sidebar (old navigation)
+        navDiv = document.getElementById('ak-side-navigation');
         if (navDiv != null) {
             navDiv = navDiv.parentNode
             if (navDiv != null) {
                 updateElement(navDiv, 'display', expandButtonPressed ? 'none' : '', false);
             }
         }
-        // remove top menu
-        navDiv = document.getElementById('ak-jira-navigation');
-        if (navDiv != null) {
-            navDiv = navDiv.parentNode
+        if (newNavigation) {
+            // new navigation
+            // remove left sidebar splitter
+            navDiv = document.querySelector("[data-testid='page-container-v2.common.ui.sidebar.panel-splitter']");
             if (navDiv != null) {
-                let navParent = navDiv.parentNode;
-                if (navParent != null) {
-                    updateElement(navDiv, 'display', expandButtonPressed ? 'none' : '', false);
+                updateElement(navDiv, 'display', expandButtonPressed ? 'none' : '', false);
+            }
+            // // remove top menu
+            // navDiv = document.getElementById('element-:r0:');
+            // if (navDiv != null) {
+            //     updateElement(navDiv, 'display', expandButtonPressed ? 'none' : '', false);
+            //     // updateElement(navDiv, '--n_tbrM', expandButtonPressed ? '0px' : '', false);
+            //     // --n_tbrM: 48px;
+            // }
+            // remove project level navigation
+            navDiv = document.getElementById('ak-project-view-navigation');
+            if (navDiv != null) {
+                updateElement(navDiv, 'display', expandButtonPressed ? 'none' : '', false);
+            }
+            // remove buttons in the top right corner of the page
+            navDiv = document.querySelector("[data-testid='software-board.header.menu.icon-button']");
+            if (navDiv != null) {
+                navDiv = navDiv.parentNode.parentNode;
+                updateElement(navDiv, 'display', expandButtonPressed ? 'none' : '', false);
+            }
+            // TODO: move filters and hide top filter buttons
+        } else {
+            // old navigation
+            // remove top menu
+            navDiv = document.getElementById('ak-jira-navigation');
+            if (navDiv != null) {
+                navDiv = navDiv.parentNode
+                if (navDiv != null) {
+                    let navParent = navDiv.parentNode;
+                    if (navParent != null) {
+                        updateElement(navDiv, 'display', expandButtonPressed ? 'none' : '', false);
+                    }
                 }
             }
-        }
-        // remove grid style
-        if (topParent != null) {
-            updateElement(topParent, 'display', expandButtonPressed ? 'flex' : '', false);
-        }
-        // remove navigation breadcrumbs
-        navDiv = document.querySelector("[data-fullscreen-id='fullscreen-board-breadcrumbs']");
-        if (navDiv != null) {
-            updateElement(navDiv, 'display', expandButtonPressed ? 'none' : '', false);
-        }
-        navDiv = document.querySelector("[data-fullscreen-id='fullscreen-backlog-breadcrumbs']");
-        if (navDiv != null) {
-            updateElement(navDiv, 'display', expandButtonPressed ? 'none' : '', false);
-        }
-        // remove sprint name
-        navDiv = document.querySelector("[data-testid='software-board.header.title.container']");
-        if (navDiv != null) {
-            let navParent = navDiv.parentNode.parentNode;
-            if (navParent != null) {
-                updateElement(navParent, 'display', expandButtonPressed ? 'none' : '', false);
+            // remove grid style
+            if (topParent != null) {
+                updateElement(topParent, 'display', expandButtonPressed ? 'flex' : '', false);
             }
-        }
-        // remove backlog name
-        navDiv = document.querySelector("[data-testid='platform.ui.fullscreen-button.fullscreen-button']");
-        if (navDiv != null) {
-            let navParent = navDiv.parentNode.parentNode.parentNode.parentNode.parentNode;
-            if (navParent != null) {
-                updateElement(navParent, 'display', expandButtonPressed ? 'none' : '', false);
+            // remove navigation breadcrumbs
+            navDiv = document.querySelector("[data-fullscreen-id='fullscreen-board-breadcrumbs']");
+            if (navDiv != null) {
+                updateElement(navDiv, 'display', expandButtonPressed ? 'none' : '', false);
             }
-        }
-        // remove top quick filters
-        let assigneeFilters = document.querySelector("[data-testid='filters.ui.filters.assignee.stateless.assignee-filter']");
-        let quickFilters = document.querySelector("[data-testid='software-filters.ui.filter-selection-bar.filter-selection-bar']");
-        if (assigneeFilters != null && quickFilters != null)
-        {
-            const modified = quickFilters.getAttribute('focus_modified');
-            if (modified == null || modified == '') {
-                quickFilters.insertBefore(assigneeFilters.childNodes[1], quickFilters.childNodes[1]); // move people filter before quick filters block
-                quickFilters.setAttribute('focus_modified', 'true');
+            navDiv = document.querySelector("[data-fullscreen-id='fullscreen-backlog-breadcrumbs']");
+            if (navDiv != null) {
+                updateElement(navDiv, 'display', expandButtonPressed ? 'none' : '', false);
             }
-            updateElement(quickFilters.parentNode.parentNode.parentNode, 'margin-top', expandButtonPressed ? '0' : '', false);
-            updateElement(quickFilters.parentNode.parentNode, 'margin-top', expandButtonPressed ? '0' : '', false);
-            updateElement(quickFilters.parentNode, 'margin-bottom', expandButtonPressed ? '0' : '', false);
-        }
-        navDiv = document.querySelector("[data-testid='software-board.header.controls-bar']");
-        if (navDiv != null) {
-            updateElement(navDiv, 'display', expandButtonPressed ? 'none' : '', false);
-        }
-        // remove insight button
-        navDiv = document.querySelector("[data-testid='insights-show-insights-button.ui.button-test-id-hide']");
-        if (navDiv != null) {
-            let navParent = navDiv.parentNode.parentNode.parentNode.parentNode;
-            if (navParent != null) {
-                updateElement(navParent, 'display', expandButtonPressed ? 'none' : '', false);
+            // remove sprint name
+            navDiv = document.querySelector("[data-testid='software-board.header.title.container']");
+            if (navDiv != null) {
+                let navParent = navDiv.parentNode.parentNode;
+                if (navParent != null) {
+                    updateElement(navParent, 'display', expandButtonPressed ? 'none' : '', false);
+                }
             }
-        }
-        // remove small settings button
-        navDiv = document.querySelector("[data-testid='software-view-settings.ui.small-button']");
-        if (navDiv != null) {
-            let navParent = navDiv.parentNode.parentNode;
-            if (navParent != null) {
-                updateElement(navParent, 'display', expandButtonPressed ? 'none' : '', false);
+            // remove backlog name
+            navDiv = document.querySelector("[data-testid='platform.ui.fullscreen-button.fullscreen-button']");
+            if (navDiv != null) {
+                let navParent = navDiv.parentNode.parentNode.parentNode.parentNode.parentNode;
+                if (navParent != null) {
+                    updateElement(navParent, 'display', expandButtonPressed ? 'none' : '', false);
+                }
             }
-        }
-        // remove big settings button
-        navDiv = document.querySelector("[data-testid='software-view-settings.ui.large-button']");
-        if (navDiv != null) {
-            let navParent = navDiv.parentNode.parentNode;
-            if (navParent != null) {
-                updateElement(navParent, 'display', expandButtonPressed ? 'none' : '', false);
+            // remove top quick filters
+            let assigneeFilters = document.querySelector("[data-testid='filters.ui.filters.assignee.stateless.assignee-filter']");
+            let quickFilters = document.querySelector("[data-testid='software-filters.ui.filter-selection-bar.filter-selection-bar']");
+            if (assigneeFilters != null && quickFilters != null)
+            {
+                const modified = quickFilters.getAttribute('focus_modified');
+                if (modified == null || modified == '') {
+                    quickFilters.insertBefore(assigneeFilters.childNodes[1], quickFilters.childNodes[1]); // move people filter before quick filters block
+                    quickFilters.setAttribute('focus_modified', 'true');
+                }
+                updateElement(quickFilters.parentNode.parentNode.parentNode, 'margin-top', expandButtonPressed ? '0' : '', false);
+                updateElement(quickFilters.parentNode.parentNode, 'margin-top', expandButtonPressed ? '0' : '', false);
+                updateElement(quickFilters.parentNode, 'margin-bottom', expandButtonPressed ? '0' : '', false);
             }
+            navDiv = document.querySelector("[data-testid='software-board.header.controls-bar']");
+            if (navDiv != null) {
+                updateElement(navDiv, 'display', expandButtonPressed ? 'none' : '', false);
+            }
+            // remove insight button
+            navDiv = document.querySelector("[data-testid='insights-show-insights-button.ui.button-test-id-hide']");
+            if (navDiv != null) {
+                let navParent = navDiv.parentNode.parentNode.parentNode.parentNode;
+                if (navParent != null) {
+                    updateElement(navParent, 'display', expandButtonPressed ? 'none' : '', false);
+                }
+            }
+            // remove small settings button
+            navDiv = document.querySelector("[data-testid='software-view-settings.ui.small-button']");
+            if (navDiv != null) {
+                let navParent = navDiv.parentNode.parentNode;
+                if (navParent != null) {
+                    updateElement(navParent, 'display', expandButtonPressed ? 'none' : '', false);
+                }
+            }
+            // remove big settings button
+            navDiv = document.querySelector("[data-testid='software-view-settings.ui.large-button']");
+            if (navDiv != null) {
+                let navParent = navDiv.parentNode.parentNode;
+                if (navParent != null) {
+                    updateElement(navParent, 'display', expandButtonPressed ? 'none' : '', false);
+                }
+            }
+            // expand content
+            updateElement(document.documentElement, '--leftSidebarWidth', expandButtonPressed ? '0px' : '', false);
+            updateElement(document.documentElement, '--topNavigationHeight', expandButtonPressed ? '0px' : '', false);
         }
-        // expand content
-        updateElement(document.documentElement, '--leftSidebarWidth', expandButtonPressed ? '0px' : '', false);
-        updateElement(document.documentElement, '--topNavigationHeight', expandButtonPressed ? '0px' : '', false);
     }
 
     function getButtonPressed(button) {

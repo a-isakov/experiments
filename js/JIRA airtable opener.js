@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         JIRA airtable opener
 // @namespace    http://tampermonkey.net/
-// @version      1.2
+// @version      1.3
 // @description  enables to open airtable record
 // @author       You
 // @match        https://tinypass.atlassian.net/browse/*
@@ -35,7 +35,11 @@
 
             // look for airtable ID
             let uniqueProjectCode = '';
-            let uniqueProjectCodeElement = document.querySelector('[data-testid="issue.views.field.single-line-text-inline-edit.read-view.customfield_14548"]');
+            let uniqueProjectCodeElement = document.querySelector('[data-testid="issue.views.field.single-line-text.read-view.customfield_14548"]');
+            if (uniqueProjectCodeElement == null) {
+                // old navigation style support
+                uniqueProjectCodeElement = document.querySelector('[data-testid="issue.views.field.single-line-text-inline-edit.read-view.customfield_14548"]');
+            }
             if (uniqueProjectCodeElement != null) {
                 uniqueProjectCode = uniqueProjectCodeElement.textContent;
             }
