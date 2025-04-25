@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         JIRA focus board
 // @namespace    http://tampermonkey.net/
-// @version      2.3
+// @version      2.4
 // @description  hide unnecessary elements
 // @author       You
 // @match        https://tinypass.atlassian.net/jira/*
@@ -107,13 +107,26 @@
             if (navDiv != null) {
                 updateElement(navDiv, 'display', expandButtonPressed ? 'none' : '', false);
             }
-            // // remove top menu
-            // navDiv = document.getElementById('element-:r0:');
-            // if (navDiv != null) {
-            //     updateElement(navDiv, 'display', expandButtonPressed ? 'none' : '', false);
-            //     // updateElement(navDiv, '--n_tbrM', expandButtonPressed ? '0px' : '', false);
-            //     // --n_tbrM: 48px;
-            // }
+            // remove top menu
+            navDiv = document.querySelector("[data-testid='page-layout.top-nav']");
+            if (navDiv != null) {
+                updateElement(navDiv, 'display', expandButtonPressed ? 'none' : '', false);
+                if (expandButtonPressed) {
+                    let styleToRemove = null;
+                    navDiv.childNodes.forEach(child => {
+                        if (child.innerHTML.indexOf("--n_tbrM: 48px") != -1) {
+                            styleToRemove = child;
+                        }
+                    });
+                    if (styleToRemove != null) {
+                        navDiv.removeChild(styleToRemove);
+                    }
+                } else {
+                    let styleToReturn = document.createElement('style');
+                    styleToReturn.innerHTML = "#unsafe-design-system-page-layout-root { --n_tbrM: 48px }";
+                    navDiv.appendChild(styleToReturn);
+                }
+            }
             // remove project level navigation
             navDiv = document.getElementById('ak-project-view-navigation');
             if (navDiv != null) {
@@ -125,7 +138,19 @@
                 navDiv = navDiv.parentNode.parentNode;
                 updateElement(navDiv, 'display', expandButtonPressed ? 'none' : '', false);
             }
-            // TODO: move filters and hide top filter buttons
+            // remove top quick filters
+            let assigneeFilters = document.querySelector("[data-testid='filters.ui.filters.assignee.stateless.assignee-filter']");
+            let quickFilters = document.querySelector("[data-testid='software-filters.ui.filter-selection-bar.filter-selection-bar']");
+            if (assigneeFilters != null && quickFilters != null)
+            {
+                let assigneeFiltersParent = assigneeFilters.parentNode;
+                const modified = quickFilters.getAttribute('focus_modified');
+                if (modified == null || modified == '') {
+                    quickFilters.insertBefore(assigneeFilters.childNodes[1], quickFilters.childNodes[1]); // move people filter before quick filters block
+                    quickFilters.setAttribute('focus_modified', 'true');
+                }
+                updateElement(assigneeFiltersParent, 'display', expandButtonPressed ? 'none' : '', false);
+            }
         } else {
             // old navigation
             // remove top menu
