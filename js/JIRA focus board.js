@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         JIRA focus board
 // @namespace    http://tampermonkey.net/
-// @version      2.4
+// @version      2.5
 // @description  hide unnecessary elements
 // @author       You
 // @match        https://tinypass.atlassian.net/jira/*
@@ -150,6 +150,11 @@
                     quickFilters.setAttribute('focus_modified', 'true');
                 }
                 updateElement(assigneeFiltersParent, 'display', expandButtonPressed ? 'none' : '', false);
+            }
+            // remove settings button
+            navDiv = document.querySelector("[data-testid='horizontal-nav-page-topbar.ui.horizontal-nav-page-topbar']");
+            if (navDiv != null) {
+                updateElement(navDiv, 'display', expandButtonPressed ? 'none' : '', false);
             }
         } else {
             // old navigation
