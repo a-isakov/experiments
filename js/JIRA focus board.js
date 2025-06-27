@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         JIRA focus board
 // @namespace    http://tampermonkey.net/
-// @version      2.5
+// @version      2.6
 // @description  hide unnecessary elements
 // @author       You
 // @match        https://tinypass.atlassian.net/jira/*
@@ -111,10 +111,11 @@
             navDiv = document.querySelector("[data-testid='page-layout.top-nav']");
             if (navDiv != null) {
                 updateElement(navDiv, 'display', expandButtonPressed ? 'none' : '', false);
+                const extraStyle = '--n_tNvM';
                 if (expandButtonPressed) {
                     let styleToRemove = null;
                     navDiv.childNodes.forEach(child => {
-                        if (child.innerHTML.indexOf("--n_tbrM: 48px") != -1) {
+                        if (child.innerHTML.indexOf(extraStyle + ": 48px") != -1) {
                             styleToRemove = child;
                         }
                     });
@@ -123,7 +124,7 @@
                     }
                 } else {
                     let styleToReturn = document.createElement('style');
-                    styleToReturn.innerHTML = "#unsafe-design-system-page-layout-root { --n_tbrM: 48px }";
+                    styleToReturn.innerHTML = "#unsafe-design-system-page-layout-root { " + extraStyle + ": 48px }";
                     navDiv.appendChild(styleToReturn);
                 }
             }
@@ -156,6 +157,9 @@
             if (navDiv != null) {
                 updateElement(navDiv, 'display', expandButtonPressed ? 'none' : '', false);
             }
+            // remove extra space from the quick filters
+            navDiv = document.querySelector("[data-testid='software-board.header.controls-bar']");
+            updateElement(navDiv.parentNode.parentNode, 'padding-top', expandButtonPressed ? '0' : '', false);
         } else {
             // old navigation
             // remove top menu
