@@ -24,10 +24,17 @@ headers = {
 def get_whos_out(date_from, date_to):
     """Gets list of employees who are out on the specified date"""
     try:
+        # response = requests.get(
+        #     f"{base_url}/meta/lists",
+        #     headers=headers
+        #     # params={"start": date_from, "end": date_to, "location": "all"}
+        # )
+        # response.raise_for_status()
+        # print(response.json())
         response = requests.get(
             f"{base_url}/time_off/whos_out",
             headers=headers,
-            params={"start": date_from, "end": date_to, "location": "all"}
+            params={"start": date_from, "end": date_to, "option": "all"}
         )
         response.raise_for_status()
         return response.json()
