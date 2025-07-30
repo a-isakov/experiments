@@ -42,21 +42,36 @@ def get_whos_out(date_from, date_to):
         print(f"Error getting list of absent employees: {e}")
         return None
 
+def get_employees_directory():
+    """Gets the employee directory from BambooHR"""
+    try:
+        response = requests.get(
+            f"{base_url}/employees/directory",
+            headers=headers
+        )
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        print(f"Error getting employee directory: {e}")
+        return None
+
 def main():
-    """Main function to get employees on vacation today"""
-    today = datetime.now().strftime("%Y-%m-%d")
+    # """Main function to get employees on vacation today"""
+    # today = datetime.now().strftime("%Y-%m-%d")
     
-    print(f"Checking absent employees for {today}...")
-    whos_out_data = get_whos_out(today, today)
-    if whos_out_data:
-        print(f"Found absent employees via whos_out API: {len(whos_out_data)}")
-        print("\n--- Employees on vacation today ---")
-        for employee in whos_out_data:
-            name = employee.get('name', 'Unknown')
-            start_date = employee.get('start', 'N/A')
-            end_date = employee.get('end', 'N/A')
-            print(f"• {name}: {start_date} to {end_date}")
-        print("--- End of vacation list ---\n")
+    # print(f"Checking absent employees for {today}...")
+    # whos_out_data = get_whos_out(today, today)
+    # if whos_out_data:
+    #     print(f"Found absent employees via whos_out API: {len(whos_out_data)}")
+    #     print("\n--- Employees on vacation today ---")
+    #     for employee in whos_out_data:
+    #         name = employee.get('name', 'Unknown')
+    #         start_date = employee.get('start', 'N/A')
+    #         end_date = employee.get('end', 'N/A')
+    #         print(f"• {name}: {start_date} to {end_date}")
+    #     print("--- End of vacation list ---\n")
+    employees = get_employees_directory()
+    print(employees)
     
 if __name__ == "__main__":
     main()
