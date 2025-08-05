@@ -82,14 +82,14 @@ def get_tempo_worklogs(employee_account_id: str, start_date: str, end_date: str)
         return set()
     
     try:
-        url = "https://api.tempo.io/core/3/worklogs"
+        url = "https://api.tempo.io/4/worklogs/user/" + employee_account_id
         headers = {
             'Authorization': f'Bearer {tempo_token}',
             'Content-Type': 'application/json'
         }
         
         params = {
-            'worker': employee_account_id,
+            # 'worker': employee_account_id,
             'from': start_date,
             'to': end_date
         }
@@ -196,20 +196,22 @@ def send_slack_notification(slack_user_id: str, employee_name: str, missing_date
         
         message = f"Привет! Обнаружены пропущенные записи времени на следующие рабочие дни: {dates_text}. Пожалуйста, заполни время в Tempo."
         
-        payload = {
-            'channel': slack_user_id,
-            'text': message
-        }
-        
-        response = requests.post(url, headers=headers, json=payload)
-        response.raise_for_status()
-        
-        data = response.json()
-        
-        if data.get('ok'):
-            logging.info(f"Slack notification sent successfully to {employee_name}")
-        else:
-            logging.error(f"Failed to send Slack notification to {employee_name}: {data.get('error', 'Unknown error')}")
+        send = False
+        if send:
+            payload = {
+                'channel': slack_user_id,
+                'text': message
+            }
+            
+            response = requests.post(url, headers=headers, json=payload)
+            response.raise_for_status()
+            
+            data = response.json()
+            
+            if data.get('ok'):
+                logging.info(f"Slack notification sent successfully to {employee_name}")
+            else:
+                logging.error(f"Failed to send Slack notification to {employee_name}: {data.get('error', 'Unknown error')}")
             
     except requests.exceptions.RequestException as e:
         logging.error(f"Error sending Slack notification to {employee_name}: {e}")
@@ -309,14 +311,15 @@ def monitor_time_tracking(start_date: str, end_date: str, teams_file: str = None
 
 def main():
     """Main entry point"""
-    parser = argparse.ArgumentParser(description='Monitor employee time tracking')
-    parser.add_argument('--start-date', required=True, help='Start date (YYYY-MM-DD)')
-    parser.add_argument('--end-date', required=True, help='End date (YYYY-MM-DD)')
-    parser.add_argument('--teams-file', help='Path to teams.json file (default: ~/teams.json)')
+    # parser = argparse.ArgumentParser(description='Monitor employee time tracking')
+    # parser.add_argument('--start-date', required=True, help='Start date (YYYY-MM-DD)')
+    # parser.add_argument('--end-date', required=True, help='End date (YYYY-MM-DD)')
+    # parser.add_argument('--teams-file', help='Path to teams.json file (default: ~/teams.json)')
     
-    args = parser.parse_args()
+    # args = parser.parse_args()
     
-    monitor_time_tracking(args.start_date, args.end_date, args.teams_file)
+    # monitor_time_tracking(args.start_date, args.end_date, args.teams_file)
+    monitor_time_tracking("2025-08-04", "2025-08-08", "C:\\Users\\AlexeyIsakov\\OneDrive - Piano\\Projects\\teams.json")
 
 if __name__ == "__main__":
     main()
