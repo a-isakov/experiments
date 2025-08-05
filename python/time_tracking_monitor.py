@@ -311,15 +311,14 @@ def monitor_time_tracking(start_date: str, end_date: str, teams_file: str = None
 
 def main():
     """Main entry point"""
-    # parser = argparse.ArgumentParser(description='Monitor employee time tracking')
-    # parser.add_argument('--start-date', required=True, help='Start date (YYYY-MM-DD)')
-    # parser.add_argument('--end-date', required=True, help='End date (YYYY-MM-DD)')
-    # parser.add_argument('--teams-file', help='Path to teams.json file (default: ~/teams.json)')
+    parser = argparse.ArgumentParser(description='Monitor employee time tracking')
+    parser.add_argument('--start-date', required=True, help='Start date (YYYY-MM-DD)')
+    parser.add_argument('--end-date', required=True, help='End date (YYYY-MM-DD)')
+    parser.add_argument('--teams-file', help='Path to teams.json file (default: ~/teams.json)')
     
-    # args = parser.parse_args()
+    args = parser.parse_args()
     
-    # monitor_time_tracking(args.start_date, args.end_date, args.teams_file)
-    monitor_time_tracking("2025-08-04", "2025-08-08", "C:\\Users\\AlexeyIsakov\\OneDrive - Piano\\Projects\\teams.json")
+    monitor_time_tracking(args.start_date, args.end_date, args.teams_file)
 
 if __name__ == "__main__":
     main()
