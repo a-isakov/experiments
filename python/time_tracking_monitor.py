@@ -129,7 +129,7 @@ def get_bamboo_vacation_days(employee_id: str, start_date: str, end_date: str) -
         return set()
     
     try:
-        url = f"https://{bamboo_subdomain}.bamboohr.com/api/gateway.php/time_off/requests"
+        url = f"https://{bamboo_subdomain}.bamboohr.com/api/v1/time_off/requests"
         
         # BambooHR uses basic auth with API key as username and 'x' as password
         auth = base64.b64encode(f"{bamboo_api_key}:x".encode()).decode()
@@ -143,7 +143,7 @@ def get_bamboo_vacation_days(employee_id: str, start_date: str, end_date: str) -
             'start': start_date,
             'end': end_date,
             'employeeId': employee_id,
-            'status': 'approved'
+            'status': 'approved,requested'
         }
         
         response = requests.get(url, headers=headers, params=params)
