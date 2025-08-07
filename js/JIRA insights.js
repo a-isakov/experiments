@@ -170,7 +170,7 @@
             button2.setAttribute('class', style);
             button2.setAttribute('type', 'button');
             button2.style.width = 'auto';
-            button2.innerHTML = '<p>&nbsp;&nbsp;Full insights in Russian&nbsp;&nbsp;</p>';
+            button2.innerHTML = '<p>&nbsp;&nbsp;Full insights in Russian (wait longer)&nbsp;&nbsp;</p>';
             button2.addEventListener('click', () => handleButtonClick('ru', true, jiraKey, buttonsContainer, responseContainer));
             
             const button3 = document.createElement('button');
@@ -184,7 +184,7 @@
             button4.setAttribute('class', style);
             button4.setAttribute('type', 'button');
             button4.style.width = 'auto';
-            button4.innerHTML = '<p>&nbsp;&nbsp;Full insights in English&nbsp;&nbsp;</p>';
+            button4.innerHTML = '<p>&nbsp;&nbsp;Full insights in English (wait longer)&nbsp;&nbsp;</p>';
             button4.addEventListener('click', () => handleButtonClick('en', true, jiraKey, buttonsContainer, responseContainer));
             
             buttonsContainer.appendChild(button1);
