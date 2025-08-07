@@ -98,8 +98,8 @@
 
         const popup = document.createElement('div');
         popup.style.cssText = `
-            width: 80%;
-            height: 80%;
+            width: 85%;
+            height: 85%;
             background-color: white;
             border-radius: 8px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
