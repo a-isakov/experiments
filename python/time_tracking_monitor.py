@@ -73,7 +73,7 @@ def get_date_range(start_date: str, end_date: str) -> List[datetime]:
 def get_tempo_worklogs(employee_account_id: str, start_date: str, end_date: str) -> Set[str]:
     """
     Fetch worklogs from Tempo API for a specific employee
-    Returns set of dates with logged time
+    Returns set of dates with logged time more than 3 hours
     """
     logging.info(f"Fetching Tempo worklogs for employee {employee_account_id}")
     
@@ -100,11 +100,23 @@ def get_tempo_worklogs(employee_account_id: str, start_date: str, end_date: str)
         
         data = response.json()
         
-        # Extract dates with logged time
-        logged_dates = set()
+        # Extract dates with logged time less than 3 hours
+        date_time_dict = {}
         if 'results' in data:
             for worklog in data['results']:
-                logged_dates.add(worklog.get('startDate', ''))
+                date = worklog.get('startDate', '')
+                time_seconds = worklog.get('timeSpentSeconds', 0)
+                
+                if date:
+                    if date not in date_time_dict:
+                        date_time_dict[date] = 0
+                    date_time_dict[date] += time_seconds
+        
+        # Return only dates with more than 3 hours (10800 seconds) logged
+        logged_dates = set()
+        for date, total_seconds in date_time_dict.items():
+            if total_seconds > 3*60*60:
+                logged_dates.add(date)
         
         return logged_dates
         
