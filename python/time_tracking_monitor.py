@@ -47,9 +47,10 @@ def get_all_employees(teams_data: Dict) -> List[Dict]:
     """Extract all employees from teams data"""
     employees = []
     for team_name, team_members in teams_data.items():
-        for member in team_members:
-            member['team'] = team_name
-            employees.append(member)
+        if team_name != 'Templates':
+            for member in team_members:
+                member['team'] = team_name
+                employees.append(member)
     return employees
 
 def is_workday(date: datetime) -> bool:
@@ -174,9 +175,9 @@ def get_bamboo_vacation_days(employee_id: str, start_date: str, end_date: str) -
         logging.error(f"Unexpected error fetching BambooHR vacation data for {employee_id}: {e}")
         return set()
 
-def send_slack_notification(slack_user_id: str, employee_name: str, missing_dates: List[str]):
+def send_slack_notification(slack_channel_id: str, lang: str, employee_name: str, missing_dates: List[str]):
     """Send Slack notification about missing time logs"""
-    logging.info(f"Sending Slack notification to {employee_name} ({slack_user_id})")
+    logging.info(f"Sending Slack notification to {employee_name} ({slack_channel_id})")
     
     slack_token = os.getenv('SLACK_BOT_TOKEN')
     if not slack_token:
@@ -195,23 +196,23 @@ def send_slack_notification(slack_user_id: str, employee_name: str, missing_date
         dates_text = ", ".join(missing_dates)
         
         message = f"Привет! Обнаружены пропущенные записи времени на следующие рабочие дни: {dates_text}. Пожалуйста, заполни время в Tempo."
+        if (lang != "ru"):
+            message = f"Hi! There are missing worklogs for the days: {dates_text}. Please, log time in Tempo."
         
-        send = False
-        if send:
-            payload = {
-                'channel': slack_user_id,
-                'text': message
-            }
-            
-            response = requests.post(url, headers=headers, json=payload)
-            response.raise_for_status()
-            
-            data = response.json()
-            
-            if data.get('ok'):
-                logging.info(f"Slack notification sent successfully to {employee_name}")
-            else:
-                logging.error(f"Failed to send Slack notification to {employee_name}: {data.get('error', 'Unknown error')}")
+        payload = {
+            'channel': slack_channel_id,
+            'text': message
+        }
+        
+        response = requests.post(url, headers=headers, json=payload)
+        response.raise_for_status()
+        
+        data = response.json()
+        
+        if data.get('ok'):
+            logging.info(f"Slack notification sent successfully to {employee_name}")
+        else:
+            logging.error(f"Failed to send Slack notification to {employee_name}: {data.get('error', 'Unknown error')}")
             
     except requests.exceptions.RequestException as e:
         logging.error(f"Error sending Slack notification to {employee_name}: {e}")
@@ -300,7 +301,8 @@ def monitor_time_tracking(start_date: str, end_date: str, teams_file: str = None
         if missing_dates:
             logging.warning(f"Employee {employee_name} has {len(missing_dates)} missing time logs")
             send_slack_notification(
-                employee['slackUserId'],
+                employee['slackChannelId'],
+                employee['lang'],
                 employee_name,
                 missing_dates
             )
