@@ -278,6 +278,7 @@ def monitor_time_tracking(start_date: str, end_date: str, teams_file: str = None
     logging.info(f"Checking {len(workdays)} workdays in the specified period")
     
     # Process each employee
+    employees_informed = []
     for employee in employees:
         employee_name = employee['name']
         logging.info(f"Processing employee: {employee_name}")
@@ -318,8 +319,15 @@ def monitor_time_tracking(start_date: str, end_date: str, teams_file: str = None
                 employee_name,
                 missing_dates
             )
+            employees_informed.append(employee_name)
         else:
             logging.info(f"Employee {employee_name} has all time logs complete")
+    
+    # Display summary of employees who were informed
+    if employees_informed:
+        logging.info(f"Employees who were informed about missing time logs: {', '.join(employees_informed)}")
+    else:
+        logging.info("All employees have logged their time properly!")
     
     logging.info("Time tracking monitoring completed")
 
