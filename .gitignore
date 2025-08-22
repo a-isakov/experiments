@@ -1,6 +1,8 @@
 node_modules/
 .vscode/
 .idea/
+.claude/
+.crush/
 out/
 *.iml
 *.class
@@ -12,6 +14,7 @@ out/
 *.csv
 *.data
 *.names
+settings.local.json
 
 *__pycache__/
 

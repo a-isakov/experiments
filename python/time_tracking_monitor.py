@@ -47,7 +47,7 @@ def get_all_employees(teams_data: Dict) -> List[Dict]:
     """Extract all employees from teams data"""
     employees = []
     for team_name, team_members in teams_data.items():
-        if team_name != 'Templates':
+        if team_name != 'Templates' and team_name != 'Reports-1':
             for member in team_members:
                 member['team'] = team_name
                 employees.append(member)
@@ -127,22 +127,22 @@ def get_tempo_worklogs(employee_account_id: str, start_date: str, end_date: str)
         logging.error(f"Unexpected error fetching Tempo worklogs for {employee_account_id}: {e}")
         return set()
 
-def get_bamboo_vacation_days(employee_id: str, start_date: str, end_date: str) -> Set[str]:
+def get_all_bamboo_vacation_days(start_date: str, end_date: str) -> Dict[str, Set[str]]:
     """
-    Fetch vacation days from BambooHR for a specific employee
-    Returns set of vacation dates
+    Fetch vacation days from BambooHR for all employees using the "who's out" API
+    Returns dictionary with employee_id as key and set of vacation dates as value
     """
-    logging.info(f"Fetching BambooHR vacation data for employee {employee_id}")
+    logging.info("Fetching BambooHR vacation data for all employees")
     
     bamboo_api_key = os.getenv('BAMBOOHR_API_KEY')
     bamboo_subdomain = os.getenv('BAMBOOHR_SUBDOMAIN')
     
     if not bamboo_api_key or not bamboo_subdomain:
         logging.error("BAMBOOHR_API_KEY or BAMBOOHR_SUBDOMAIN environment variables not set")
-        return set()
+        return {}
     
     try:
-        url = f"https://{bamboo_subdomain}.bamboohr.com/api/v1/time_off/requests"
+        url = f"https://{bamboo_subdomain}.bamboohr.com/api/v1/time_off/whos_out"
         
         # BambooHR uses basic auth with API key as username and 'x' as password
         auth = base64.b64encode(f"{bamboo_api_key}:x".encode()).decode()
@@ -154,38 +154,45 @@ def get_bamboo_vacation_days(employee_id: str, start_date: str, end_date: str) -
         
         params = {
             'start': start_date,
-            'end': end_date,
-            'employeeId': employee_id,
-            'status': 'approved,requested'
+            'end': end_date
         }
-        
+
         response = requests.get(url, headers=headers, params=params)
         response.raise_for_status()
         
         data = response.json()
         
-        # Extract vacation dates
-        vacation_dates = set()
-        if isinstance(data, list):
-            for request in data:
-                if request.get('status', {}).get('status') == 'approved':
+        # Extract vacation dates for all employees
+        all_vacation_data = {}
+        
+        # The API returns a list of entries for all employees who are out
+        for entry in data:
+            employee_id = str(entry.get('employeeId', ''))
+            if employee_id:
+                if employee_id not in all_vacation_data:
+                    all_vacation_data[employee_id] = set()
+                    
+                entry_start = entry.get('start', '')
+                entry_end = entry.get('end', '')
+                
+                if entry_start and entry_end:
                     # Parse date range and add all dates
-                    start_dt = datetime.strptime(request['start'], '%Y-%m-%d')
-                    end_dt = datetime.strptime(request['end'], '%Y-%m-%d')
+                    start_dt = datetime.strptime(entry_start, '%Y-%m-%d')
+                    end_dt = datetime.strptime(entry_end, '%Y-%m-%d')
                     
                     current = start_dt
                     while current <= end_dt:
-                        vacation_dates.add(current.strftime('%Y-%m-%d'))
+                        all_vacation_data[employee_id].add(current.strftime('%Y-%m-%d'))
                         current += timedelta(days=1)
         
-        return vacation_dates
+        return all_vacation_data
         
     except requests.exceptions.RequestException as e:
-        logging.error(f"Error fetching BambooHR vacation data for {employee_id}: {e}")
-        return set()
+        logging.error(f"Error fetching BambooHR vacation data: {e}")
+        return {}
     except Exception as e:
-        logging.error(f"Unexpected error fetching BambooHR vacation data for {employee_id}: {e}")
-        return set()
+        logging.error(f"Unexpected error fetching BambooHR vacation data: {e}")
+        return {}
 
 def send_slack_notification(slack_channel_id: str, lang: str, employee_name: str, missing_dates: List[str]):
     """Send Slack notification about missing time logs"""
@@ -277,6 +284,9 @@ def monitor_time_tracking(start_date: str, end_date: str, teams_file: str = None
     
     logging.info(f"Checking {len(workdays)} workdays in the specified period")
     
+    # Get vacation data for all employees once
+    all_vacation_data = get_all_bamboo_vacation_days(start_date, end_date)
+    
     # Process each employee
     employees_informed = []
     for employee in employees:
@@ -290,12 +300,9 @@ def monitor_time_tracking(start_date: str, end_date: str, teams_file: str = None
             end_date
         )
         
-        # Get BambooHR vacation days
-        vacation_dates = get_bamboo_vacation_days(
-            employee['bambooAccountId'],
-            start_date,
-            end_date
-        )
+        # Get BambooHR vacation days from cached data
+        bamboo_employee_id = employee['bambooAccountId']
+        vacation_dates = all_vacation_data.get(bamboo_employee_id, set())
         
         # Check for missing time logs on workdays
         missing_dates = []
@@ -333,14 +340,15 @@ def monitor_time_tracking(start_date: str, end_date: str, teams_file: str = None
 
 def main():
     """Main entry point"""
-    parser = argparse.ArgumentParser(description='Monitor employee time tracking')
-    parser.add_argument('--start-date', required=True, help='Start date (YYYY-MM-DD)')
-    parser.add_argument('--end-date', required=True, help='End date (YYYY-MM-DD)')
-    parser.add_argument('--teams-file', help='Path to teams.json file (default: ~/teams.json)')
+    # parser = argparse.ArgumentParser(description='Monitor employee time tracking')
+    # parser.add_argument('--start-date', required=True, help='Start date (YYYY-MM-DD)')
+    # parser.add_argument('--end-date', required=True, help='End date (YYYY-MM-DD)')
+    # parser.add_argument('--teams-file', help='Path to teams.json file (default: ~/teams.json)')
     
-    args = parser.parse_args()
+    # args = parser.parse_args()
     
-    monitor_time_tracking(args.start_date, args.end_date, args.teams_file)
+    # monitor_time_tracking(args.start_date, args.end_date, args.teams_file)
+    monitor_time_tracking("2025-08-07", "2025-08-21", "C:\\repos\\teams.json")
 
 if __name__ == "__main__":
     main()
