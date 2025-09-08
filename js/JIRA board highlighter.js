@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         JIRA board highlighter
 // @namespace    http://tampermonkey.net/
-// @version      2.5
+// @version      2.6
 // @description  Add days in column as text, make epic clickable
 // @author       You
 // @match        https://tinypass.atlassian.net/jira/*
@@ -69,15 +69,15 @@
                     newMenuItem.setAttribute('id', HIGHLIGHTER_MENU_ID);
                     newMenuItem.setAttribute('class', menuItemToClone.getAttribute('class'));
 
-                    let newButton = document.createElement('div');
-                    newButton.setAttribute('class', menuItemToClone.childNodes[0].getAttribute('class'));
-                    newMenuItem.appendChild(newButton);
-                    
                     let settingsLink = document.createElement('a');
                     settingsLink.setAttribute('href', location.origin + (location.pathname.endsWith('/') ? location.pathname.slice(0, -1) : location.pathname) + '/settings/filter?from-backlog=1');
-                    settingsLink.textContent = 'Configure board';
-                    newButton.appendChild(settingsLink);
+                    
+                    let newButton = document.createElement('div');
+                    newButton.setAttribute('class', menuItemToClone.childNodes[0].getAttribute('class'));
+                    newButton.textContent = 'Configure board';
 
+                    settingsLink.appendChild(newButton);
+                    newMenuItem.appendChild(settingsLink);
                     menuContainer.appendChild(newMenuItem);
                 }
             }
