@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         JIRA board highlighter
 // @namespace    http://tampermonkey.net/
-// @version      2.4
+// @version      2.5
 // @description  Add days in column as text, make epic clickable
 // @author       You
 // @match        https://tinypass.atlassian.net/jira/*
@@ -28,19 +28,22 @@
     const cachePrefix = 'duration_';
     const processedCardTag = 'duration_processed';
 
+    const HIGHLIGHTER_ID = 'custom_highlighter';
+    const HIGHLIGHTER_MENU_ID = 'custom_highlighter_menu';
+
     waitForKeyElements(
         '<div id="content" class="z-index-content">',
         onElement
     );
 
     async function onElement(element) {
-        const content = document.getElementById('custom_highlighter');
+        const content = document.getElementById(HIGHLIGHTER_ID);
         if (content == null) {
             let boardContainer = document.getElementById('ghx-pool');
             if (boardContainer != null) {
                 // old JIRA UI
                 let onceElement = document.createElement('div');
-                onceElement.setAttribute('id', 'custom_highlighter');
+                onceElement.setAttribute('id', HIGHLIGHTER_ID);
                 onceElement.setAttribute('counter', counter++); // just to reflect updates count
                 boardContainer.appendChild(onceElement);
                 onRefreshOld(boardContainer);
@@ -51,6 +54,33 @@
             }
             // wait for 1 second before next review
             await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+
+        const menuItem = document.getElementById(HIGHLIGHTER_MENU_ID);
+        if (menuItem == null) {
+            // check if menu opened
+            let menu = document.querySelector('[data-testid="software-board.header.menu.popup"]');
+            if (menu != null) {
+                let menuContainer = menu.childNodes[0];
+                if (menuContainer != null) {
+                    const menuItemToClone = menuContainer.childNodes[0];
+
+                    let newMenuItem = document.createElement('div');
+                    newMenuItem.setAttribute('id', HIGHLIGHTER_MENU_ID);
+                    newMenuItem.setAttribute('class', menuItemToClone.getAttribute('class'));
+
+                    let newButton = document.createElement('div');
+                    newButton.setAttribute('class', menuItemToClone.childNodes[0].getAttribute('class'));
+                    newMenuItem.appendChild(newButton);
+                    
+                    let settingsLink = document.createElement('a');
+                    settingsLink.setAttribute('href', location.origin + (location.pathname.endsWith('/') ? location.pathname.slice(0, -1) : location.pathname) + '/settings/filter?from-backlog=1');
+                    settingsLink.textContent = 'Configure board';
+                    newButton.appendChild(settingsLink);
+
+                    menuContainer.appendChild(newMenuItem);
+                }
+            }
         }
     }
 
