@@ -92,7 +92,8 @@ def get_tempo_worklogs(employee_account_id: str, start_date: str, end_date: str)
         params = {
             # 'worker': employee_account_id,
             'from': start_date,
-            'to': end_date
+            'to': end_date,
+            'limit': 1000
         }
         
         response = requests.get(url, headers=headers, params=params)
@@ -223,15 +224,19 @@ def send_slack_notification(slack_channel_id: str, lang: str, employee_name: str
             'text': message
         }
         
-        response = requests.post(url, headers=headers, json=payload)
-        response.raise_for_status()
-        
-        data = response.json()
-        
-        if data.get('ok'):
-            logging.info(f"Slack notification sent successfully to {employee_name}")
+        skip = True
+        if (skip):
+            print(message)
         else:
-            logging.error(f"Failed to send Slack notification to {employee_name}: {data.get('error', 'Unknown error')}")
+            response = requests.post(url, headers=headers, json=payload)
+            response.raise_for_status()
+            
+            data = response.json()
+            
+            if data.get('ok'):
+                logging.info(f"Slack notification sent successfully to {employee_name}")
+            else:
+                logging.error(f"Failed to send Slack notification to {employee_name}: {data.get('error', 'Unknown error')}")
             
     except requests.exceptions.RequestException as e:
         logging.error(f"Error sending Slack notification to {employee_name}: {e}")
@@ -340,15 +345,14 @@ def monitor_time_tracking(start_date: str, end_date: str, teams_file: str = None
 
 def main():
     """Main entry point"""
-    # parser = argparse.ArgumentParser(description='Monitor employee time tracking')
-    # parser.add_argument('--start-date', required=True, help='Start date (YYYY-MM-DD)')
-    # parser.add_argument('--end-date', required=True, help='End date (YYYY-MM-DD)')
-    # parser.add_argument('--teams-file', help='Path to teams.json file (default: ~/teams.json)')
+    parser = argparse.ArgumentParser(description='Monitor employee time tracking')
+    parser.add_argument('--start-date', required=True, help='Start date (YYYY-MM-DD)')
+    parser.add_argument('--end-date', required=True, help='End date (YYYY-MM-DD)')
+    parser.add_argument('--teams-file', help='Path to teams.json file (default: ~/teams.json)')
     
-    # args = parser.parse_args()
+    args = parser.parse_args()
     
-    # monitor_time_tracking(args.start_date, args.end_date, args.teams_file)
-    monitor_time_tracking("2025-08-07", "2025-08-21", "C:\\repos\\teams.json")
+    monitor_time_tracking(args.start_date, args.end_date, args.teams_file)
 
 if __name__ == "__main__":
     main()
