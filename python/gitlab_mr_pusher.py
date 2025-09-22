@@ -167,6 +167,7 @@ def main():
         project_ids = get_project_ids()
         write_project_ids(project_ids)
     total_found = 0
+    found_by_author = {}
     for project_id in project_ids:
         mrs = list_open_merge_requests(project_id)
         for mr in mrs:
@@ -193,16 +194,26 @@ def main():
                 author = mr.get('author') or {}
                 author_name = author.get('name') or ''
                 author_username = author.get('username') or ''
-                print('Project', project_id, 'MR !' + str(iid), title)
-                print('Author:', author_username, author_name)
-                print('Approvals left:', approvals_left, web_url)
-                if missing:
-                    for u in missing:
-                        print('Waiting:', u.get('username'), u.get('name'))
-                else:
-                    print('Waiting: not determined')
+                key = (author_username, author_name)
+                found_by_author.setdefault(key, []).append({'project_id': project_id, 'iid': iid, 'title': title, 'web_url': web_url, 'approvals_left': approvals_left, 'missing': missing, 'author_username': author_username, 'author_name': author_name})
+                print('.', end='', flush=True)
     if total_found == 0:
         print('No MRs awaiting approvals found')
+    else:
+        print()
+        for key, items in found_by_author.items():
+            first_rec = True
+            for rec in items:
+                if (first_rec == True):
+                    print('Author:', rec['author_username'], rec['author_name'])
+                    first_rec = False
+                print('  Project', rec['project_id'], 'MR !' + str(rec['iid']), rec['title'])
+                print('  Approvals left:', rec['approvals_left'], rec['web_url'])
+                if rec['missing']:
+                    for u in rec['missing']:
+                        print('  Waiting:', u.get('username'), u.get('name'))
+                else:
+                    print('  Waiting: not determined')
 
 
 if __name__ == '__main__':
