@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         JIRA blockers
 // @namespace    http://tampermonkey.net/
-// @version      2.3
+// @version      2.4
 // @description  hide unnecessary elements
 // @author       You
 // @match        https://tinypass.atlassian.net/jira/*
@@ -57,7 +57,7 @@
         cardMarkers.forEach(async cardMarker => {
             let card = cardMarker.parentNode;
             // drill down to card container
-            let cardContainer = await getChild(card, 3, [1, 0, 0]);
+            let cardContainer = await getChild(card, 4, [1, 0, 0, 0]);
             if (cardContainer != null) {
                 let keyContainer = cardContainer.querySelector('[data-testid="platform-card.common.ui.key.key"]');
                 if (keyContainer != null) {
