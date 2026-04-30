@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         JIRA board highlighter
 // @namespace    http://tampermonkey.net/
-// @version      2.7
+// @version      2.8
 // @description  Add days in column as text, make epic clickable
 // @author       You
 // @match        https://tinypass.atlassian.net/jira/*
@@ -30,6 +30,8 @@
 
     const HIGHLIGHTER_ID = 'custom_highlighter';
     const HIGHLIGHTER_MENU_ID = 'custom_highlighter_menu';
+
+    GM_addStyle('.yse7za_content { padding: 4px !important; }');
 
     waitForKeyElements(
         '<div id="content" class="z-index-content">',
