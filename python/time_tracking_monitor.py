@@ -9,6 +9,7 @@ This script monitors employee time logging by:
 4. Sending Slack notifications for missing time logs on work days
 """
 
+import csv
 import json
 import os
 import sys
@@ -19,6 +20,8 @@ import logging
 import requests
 from urllib.parse import urljoin
 import base64
+
+HOLIDAYS_DIR = os.path.expanduser("~/OneDrive - Piano/Projects/claude_po")
 
 def setup_logging():
     """Setup logging configuration"""
@@ -47,11 +50,31 @@ def get_all_employees(teams_data: Dict) -> List[Dict]:
     """Extract all employees from teams data"""
     employees = []
     for team_name, team_members in teams_data.items():
-        if team_name != 'Templates' and team_name != 'Reports-1':
+        if team_name != 'Templates' and team_name != 'Reports-1' and team_name != 'BData-1':# and team_name != 'Checkout':
             for member in team_members:
                 member['team'] = team_name
                 employees.append(member)
     return employees
+
+LOCATION_FILES = ['bts', 'dub', 'izh', 'kzn', 'waw']
+
+def load_holidays(holidays_dir: str) -> Dict[str, Set[str]]:
+    """Load holiday dates from CSV files per location.
+    Returns dict: location -> set of date strings (YYYY-MM-DD)."""
+    holidays = {}
+    for location in LOCATION_FILES:
+        filepath = os.path.join(holidays_dir, f"{location}.csv")
+        if not os.path.exists(filepath):
+            logging.warning(f"Holiday file not found: {filepath}")
+            continue
+        dates = set()
+        with open(filepath, 'r', encoding='utf-8') as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                dates.add(row['date'])
+        holidays[location] = dates
+        logging.info(f"Loaded {len(dates)} holidays for location '{location}'")
+    return holidays
 
 def is_workday(date: datetime) -> bool:
     """Check if a date is a workday (Monday-Friday)"""
@@ -224,7 +247,8 @@ def send_slack_notification(slack_channel_id: str, lang: str, employee_name: str
             'text': message
         }
         
-        skip = True
+        skip = False
+        # skip = True
         if (skip):
             print(message)
         else:
@@ -289,6 +313,9 @@ def monitor_time_tracking(start_date: str, end_date: str, teams_file: str = None
     
     logging.info(f"Checking {len(workdays)} workdays in the specified period")
     
+    # Load location holidays
+    location_holidays = load_holidays(HOLIDAYS_DIR)
+
     # Get vacation data for all employees once
     all_vacation_data = get_all_bamboo_vacation_days(start_date, end_date)
     
@@ -308,16 +335,24 @@ def monitor_time_tracking(start_date: str, end_date: str, teams_file: str = None
         # Get BambooHR vacation days from cached data
         bamboo_employee_id = employee['bambooAccountId']
         vacation_dates = all_vacation_data.get(bamboo_employee_id, set())
-        
+
+        # Get location holidays for this employee
+        employee_location = employee.get('location', '')
+        holiday_dates = location_holidays.get(employee_location, set())
+
         # Check for missing time logs on workdays
         missing_dates = []
         for workday in workdays:
             workday_str = workday.strftime('%Y-%m-%d')
-            
+
             # Skip if employee was on vacation
             if workday_str in vacation_dates:
                 continue
-                
+
+            # Skip location holidays
+            if workday_str in holiday_dates:
+                continue
+
             # Check if time was logged
             if workday_str not in tempo_logged_dates:
                 missing_dates.append(workday_str)
@@ -344,15 +379,17 @@ def monitor_time_tracking(start_date: str, end_date: str, teams_file: str = None
     logging.info("Time tracking monitoring completed")
 
 def main():
-    """Main entry point"""
-    parser = argparse.ArgumentParser(description='Monitor employee time tracking')
-    parser.add_argument('--start-date', required=True, help='Start date (YYYY-MM-DD)')
-    parser.add_argument('--end-date', required=True, help='End date (YYYY-MM-DD)')
-    parser.add_argument('--teams-file', help='Path to teams.json file (default: ~/teams.json)')
+    # """Main entry point"""
+    # parser = argparse.ArgumentParser(description='Monitor employee time tracking')
+    # parser.add_argument('--start-date', required=True, help='Start date (YYYY-MM-DD)')
+    # parser.add_argument('--end-date', required=True, help='End date (YYYY-MM-DD)')
+    # parser.add_argument('--teams-file', help='Path to teams.json file (default: ~/teams.json)')
     
-    args = parser.parse_args()
+    # args = parser.parse_args()
     
-    monitor_time_tracking(args.start_date, args.end_date, args.teams_file)
+    # monitor_time_tracking(args.start_date, args.end_date, args.t5eams_file)
+    # monitor_time_tracking("2025-11-10", "2025-11-21", "C:\\repos\\teams.json")
+    monitor_time_tracking("2026-02-01", "2026-04-03", "C:\\repos\\teams.json")
 
 if __name__ == "__main__":
     main()

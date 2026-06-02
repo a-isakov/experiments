@@ -1,0 +1,7 @@
+#include <windows.h>
+#include "resource.h"
+
+/////////////////////////////////////////////////////////////////////////////
+// Tray state icons
+IDI_ON  ICON "assets\\on.ico"
+IDI_OFF ICON "assets\\off.ico"

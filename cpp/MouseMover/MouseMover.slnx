@@ -1,0 +1,7 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="MouseMover.vcxproj" Id="c0d46744-320c-4c31-83db-7c0953fed794" />
+</Solution>
