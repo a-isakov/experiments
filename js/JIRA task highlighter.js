@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         JIRA task highlighter
 // @namespace    http://tampermonkey.net/
-// @version      1.4
+// @version      1.5
 // @description  removes unnecessary parts
 // @author       You
 // @match        https://tinypass.atlassian.net/browse/*
@@ -14,6 +14,15 @@
 
 (function() {
     'use strict';
+
+    // hide annoying elements (CSS so React can't bring them back)
+    GM_addStyle(`
+        [data-testid="issue.views.issue-base.foundation.status.improve-issue"],
+        [data-testid="layout-controller.ui.bottom-right-corner.container.styled-container"],
+        [data-testid="atlassian-navigation.ui.conversation-assistant.app-navigation-ai-mate"] {
+            display: none !important;
+        }
+    `);
 
     waitForKeyElements (
         '<div class="css-k9aspw">',
