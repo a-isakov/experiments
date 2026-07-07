@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         JIRA board highlighter
 // @namespace    http://tampermonkey.net/
-// @version      2.8
+// @version      2.9
 // @description  Add days in column as text, make epic clickable
 // @author       You
 // @match        https://tinypass.atlassian.net/jira/*
@@ -16,16 +16,11 @@
     const delayMin = 2;      // min days to show delays to indicate in green
     const delayMax = 5;      // max days to indicate in red
     const removeDots = true; // remove dots after showing text delays
-    const cache_limit_minutes = 120;
 
     const clickableEpics = true; // enables opening of the epics by clicking on epics name on issue card
 
     let counter = 0;
-    let boardCacheChecked = false;
 
-    const now = new Date();
-
-    const cachePrefix = 'duration_';
     const processedCardTag = 'duration_processed';
 
     const HIGHLIGHTER_ID = 'custom_highlighter';
@@ -52,7 +47,6 @@
             } else {
                 // new JIRA UI
                 onRefreshNew();
-                checkBoardCache();
             }
             // wait for 1 second before next review
             await new Promise(resolve => setTimeout(resolve, 1000));
@@ -86,6 +80,11 @@
         }
     }
 
+    // Old approach: pull "days in column" from an undocumented board REST endpoint and cache it in
+    // localStorage per issue key. Atlassian stopped returning some issues through this endpoint,
+    // so those cards silently never got a badge. Jira's own card UI already renders the same number
+    // natively (see processIssueCard), so this is no longer called - kept here for reference only.
+    /*
     async function checkBoardCache() {
         if (!boardCacheChecked) {
             boardCacheChecked = true;
@@ -119,6 +118,7 @@
             }
         }
     }
+    */
 
     async function onRefreshNew() {
         await new Promise(resolve => setTimeout(resolve, 5000));
@@ -129,17 +129,10 @@
             // drill down to card container
             let cardContainer = await getChild(card, 4, [1, 0, 0, 0]);
             if (cardContainer != null) {
-                let keyContainer = cardContainer.querySelector('[data-testid="platform-card.common.ui.key.key"]');
-                if (keyContainer != null) {
-                    let key = await getChild(keyContainer, 3, [0, 0, 0]);
-                    cardKey = key.textContent; // task number
-                    if (localStorage.getItem(cachePrefix + cardKey) != null) {
-                        const blockersProcessed = cardContainer.getAttribute(processedCardTag);
-                        if (blockersProcessed == null || blockersProcessed != 'true') {
-                            processIssueCard(cardContainer, cardKey);
-                            cardContainer.setAttribute(processedCardTag, 'true');
-                        }
-                    }
+                const processed = cardContainer.getAttribute(processedCardTag);
+                if (processed == null || processed != 'true') {
+                    processIssueCard(cardContainer);
+                    cardContainer.setAttribute(processedCardTag, 'true');
                 }
             }
         });
@@ -162,49 +155,48 @@
     }
 
     // add days into JIRA card and hide dots if need
-    async function processIssueCard (card, key) {
+    // Days come from Jira's own native tooltip (role="tooltip" aria-label="N days in this column"),
+    // already rendered on every card - no REST call or cache needed anymore.
+    async function processIssueCard (card) {
         if (card != null && card.parentNode.childElementCount > 0) {
-            const cacheObject = JSON.parse(localStorage.getItem(cachePrefix + key));
-            const differenceMinutes = parseInt((now - new Date(cacheObject['time'])) / 60000);
-            // put info if cache is not expired
-            if (differenceMinutes < cache_limit_minutes) {
-                const daysValue = cacheObject['duration'];
-                let element = document.createElement('div');
-                if (daysValue <= delayMax) {
-                    element.setAttribute('class', 'aui-lozenge ghx-label-6');
-                } else {
-                    element.setAttribute('class', 'aui-lozenge ghx-label-14');
-                }
-                element.setAttribute('style', 'font-size:80%');
-                element.innerHTML = daysValue + ' days in column';
-                card.appendChild(element);
-                // remove dots
-                if (removeDots) {
-                    let dotsContainer = card.getElementsByClassName('_4t3i1osq _1e0c1txw _4cvr1h6o _1bah1h6o _zulpv77o')[0];
-                    if (dotsContainer != null) {
+            let dotsContainer = card.querySelector('[role="tooltip"][aria-label*="in this column"]');
+            if (dotsContainer != null) {
+                const match = dotsContainer.getAttribute('aria-label').match(/(\d+)\s+days?\s+in this column/i);
+                if (match != null) {
+                    const daysValue = parseInt(match[1]);
+                    let element = document.createElement('div');
+                    if (daysValue <= delayMax) {
+                        element.setAttribute('class', 'aui-lozenge ghx-label-6');
+                    } else {
+                        element.setAttribute('class', 'aui-lozenge ghx-label-14');
+                    }
+                    element.setAttribute('style', 'font-size:80%');
+                    element.innerHTML = daysValue + ' days in column';
+                    card.appendChild(element);
+                    // remove dots
+                    if (removeDots) {
                         let dotsContainerParent = dotsContainer.parentNode;
                         dotsContainerParent.removeChild(dotsContainer);
                     }
-                }
-                // make epic clickable
-                if (clickableEpics) {
-                    // const epicKey = cacheObject['epicKey'];
-                    // if (epicKey != null && epicKey != '') {
-                    //     let epicContainer = card.getElementsByClassName('l1vxah-0 cKAygz');
-                    //     // console.log(key, epicKey, epicContainer);
-                    //     if (epicContainer != null) {
-                    //         let epicSpan = epicContainer[0];
-                    //         let epicURL = document.createElement('a');
-                    //         epicURL.setAttribute('href', '/browse/' + epicKey);
-                    //         epicURL.innerHTML = epicSpan.parentNode.innerHTML;
-                    //         epicSpan.parentNode.appendChild(epicURL);
-                    //         epicSpan.parentNode.removeChild(epicSpan);
-                    //     }
-                    // }
+                    // make epic clickable
+                    if (clickableEpics) {
+                        // const epicKey = ...;
+                        // if (epicKey != null && epicKey != '') {
+                        //     let epicContainer = card.getElementsByClassName('l1vxah-0 cKAygz');
+                        //     if (epicContainer != null) {
+                        //         let epicSpan = epicContainer[0];
+                        //         let epicURL = document.createElement('a');
+                        //         epicURL.setAttribute('href', '/browse/' + epicKey);
+                        //         epicURL.innerHTML = epicSpan.parentNode.innerHTML;
+                        //         epicSpan.parentNode.appendChild(epicURL);
+                        //         epicSpan.parentNode.removeChild(epicSpan);
+                        //     }
+                        // }
+                    }
                 }
             }
         }
-}
+    }
 
     function onRefreshOld(boardContainer) {
         // make epic clickable
