@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         JIRA blockers
 // @namespace    http://tampermonkey.net/
-// @version      2.4
+// @version      2.5
 // @description  hide unnecessary elements
 // @author       You
 // @match        https://tinypass.atlassian.net/jira/*
@@ -52,23 +52,34 @@
         //     }
         // };
         await new Promise(resolve => setTimeout(resolve, 5000));
-        
+
         let cardMarkers = document.querySelectorAll('[data-testid="platform-card.ui.card.focus-container"]');
         cardMarkers.forEach(async cardMarker => {
-            let card = cardMarker.parentNode;
-            // drill down to card container
-            let cardContainer = await getChild(card, 4, [1, 0, 0, 0]);
-            if (cardContainer != null) {
-                let keyContainer = cardContainer.querySelector('[data-testid="platform-card.common.ui.key.key"]');
-                if (keyContainer != null) {
-                    let key = await getChild(keyContainer, 3, [0, 0, 0]);
-                    cardKey = key.textContent; // task number
-                    const blockersProcessed = cardContainer.getAttribute('blockers_processed');
-                    if (blockersProcessed == null || blockersProcessed != 'true') {
-                        processIssueCard(cardContainer, cardKey);
-                        cardContainer.setAttribute('blockers_processed', 'true');
-                    }
-                }
+            let cardRoot = cardMarker.parentNode; // card container that holds the whole card
+            if (cardRoot == null) {
+                return;
+            }
+            // exactly one key.key lives inside a card subtree; take the issue key from its browse link
+            // (index-based traversal breaks now that Jira injects <style data-emotion> nodes as first children)
+            let keyContainer = cardRoot.querySelector('[data-testid="platform-card.common.ui.key.key"]');
+            if (keyContainer == null) {
+                return;
+            }
+            let keyLink = keyContainer.querySelector('a[href*="/browse/"]');
+            if (keyLink == null) {
+                return;
+            }
+            let cardKey = keyLink.getAttribute('href').split('/browse/')[1].split(/[?#]/)[0]; // task number
+            if (!cardKey) {
+                return;
+            }
+            // stable insertion point: the content column that holds the footer (and all content sections)
+            let footer = cardRoot.querySelector('[data-testid="platform-card.ui.card.card-content.footer"]');
+            let cardContainer = footer != null ? footer.parentNode : cardRoot;
+            const blockersProcessed = cardContainer.getAttribute('blockers_processed');
+            if (blockersProcessed == null || blockersProcessed != 'true') {
+                cardContainer.setAttribute('blockers_processed', 'true');
+                processIssueCard(cardContainer, cardKey);
             }
         });
 
@@ -176,19 +187,20 @@
         return blockersContainer;
     }
 
-    async function getChild(node, level, path) {
-        let child = node;
-        for (let i = 0; i < level; i++) {
-            const childPosition = path[i];
-            if (childPosition > child.childNodes.length - 1) {
-                // check array index
-                return null;
-            }
-            child = child.childNodes[childPosition];
-            if (child == null) {
-                break;
-            }
-        }
-        return child;
-    }
+    // async function getChild(node, level, path) {
+    //     // example: let cardContainer = await getChild(card, 4, [1, 0, 0, 0]);
+    //     let child = node;
+    //     for (let i = 0; i < level; i++) {
+    //         const childPosition = path[i];
+    //         if (childPosition > child.childNodes.length - 1) {
+    //             // check array index
+    //             return null;
+    //         }
+    //         child = child.childNodes[childPosition];
+    //         if (child == null) {
+    //             break;
+    //         }
+    //     }
+    //     return child;
+    // }
 })();
