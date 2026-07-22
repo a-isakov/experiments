@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         JIRA focus board
 // @namespace    http://tampermonkey.net/
-// @version      2.6
+// @version      2.7
 // @description  hide unnecessary elements
 // @author       You
 // @match        https://tinypass.atlassian.net/jira/*
@@ -90,6 +90,7 @@
         let navDiv = document.querySelector("[data-testid='page-layout.sidebar']");
         if (navDiv != null) {
             updateElement(navDiv, 'display', expandButtonPressed ? 'none' : '', false);
+            updateSlotSizeStyle(navDiv, expandButtonPressed);
             newNavigation = true;
         }
         // remove left sidebar (old navigation)
@@ -111,22 +112,7 @@
             navDiv = document.querySelector("[data-testid='page-layout.top-nav']");
             if (navDiv != null) {
                 updateElement(navDiv, 'display', expandButtonPressed ? 'none' : '', false);
-                const extraStyle = '--n_tNvM';
-                if (expandButtonPressed) {
-                    let styleToRemove = null;
-                    navDiv.childNodes.forEach(child => {
-                        if (child.innerHTML.indexOf(extraStyle + ": 48px") != -1) {
-                            styleToRemove = child;
-                        }
-                    });
-                    if (styleToRemove != null) {
-                        navDiv.removeChild(styleToRemove);
-                    }
-                } else {
-                    let styleToReturn = document.createElement('style');
-                    styleToReturn.innerHTML = "#unsafe-design-system-page-layout-root { " + extraStyle + ": 48px }";
-                    navDiv.appendChild(styleToReturn);
-                }
+                updateSlotSizeStyle(navDiv, expandButtonPressed);
             }
             // remove project level navigation
             navDiv = document.getElementById('ak-project-view-navigation');
@@ -262,6 +248,35 @@
         } else {
             button.innerHTML = '<svg width="20" height="20" viewBox="0 -4 24 24" role="presentation"><path d="M16.587 6.003H15A1 1 0 0115 4h3.9l.047.001a.975.975 0 01.736.285l.032.032c.2.2.296.47.284.736l.001.048v3.896a1 1 0 11-2 0V7.411l-3.309 3.308a.977.977 0 01-1.374-.005l-.032-.032a.976.976 0 01-.005-1.374l3.307-3.305zM7.413 17.997H9A1 1 0 019 20H5.1l-.047-.001a.975.975 0 01-.736-.285l-.032-.032A.977.977 0 014 18.946a1.12 1.12 0 010-.048v-3.896a1 1 0 112 0v1.587l3.309-3.308a.977.977 0 011.374.005l.032.032a.976.976 0 01.005 1.374l-3.307 3.305z" fill="currentColor" fill-rule="evenodd"></path></svg>';
             button.setAttribute('aria-pressed', 'false');
+        }
+    }
+
+    function updateSlotSizeStyle(container, pressed) {
+        // Jira's page layout reserves grid space for a slot (sidebar, top-nav, ...) via an inline
+        // <style> child that sets a CSS variable on #unsafe-design-system-page-layout-root, separately
+        // from the slot element's own box. Hiding the slot alone leaves that reservation in place, so
+        // the rest of the board doesn't expand into the freed space until this style is removed too.
+        if (container == null) {
+            return;
+        }
+        if (pressed) {
+            let styleToRemove = null;
+            container.childNodes.forEach(child => {
+                if (child.tagName === 'STYLE' && child.innerHTML.indexOf('#unsafe-design-system-page-layout-root') != -1) {
+                    styleToRemove = child;
+                }
+            });
+            if (styleToRemove != null) {
+                container.setAttribute('backup-slot-size-style', styleToRemove.innerHTML);
+                container.removeChild(styleToRemove);
+            }
+        } else {
+            const backup = container.getAttribute('backup-slot-size-style');
+            if (backup) {
+                let styleToReturn = document.createElement('style');
+                styleToReturn.innerHTML = backup;
+                container.appendChild(styleToReturn);
+            }
         }
     }
 
