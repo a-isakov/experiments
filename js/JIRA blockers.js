@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         JIRA blockers
 // @namespace    http://tampermonkey.net/
-// @version      2.5
-// @description  hide unnecessary elements
+// @version      2.6
+// @description  hide unnecessary elements, mark scope creep issues added after sprint start
 // @author       You
 // @match        https://tinypass.atlassian.net/jira/*
 // @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
@@ -17,7 +17,9 @@
     let linksReverse = ['is blocking', 'Predecessor'];
     let now = new Date();
     const cache_limit_minutes = 120;
-    
+    let extraKeysPromise = null;   // Promise<Set<string>>, page-lifetime cache
+    let extraKeysBoardId = null;   // reset the cache when the board changes
+
     waitForKeyElements(
         '<div id="content" class="z-index-content">',
         checkFlag
@@ -53,6 +55,8 @@
         // };
         await new Promise(resolve => setTimeout(resolve, 5000));
 
+        const extraKeys = await getExtraIssueKeys(getBoardId());
+
         let cardMarkers = document.querySelectorAll('[data-testid="platform-card.ui.card.focus-container"]');
         cardMarkers.forEach(async cardMarker => {
             let cardRoot = cardMarker.parentNode; // card container that holds the whole card
@@ -81,6 +85,9 @@
                 cardContainer.setAttribute('blockers_processed', 'true');
                 processIssueCard(cardContainer, cardKey);
             }
+            if (footer != null && extraKeys.has(cardKey)) {
+                appendExtraPill(footer);
+            }
         });
 
         // if (progressBar != null) { //delete a progress bar
@@ -89,6 +96,74 @@
         //         navParent.removeChild(progressBar);
         //     }
         // }
+    }
+
+    // extract the board id from the url, either /boards/123 or ?rapidView=123
+    function getBoardId() {
+        let match = location.pathname.match(/\/boards\/(\d+)/);
+        if (match != null) {
+            return match[1];
+        }
+        let params = new URLSearchParams(location.search);
+        let rapidView = params.get('rapidView');
+        if (rapidView != null) {
+            return rapidView;
+        }
+        return null;
+    }
+
+    // returns a Set of issue keys added to an active sprint after it started, cached for the page lifetime
+    async function getExtraIssueKeys(boardId) {
+        if (boardId == null) {
+            return new Set();
+        }
+        if (boardId !== extraKeysBoardId) {
+            extraKeysBoardId = boardId;
+            extraKeysPromise = null;
+        }
+        if (extraKeysPromise != null) {
+            return extraKeysPromise;
+        }
+        extraKeysPromise = fetchExtraIssueKeys(boardId);
+        return extraKeysPromise;
+    }
+
+    // fetches the scope-creep issue keys for a board, empty Set on any failure or non-scrum board
+    async function fetchExtraIssueKeys(boardId) {
+        let extraKeys = new Set();
+        try {
+            const boardResponse = await fetch('/rest/agile/1.0/board/' + boardId);
+            if (boardResponse.status != 200) {
+                return extraKeys;
+            }
+            const board = await boardResponse.json();
+            if (board['type'] != 'scrum') {
+                return extraKeys;
+            }
+
+            const sprintResponse = await fetch('/rest/agile/1.0/board/' + boardId + '/sprint?state=active');
+            if (sprintResponse.status != 200) {
+                return extraKeys;
+            }
+            const sprintJson = await sprintResponse.json();
+            const sprints = sprintJson['values'] || [];
+
+            for (let i = 0; i < sprints.length; i++) {
+                const sprint = sprints[i];
+                const reportResponse = await fetch('/rest/greenhopper/1.0/rapid/charts/sprintreport?rapidViewId=' + boardId + '&sprintId=' + sprint['id']);
+                if (reportResponse.status != 200) {
+                    continue;
+                }
+                const reportJson = await reportResponse.json();
+                const addedKeys = (reportJson['contents'] || {})['issueKeysAddedDuringSprint'] || {};
+                for (let key in addedKeys) {
+                    extraKeys.add(key);
+                }
+            }
+        } catch (e) {
+            return new Set();
+        }
+        return extraKeys;
     }
 
     async function processIssueCard(card, key) {
@@ -185,6 +260,34 @@
         }
         let blockersContainer = div.querySelector(forBlocker ? "[id='blockers_container_left']" : "[id='blockers_container_right']");
         return blockersContainer;
+    }
+
+    // append an "extra" pill to a card added to the active sprint after it started
+    function appendExtraPill(footer) {
+        if (footer.querySelector('[data-extra-pill]') != null) {
+            return;
+        }
+        let row = footer;
+        let priorityIcon = footer.querySelector('[data-testid="platform-card.common.ui.priority.icon"]');
+        let estimateWrapper = footer.querySelector('[data-testid="software-board.common.fields.estimate-field.static.estimate-wrapper"]');
+        if (priorityIcon != null) {
+            row = priorityIcon.parentNode;
+        } else if (estimateWrapper != null) {
+            row = estimateWrapper.parentNode;
+        }
+        let pill = document.createElement('span');
+        pill.setAttribute('data-extra-pill', 'true');
+        pill.textContent = 'extra';
+        pill.style.setProperty('font-size', '70%');
+        pill.style.setProperty('font-weight', '600');
+        pill.style.setProperty('text-transform', 'uppercase');
+        pill.style.setProperty('border-radius', '3px');
+        pill.style.setProperty('padding', '0 4px');
+        pill.style.setProperty('line-height', '1.4');
+        pill.style.setProperty('white-space', 'nowrap');
+        pill.style.setProperty('background', 'var(--ds-background-accent-orange-subtler, #FFF0B3)');
+        pill.style.setProperty('color', 'var(--ds-text-accent-orange-bolder, #7F5F01)');
+        row.appendChild(pill);
     }
 
     // async function getChild(node, level, path) {
