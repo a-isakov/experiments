@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         JIRA board highlighter
 // @namespace    http://tampermonkey.net/
-// @version      2.9
+// @version      2.10
 // @description  Add days in column as text, make epic clickable
 // @author       You
 // @match        https://tinypass.atlassian.net/jira/*
@@ -26,7 +26,9 @@
     const HIGHLIGHTER_ID = 'custom_highlighter';
     const HIGHLIGHTER_MENU_ID = 'custom_highlighter_menu';
 
-    GM_addStyle('.yse7za_content { padding: 4px !important; }');
+    // card content wrapper: padding lives on the parent of the content sections
+    // (old emotion class .yse7za_content is gone since the compiled-CSS migration)
+    GM_addStyle('div:has(> [data-component-selector="platform-card.ui.card.card-content.content-section"]) { padding: 4px !important; }');
 
     waitForKeyElements(
         '<div id="content" class="z-index-content">',
