@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         JIRA board highlighter
 // @namespace    http://tampermonkey.net/
-// @version      2.10
+// @version      2.11
 // @description  Add days in column as text, make epic clickable
 // @author       You
 // @match        https://tinypass.atlassian.net/jira/*
@@ -67,15 +67,52 @@
                     newMenuItem.setAttribute('id', HIGHLIGHTER_MENU_ID);
                     newMenuItem.setAttribute('class', menuItemToClone.getAttribute('class'));
 
-                    let settingsLink = document.createElement('a');
-                    settingsLink.setAttribute('href', location.origin + (location.pathname.endsWith('/') ? location.pathname.slice(0, -1) : location.pathname) + '/settings/filter?from-backlog=1');
+                    // General settings
+                    let settingsLink1 = document.createElement('a');
+                    settingsLink1.setAttribute('href', location.origin + (location.pathname.endsWith('/') ? location.pathname.slice(0, -1) : location.pathname) + '/settings/filter?from-backlog=1');
                     
-                    let newButton = document.createElement('div');
-                    newButton.setAttribute('class', menuItemToClone.childNodes[0].getAttribute('class'));
-                    newButton.textContent = 'Configure board';
+                    let newButton1 = document.createElement('div');
+                    newButton1.setAttribute('class', menuItemToClone.childNodes[0].getAttribute('class'));
+                    newButton1.textContent = 'Configure board: General settings';
 
-                    settingsLink.appendChild(newButton);
-                    newMenuItem.appendChild(settingsLink);
+                    settingsLink1.appendChild(newButton1);
+                    newMenuItem.appendChild(settingsLink1);
+                    menuContainer.appendChild(newMenuItem);
+
+                    // Columns and statuses
+                    let settingsLink2 = document.createElement('a');
+                    settingsLink2.setAttribute('href', location.origin + (location.pathname.endsWith('/') ? location.pathname.slice(0, -1) : location.pathname) + '/settings/columns?from-backlog=1');
+                    
+                    let newButton2 = document.createElement('div');
+                    newButton2.setAttribute('class', menuItemToClone.childNodes[0].getAttribute('class'));
+                    newButton2.textContent = 'Configure board: Columns and statuses';
+
+                    settingsLink2.appendChild(newButton2);
+                    newMenuItem.appendChild(settingsLink2);
+                    menuContainer.appendChild(newMenuItem);
+
+                    // Swimlanes
+                    let settingsLink3 = document.createElement('a');
+                    settingsLink3.setAttribute('href', location.origin + (location.pathname.endsWith('/') ? location.pathname.slice(0, -1) : location.pathname) + '/settings/swimlanes?from-backlog=1');
+                    
+                    let newButton3 = document.createElement('div');
+                    newButton3.setAttribute('class', menuItemToClone.childNodes[0].getAttribute('class'));
+                    newButton3.textContent = 'Configure board: Swimlanes';
+
+                    settingsLink3.appendChild(newButton3);
+                    newMenuItem.appendChild(settingsLink3);
+                    menuContainer.appendChild(newMenuItem);
+
+                    // Quick filters
+                    let settingsLink4 = document.createElement('a');
+                    settingsLink4.setAttribute('href', location.origin + (location.pathname.endsWith('/') ? location.pathname.slice(0, -1) : location.pathname) + '/settings/quickFilters?from-backlog=1');
+                    
+                    let newButton4 = document.createElement('div');
+                    newButton4.setAttribute('class', menuItemToClone.childNodes[0].getAttribute('class'));
+                    newButton4.textContent = 'Configure board: Quick filters';
+
+                    settingsLink4.appendChild(newButton4);
+                    newMenuItem.appendChild(settingsLink4);
                     menuContainer.appendChild(newMenuItem);
                 }
             }
