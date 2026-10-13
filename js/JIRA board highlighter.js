@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         JIRA board highlighter
 // @namespace    http://tampermonkey.net/
-// @version      2.11
+// @version      2.12
 // @description  Add days in column as text, make epic clickable
 // @author       You
 // @match        https://tinypass.atlassian.net/jira/*
@@ -209,7 +209,8 @@
                     } else {
                         element.setAttribute('class', 'aui-lozenge ghx-label-14');
                     }
-                    element.setAttribute('style', 'font-size:80%');
+                    // aui-lozenge is inline-block; card content wrapper is no longer flex, so stretch explicitly
+                    element.setAttribute('style', 'font-size:80%; display:block');
                     element.innerHTML = daysValue + ' days in column';
                     card.appendChild(element);
                     // remove dots
