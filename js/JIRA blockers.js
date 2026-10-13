@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         JIRA blockers
 // @namespace    http://tampermonkey.net/
-// @version      2.6
+// @version      2.7
 // @description  hide unnecessary elements, mark scope creep issues added after sprint start
 // @author       You
 // @match        https://tinypass.atlassian.net/jira/*
@@ -15,10 +15,14 @@
     'use strict';
     let links = ['is blocked by', 'Successor'];
     let linksReverse = ['is blocking', 'Predecessor'];
-    let now = new Date();
-    const cache_limit_minutes = 120;
+    const cache_limit_minutes = 120; // when to refresh the cached record in the background
+    const cache_max_age_days = 7;    // when to drop the cached record entirely
     let extraKeysPromise = null;   // Promise<Set<string>>, page-lifetime cache
     let extraKeysBoardId = null;   // reset the cache when the board changes
+    let cacheDbPromise = null;     // Promise<IDBDatabase>, page-lifetime cache
+    const pendingFetches = new Map(); // key -> in-flight fetchIssueRecord promise
+
+    cleanupExpiredCache();
 
     waitForKeyElements(
         '<div id="content" class="z-index-content">',
@@ -166,74 +170,191 @@
         return extraKeys;
     }
 
-    async function processIssueCard(card, key) {
-        let jiraIssue = null;
-        let flag = false;
-        if (localStorage.getItem(key) == null) {
-            flag = true;
-        } else {
-            jiraIssue = JSON.parse(localStorage.getItem(key));
-            let timing = jiraIssue['time_created'];
-            timing = new Date(timing);
-            let different = now - timing;
-            let dif = Math.round(different / 60000);
-            if (dif > cache_limit_minutes) {
-                flag = true;
-            }
+    // opens (or reuses) the IndexedDB cache database, never throws
+    async function openCacheDb() {
+        if (cacheDbPromise != null) {
+            return cacheDbPromise;
         }
-        if (flag == true) {
-            const response = await fetch('/rest/api/2/issue/' + key + '?fields=issuelinks');
-            if (response.status == 200) {
-                jiraIssue = await response.json();
-                jiraIssue['time_created'] = now;
-                jiraIssue = JSON.stringify(jiraIssue);
-                localStorage.setItem(key, jiraIssue);
+        cacheDbPromise = new Promise(resolve => {
+            try {
+                if (typeof indexedDB === 'undefined') {
+                    resolve(null);
+                    return;
+                }
+                const request = indexedDB.open('jira_blockers_cache', 1);
+                request.onupgradeneeded = () => {
+                    const db = request.result;
+                    if (!db.objectStoreNames.contains('issues')) {
+                        const store = db.createObjectStore('issues', { keyPath: 'key' });
+                        store.createIndex('time_created', 'time_created');
+                    }
+                };
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => resolve(null);
+            } catch (e) {
+                resolve(null);
             }
-        } else {
-            jiraIssue = JSON.parse(localStorage.getItem(key));
+        });
+        return cacheDbPromise;
+    }
+
+    // returns the cached record for a key, or null on a miss or any failure
+    async function cacheGet(key) {
+        try {
+            const db = await openCacheDb();
+            if (db == null) {
+                return null;
+            }
+            return await new Promise(resolve => {
+                try {
+                    const tx = db.transaction('issues', 'readonly');
+                    const request = tx.objectStore('issues').get(key);
+                    request.onsuccess = () => resolve(request.result || null);
+                    request.onerror = () => resolve(null);
+                } catch (e) {
+                    resolve(null);
+                }
+            });
+        } catch (e) {
+            return null;
+        }
+    }
+
+    // stores a record, silently does nothing on failure
+    async function cachePut(record) {
+        try {
+            const db = await openCacheDb();
+            if (db == null) {
+                return;
+            }
+            await new Promise(resolve => {
+                try {
+                    const tx = db.transaction('issues', 'readwrite');
+                    tx.objectStore('issues').put(record);
+                    tx.oncomplete = () => resolve();
+                    tx.onerror = () => resolve();
+                } catch (e) {
+                    resolve();
+                }
+            });
+        } catch (e) {
+            // ignore
+        }
+    }
+
+    // drops records older than cache_max_age_days, silently does nothing on failure
+    async function cleanupExpiredCache() {
+        try {
+            const db = await openCacheDb();
+            if (db == null) {
+                return;
+            }
+            const cutoff = Date.now() - cache_max_age_days * 86400000;
+            await new Promise(resolve => {
+                try {
+                    const tx = db.transaction('issues', 'readwrite');
+                    const index = tx.objectStore('issues').index('time_created');
+                    const request = index.openCursor(IDBKeyRange.upperBound(cutoff));
+                    request.onsuccess = () => {
+                        const cursor = request.result;
+                        if (cursor != null) {
+                            cursor.delete();
+                            cursor.continue();
+                        }
+                    };
+                    tx.oncomplete = () => resolve();
+                    tx.onerror = () => resolve();
+                } catch (e) {
+                    resolve();
+                }
+            });
+        } catch (e) {
+            // ignore
+        }
+    }
+
+    // fetches an issue, builds a compact cache record and stores it, null on any failure; dedups in-flight requests
+    async function fetchIssueRecord(key) {
+        if (pendingFetches.has(key)) {
+            return pendingFetches.get(key);
+        }
+        const promise = (async () => {
+            try {
+                const response = await fetch('/rest/api/2/issue/' + key + '?fields=issuelinks');
+                if (response.status != 200) {
+                    return null;
+                }
+                const jiraIssue = await response.json();
+                const issuelinks = jiraIssue['fields']['issuelinks'] || [];
+                const recordLinks = [];
+                for (let g = 0; g < issuelinks.length; g++) {
+                    let issuelink = issuelinks[g];
+                    let direction = '';
+                    if ('inwardIssue' in issuelink) {   // check rather we have inwardIssue or outwardIssue
+                        direction = 'inward';
+                    } else if ('outwardIssue' in issuelink) {
+                        direction = 'outward';
+                    }
+                    if (direction == '') {
+                        continue;
+                    }
+                    recordLinks.push({
+                        name: issuelink['type'][direction],
+                        key: issuelink[direction + 'Issue']['key'],
+                        statusCategory: issuelink[direction + 'Issue']['fields']['status']['statusCategory']['key']
+                    });
+                }
+                const record = { key: key, time_created: Date.now(), links: recordLinks };
+                await cachePut(record);
+                return record;
+            } catch (e) {
+                return null;
+            }
+        })();
+        pendingFetches.set(key, promise);
+        try {
+            return await promise;
+        } finally {
+            pendingFetches.delete(key);
+        }
+    }
+
+    async function processIssueCard(card, key) {
+        let record = await cacheGet(key);
+        if (record == null) {
+            record = await fetchIssueRecord(key);
+            if (record == null) {
+                return;
+            }
+        } else if (Date.now() - record.time_created > cache_limit_minutes * 60000) {
+            fetchIssueRecord(key); // refresh the cache in the background, render the stale record now
         }
 
-        jiraIssue = JSON.parse(localStorage.getItem(key));
-        let fields = jiraIssue['fields'];
-        let issuelinks = fields['issuelinks'];
-        if (issuelinks.length != 0) {
-            for (let g = 0; g < issuelinks.length; g++) {
-                let issuelink = issuelinks[g];
-                let direction = '';
-                if ('inwardIssue' in issuelink) {   // check rather we have inwardIssue or outwardIssue
-                    direction = 'inward';
-                } else if ('outwardIssue' in issuelink) {
-                    direction = 'outward';
-                }
-                for (let z = 0; z < links.length; z++) {
-                    if (issuelinks[g]['type'][direction] == links[z]) { // choose necessary Linked issues
-                        await appendLink(card, issuelink, direction, true);
-                    } else if (issuelinks[g]['type'][direction] == linksReverse[z]) {
-                        await appendLink(card, issuelink, direction, false);
-                    }
+        for (let g = 0; g < record.links.length; g++) {
+            let link = record.links[g];
+            for (let z = 0; z < links.length; z++) {
+                if (link.name == links[z]) { // choose necessary Linked issues
+                    await appendLink(card, link.key, link.statusCategory, true);
+                } else if (link.name == linksReverse[z]) {
+                    await appendLink(card, link.key, link.statusCategory, false);
                 }
             }
         }
     }
 
     // append blocker to the issue card
-    async function appendLink(card, issuelink, direction, forBlocker) {
-        let linkedissue = issuelink[direction + 'Issue'];
-        if (linkedissue != null && direction != '') {
-            let linked_number = issuelink[direction + 'Issue']['key']; // conected task number
-            if (card != null && card.parentNode.childElementCount > 0) { // create button
-                let element = document.createElement('div');
-                let check_links = linkedissue['fields']['status']['statusCategory']['key'];
-                if (check_links != 'done') {
-                    element.innerHTML = '<a  href="https://tinypass.atlassian.net/browse/' + linked_number + '" class="aui-lozenge ghx-label-14" style="font-size:70%" onclick="window.open(\'https://tinypass.atlassian.net/browse/' + linked_number + '\')" >' + linked_number + '</a>';
-                }
-                if (check_links == 'done') {
-                    element.innerHTML = '<a  href="https://tinypass.atlassian.net/browse/' + linked_number + '" class="aui-lozenge ghx-label-6" style="text-decoration: line-through; font-size:70%" onclick="windiw.open(\'https://tinypass.atlassian.net/browse/' + linked_number + '\')">' + linked_number + '</a>';
-                }
-                let blockersContainer = await getBlockersContainer(card, forBlocker);
-                if (blockersContainer != null) {
-                    blockersContainer.appendChild(element);
-                }
+    async function appendLink(card, linkedKey, statusCategory, forBlocker) {
+        if (card != null && card.parentNode.childElementCount > 0) { // create button
+            let element = document.createElement('div');
+            if (statusCategory != 'done') {
+                element.innerHTML = '<a  href="https://tinypass.atlassian.net/browse/' + linkedKey + '" class="aui-lozenge ghx-label-14" style="font-size:70%" onclick="window.open(\'https://tinypass.atlassian.net/browse/' + linkedKey + '\')" >' + linkedKey + '</a>';
+            }
+            if (statusCategory == 'done') {
+                element.innerHTML = '<a  href="https://tinypass.atlassian.net/browse/' + linkedKey + '" class="aui-lozenge ghx-label-6" style="text-decoration: line-through; font-size:70%" onclick="windiw.open(\'https://tinypass.atlassian.net/browse/' + linkedKey + '\')">' + linkedKey + '</a>';
+            }
+            let blockersContainer = await getBlockersContainer(card, forBlocker);
+            if (blockersContainer != null) {
+                blockersContainer.appendChild(element);
             }
         }
     }
@@ -253,6 +374,7 @@
             let rightDiv = document.createElement('div');
             rightDiv.setAttribute('id', 'blockers_container_right');
             rightDiv.style.setProperty('max-width', '50%');
+            rightDiv.style.setProperty('text-align', 'right');
             element.appendChild(leftDiv);
             element.appendChild(rightDiv);
             card.appendChild(element);
