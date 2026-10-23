@@ -231,23 +231,18 @@
     let refresh = () => {};
 
     function initPage() {
-        window.stop();
-        buildUi();
-        // the original 404 page's parser may still add nodes and wipe ours; rebuild if so
+        // document.open() aborts the 404 page's parser so none of its scripts run. Not window.stop() + innerHTML:
+        // Chrome then never starts rendering, because <body> was not inserted by the parser
+        document.open();
+        document.write('<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>JQL search</title><style>' +
+            PAGE_CSS + '</style></head><body>' + PAGE_BODY + '</body></html>');
+        document.close();
+        bindUi();
         document.addEventListener('DOMContentLoaded', () => {
-            if (!document.getElementById('jql-lite')) buildUi();
             const ta = document.getElementById('jql');
             if (ta && document.activeElement !== ta) ta.focus();
         });
         loadData();
-    }
-
-    function buildUi() {
-        let root = document.documentElement;
-        if (!root) root = document.appendChild(document.createElement('html'));
-        root.innerHTML = '<head><meta charset="utf-8"><title>JQL search</title><style>' + PAGE_CSS +
-            '</style></head><body>' + PAGE_BODY + '</body>';
-        bindUi();
     }
 
     // --- data -----------------------------------------------------------
