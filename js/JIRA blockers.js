@@ -1,12 +1,13 @@
 // ==UserScript==
 // @name         JIRA blockers
 // @namespace    http://tampermonkey.net/
-// @version      2.7
+// @version      3.0
 // @description  hide unnecessary elements, mark scope creep issues added after sprint start
 // @author       You
 // @match        https://tinypass.atlassian.net/jira/*
 // @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
 // @grant        GM_addStyle
+// @grant        unsafeWindow
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js
 // @require      https://gist.github.com/raw/2625891/waitForKeyElements.js
 // ==/UserScript==
@@ -346,17 +347,57 @@
     async function appendLink(card, linkedKey, statusCategory, forBlocker) {
         if (card != null && card.parentNode.childElementCount > 0) { // create button
             let element = document.createElement('div');
-            if (statusCategory != 'done') {
-                element.innerHTML = '<a  href="https://tinypass.atlassian.net/browse/' + linkedKey + '" class="aui-lozenge ghx-label-14" style="font-size:70%" onclick="window.open(\'https://tinypass.atlassian.net/browse/' + linkedKey + '\')" >' + linkedKey + '</a>';
-            }
+            const url = 'https://tinypass.atlassian.net/browse/' + linkedKey;
+            let anchor = document.createElement('a');
+            anchor.href = url;
+            anchor.target = '_blank';
+            anchor.rel = 'noopener';
+            anchor.draggable = false;
+            anchor.textContent = linkedKey;
+            anchor.style.setProperty('font-size', '70%');
             if (statusCategory == 'done') {
-                element.innerHTML = '<a  href="https://tinypass.atlassian.net/browse/' + linkedKey + '" class="aui-lozenge ghx-label-6" style="text-decoration: line-through; font-size:70%" onclick="windiw.open(\'https://tinypass.atlassian.net/browse/' + linkedKey + '\')">' + linkedKey + '</a>';
+                anchor.className = 'aui-lozenge ghx-label-6';
+                anchor.style.setProperty('text-decoration', 'line-through');
+            } else {
+                anchor.className = 'aui-lozenge ghx-label-14';
             }
+            // the card itself is clickable (opens the card's own issue) and draggable, so keep these events
+            // from bubbling up to it; the click then opens the linked issue instead
+            ['pointerdown', 'mousedown', 'mouseup', 'keydown'].forEach(type => {
+                anchor.addEventListener(type, e => e.stopPropagation());
+            });
+            anchor.addEventListener('click', e => {
+                e.stopPropagation();
+                if (e.ctrlKey || e.metaKey || e.shiftKey || e.altKey || e.button !== 0) {
+                    return; // modifier click: let the browser open the issue page in a new tab/window
+                }
+                e.preventDefault();
+                openIssueModal(linkedKey);
+            });
+            element.appendChild(anchor);
             let blockersContainer = await getBlockersContainer(card, forBlocker);
             if (blockersContainer != null) {
                 blockersContainer.appendChild(element);
             }
         }
+    }
+
+    // opens an issue in the board's issue modal, the same way clicking a card does (?selectedIssue=KEY)
+    function openIssueModal(issueKey) {
+        const pageWindow = typeof unsafeWindow !== 'undefined' ? unsafeWindow : window;
+        const target = new URL(pageWindow.location.href);
+        target.searchParams.set('selectedIssue', issueKey);
+        // Jira's SPA router listens to popstate: change the url without a reload and let the router pick it up
+        pageWindow.history.pushState(null, '', target.toString());
+        pageWindow.dispatchEvent(new PopStateEvent('popstate', { state: null }));
+        // fallback: if the router did not react, load the url so the board opens with the modal
+        setTimeout(() => {
+            const stillTarget = new URL(pageWindow.location.href).searchParams.get('selectedIssue') == issueKey;
+            const modal = document.querySelector('[data-testid="issue.views.issue-details.issue-modal.modal-dialog"]');
+            if (stillTarget && modal == null) {
+                pageWindow.location.assign(target.toString());
+            }
+        }, 2000);
     }
 
     // returns div of the blockers, creates it if need
@@ -368,6 +409,10 @@
             element.style.setProperty('max-width', 'none');
             element.style.setProperty('display', 'flex');
             element.style.setProperty('justify-content', 'space-between');
+            // the card content wrapper has pointer-events:none and an invisible full-card focus button
+            // lies on top of it; without these, clicks fall through to that button and open the card's own issue
+            element.style.setProperty('pointer-events', 'auto');
+            element.style.setProperty('position', 'relative');
             let leftDiv = document.createElement('div');
             leftDiv.setAttribute('id', 'blockers_container_left');
             leftDiv.style.setProperty('max-width', '50%');
